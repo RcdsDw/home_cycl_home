@@ -1,46 +1,24 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
-import { Layout, Menu, Breadcrumb, theme } from 'antd';
-import { DesktopOutlined, FileOutlined, PieChartOutlined, TeamOutlined, UserOutlined } from '@ant-design/icons';
+import { Layout, Menu, Breadcrumb, theme, Card, Divider, Button, message } from 'antd';
+import { BarChartOutlined, FundOutlined, UserOutlined, UserDeleteOutlined } from '@ant-design/icons';
 
 import { getUserById } from '../../actions/user';
+import Map from '../../components/dashboard/Map.js';
+import SearchBar from '../../components/dashboard/SearchBar.js';
+import { authLogout } from '../../actions/auth.js';
 
 const { Header, Content, Footer, Sider } = Layout;
-
-const fetchMenuItems = async () => {
-  return [
-    { label: 'Dashboard', key: '1', icon: <PieChartOutlined /> },
-    { label: 'Workstation', key: '2', icon: <DesktopOutlined /> },
-    { 
-      label: 'Menu dépliable', 
-      key: 'sub1', 
-      icon: <UserOutlined />, 
-      children: [
-        { label: 'Sous menu 1', key: '3' },
-        { label: 'Sous menu 2', key: '4' },
-        { label: 'Sous menu 3', key: '5' }
-      ]
-    },
-    { 
-      label: 'Team', 
-      key: 'sub2', 
-      icon: <TeamOutlined />, 
-      children: [
-        { label: 'Team 1', key: '6' },
-        { label: 'Team 2', key: '7' }
-      ]
-    },
-    { label: 'Files', key: '8', icon: <FileOutlined /> },
-  ];
-};
 
 export default function Dashboard () {
   const [collapsed, setCollapsed] = useState(false);
   const [menuItems, setMenuItems] = useState([]);
+  const [newZone, setNewZone] = useState({})
   const [user, setUser] = useState();
-  const { token: { colorBgContainer, borderRadiusLG } } = theme.useToken();
+  const { token: { colorBgContainer } } = theme.useToken();
 
+  const nav = useNavigate();
   const location = useLocation();
   const { userId } = location.state
 
@@ -52,6 +30,35 @@ export default function Dashboard () {
     };
     loadMenuItems();
   }, []);
+  
+  useEffect(() => {
+    console.log("DASHBOARD ZONE :", newZone)
+  }, [newZone])
+
+  const handleLogout = () => {
+    authLogout()
+    message.success("Déconnexion réussie")
+    nav('/')
+  }
+  
+  const fetchMenuItems = async () => {
+    return [
+      { label: 'Carte', key: 'map', icon: <FundOutlined /> },
+      { label: 'Planning', key: 'plan', icon: <BarChartOutlined /> },
+      { 
+        label: 'Mes informations', 
+        key: 'infos', 
+        icon: <UserOutlined />, 
+        children: [
+          { label: 'Profil', key: 'profil' },
+          { label: 'Mes rendez-vous', key: 'rdv' },
+        ]
+      },
+      { label: (
+        <Button style={{background: 'none', border: 'none', color: 'inherit'}} onClick={handleLogout}>Déconnexion</Button>
+      ), key: 'logout', icon: <UserDeleteOutlined /> },
+    ];
+  };
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
@@ -67,9 +74,11 @@ export default function Dashboard () {
             <Breadcrumb.Item>User</Breadcrumb.Item>
             <Breadcrumb.Item>{user && user.firstname}</Breadcrumb.Item>
           </Breadcrumb>
-          <div style={{ padding: 24, minHeight: 360, background: colorBgContainer, borderRadius: borderRadiusLG }}>
-            Mon email : {user && user.email}
-          </div>
+          <Card>
+            <SearchBar setNewZone={setNewZone}/>
+            <Divider/>
+            <Map newZone={newZone}/>
+          </Card>
         </Content>
         <Footer style={{ textAlign: 'center' }}>
           Home Cycl'Home ©{new Date().getFullYear()}

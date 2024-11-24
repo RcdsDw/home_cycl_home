@@ -11,8 +11,13 @@ router.get('/', async () => {
 
 router
   .group(() => {
-    router.post('/auth/register', [AuthController, 'register'])
-    router.post('/auth/login', [AuthController, 'login'])
+    router
+      .group(() => {
+        router.post('/register', [AuthController, 'register'])
+        router.post('/login', [AuthController, 'login'])
+        router.post('/logout', [AuthController, 'logout'])
+      })
+      .prefix('auth')
 
     router.get('/users/:id', [UserController, 'getUserById'])
   })

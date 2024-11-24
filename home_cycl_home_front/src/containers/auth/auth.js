@@ -4,11 +4,15 @@ import { useNavigate } from "react-router-dom";
 import { Button, Form, Input, Tabs, Card, message } from "antd";
 
 import { authLogin, authRegister } from "../../actions/auth";
+import AddressSearch from "../../utils/AdressSearch";
 
 export default function Auth() {
   const [activeTab, setActiveTab] = useState("login");
+  const [form] = Form.useForm();
   const nav = useNavigate();
 
+
+  // Login
   const onFinishLogin = (values) => {
     authLogin(values)
       .then((res) => {
@@ -20,7 +24,11 @@ export default function Auth() {
       })
   };
 
+
+  // Register
   const onFinishRegister = (values) => {
+    values.role = "user";
+
     authRegister(values)
     .then((res) => {
       message.success(`Enregistré`)
@@ -39,8 +47,9 @@ export default function Auth() {
     <Card style={{ maxWidth: 600, margin: "auto", marginTop: "200px" }}>
       <Tabs activeKey={activeTab} onChange={setActiveTab} centered>
         {/* Onglet Se connecter */}
-        <Tabs.items tab="Se connecter" key="login">
+        <Tabs.Items tab="Se connecter" key="login">
           <Form
+            form={form}
             name="login"
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
@@ -73,11 +82,12 @@ export default function Auth() {
               </Button>
             </Form.Item>
           </Form>
-        </Tabs.items>
+        </Tabs.Items>
 
         {/* Onglet S'enregistrer */}
-        <Tabs.items tab="S'enregistrer" key="register">
+        <Tabs.Items tab="S'enregistrer" key="register">
           <Form
+            form={form}
             name="register"
             labelCol={{ span: 8 }}
             wrapperCol={{ span: 16 }}
@@ -99,6 +109,26 @@ export default function Auth() {
               rules={[{ required: true, message: 'Entrez votre nom.' }]}
             >
               <Input />
+            </Form.Item>
+
+            <Form.Item
+              label="Numéro de téléphone"
+              name="number"
+              rules={[{ required: true, message: 'Entrez votre numéro de téléphone.' }]}
+            >
+              <Input type="tel"/>
+            </Form.Item>
+
+            <Form.Item
+              label="Adresse postale"
+              name="address"
+              rules={[{ required: true, message: 'Entrez votre adresse postale complète.' }]}
+            >
+              <AddressSearch
+                onAddressSelect={(address) => {
+                  form.setFieldValue("address", address);
+                }}
+              />
             </Form.Item>
 
             <Form.Item
@@ -145,7 +175,7 @@ export default function Auth() {
               </Button>
             </Form.Item>
           </Form>
-        </Tabs.items>
+        </Tabs.Items>
       </Tabs>
     </Card>
   );

@@ -3,11 +3,14 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 export default class AuthController {
   async register({ request, response }: HttpContext) {
-    const { firstname, lastname, email, password } = request.only([
+    const { firstname, lastname, number, address, email, password, role } = request.only([
       'firstname',
       'lastname',
+      'number',
+      'address',
       'email',
       'password',
+      'role',
     ])
 
     const existingUser = await User.findBy('email', email)
@@ -15,13 +18,17 @@ export default class AuthController {
       return response.badRequest('Cet email est déjà utilisé')
     }
 
-    const user = await User.create({ firstname, lastname, email, password })
+    const user = await User.create({ firstname, lastname, number, address, email, password, role })
     const token = await User.accessTokens.create(user)
 
-    return response.created({
-      message: 'Utilisateur crée dans le BDD',
+    response.cookie('token', token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+    })
+
+    return response.json({
       user: user.serialize(),
-      token: token,
     })
   }
 
@@ -31,13 +38,21 @@ export default class AuthController {
       const user = await User.verifyCredentials(email, password)
       const token = await User.accessTokens.create(user)
 
-      return response.ok({
-        message: 'Utilisateur connecté',
-        token: token,
+      response.cookie('token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'lax',
+      })
+
+      return response.json({
         user: user.serialize(),
       })
     } catch {
       return response.unauthorized('Identifiants invalides')
     }
+  }
+
+  async logout({ response }: HttpContext) {
+    response.clearCookie('token')
   }
 }

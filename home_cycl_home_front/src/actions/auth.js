@@ -32,4 +32,16 @@ export async function authLogin(values) {
     }
   }
   
+export async function authLogout() {
+    try {
+      await fetch('http://localhost:3333/api/v1/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+      throw error;
+    }
+  }
   
