@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 
 import { Layout, Menu, Breadcrumb, theme, Card, Divider, Button, message } from 'antd';
-import { BarChartOutlined, FundOutlined, UserOutlined, UserDeleteOutlined } from '@ant-design/icons';
+import { BarChartOutlined, FundOutlined, UserOutlined, UserDeleteOutlined, OrderedListOutlined, UnorderedListOutlined } from '@ant-design/icons';
 
 import { getUserById } from '../../actions/user';
 import Map from '../../components/dashboard/Map.js';
@@ -38,13 +38,27 @@ export default function Dashboard () {
   const handleLogout = () => {
     authLogout()
     message.success("Déconnexion réussie")
-    nav('/')
+    nav('/users')
+  }
+
+  const redirectToUsersList = () => {
+    nav('/users')
   }
   
   const fetchMenuItems = async () => {
     return [
       { label: 'Carte', key: 'map', icon: <FundOutlined /> },
       { label: 'Planning', key: 'plan', icon: <BarChartOutlined /> },
+      { 
+        label: 'Listes', 
+        key: "lists", 
+        icon: <UnorderedListOutlined/>,
+        children: [
+          { label: (
+            <Button style={{background: 'none', border: 'none', color: 'inherit'}} onClick={redirectToUsersList}>Liste des utilisateurs</Button>
+          ), key: 'users' },
+        ] 
+      },
       { 
         label: 'Mes informations', 
         key: 'infos', 
