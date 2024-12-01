@@ -1,6 +1,19 @@
-import { Space, Table, Tag } from "antd";
+import { Table, Tag } from "antd";
+import { useEffect, useState } from "react";
+import { getUsers } from "../../actions/user";
 
 export default function Users() {
+  const [datas, setDatas] = useState([])
+  console.log("🚀 ~ Users ~ datas:", datas)
+
+    useEffect(() => {
+      fetchUsers()
+    }, [])
+
+    const fetchUsers = async() => {
+      await getUsers().then((res) => setDatas(res.data))
+    }
+
     const columns = [
         {
             title: 'Nom',
@@ -15,10 +28,16 @@ export default function Users() {
             render: (text) => <div>{text}</div>,
         },
         {
+          title: 'Numéro',
+          dataIndex: 'number',
+          key: 'number',
+          render: (text) => <div>{text}</div>,
+        },
+        {
             title: 'Adresse',
             dataIndex: 'address',
             key: 'address',
-            render: (text) => <div>{text}</div>,
+            render: (text) => <div>{text.value}</div>,
         },
         {
           title: 'Email',
@@ -27,12 +46,12 @@ export default function Users() {
           render: (text) => <div>{text}</div>,
         },
         {
-          title: 'Tags',
-          key: 'tags',
-          dataIndex: 'tags',
-          render: (tag) => (
-            <Tag color="geekblue" key={tag}>
-                {tag.toUpperCase()}
+          title: 'Rôle',
+          key: 'role',
+          dataIndex: 'role',
+          render: (role) => (
+            <Tag color="geekblue" key={role}>
+                {role.toUpperCase()}
             </Tag>
           ),
         },
@@ -48,34 +67,7 @@ export default function Users() {
         // },
       ];
 
-      const data = [
-        {
-          key: '1',
-          firstname: 'John',
-          lastname: 'Brown',
-          email: 32,
-          address: 'New York No. 1 Lake Park',
-          tags: 'developer',
-        },
-        {
-          key: '2',
-          firstname: 'Jim',
-          lastname: 'Green',
-          email: 42,
-          address: 'London No. 1 Lake Park',
-          tags: 'loser',
-        },
-        {
-          key: '3',
-          firstname: 'Joe',
-          lastname: 'Black',
-          email: 32,
-          address: 'Sydney No. 1 Lake Park',
-          tags: 'cool',
-        },
-    ]
-
     return (
-        <Table columns={columns} dataSource={data} />
+        <Table columns={columns} dataSource={datas} />
     )
 }

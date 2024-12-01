@@ -4,12 +4,9 @@ import "leaflet/dist/leaflet.css";
 
 export default function Map({ newZone }) {
     const [zones, setZones] = useState([])
-    console.log("FINAL", newZone)
 
     useEffect(() => {
-        console.log("NewZone :", newZone)
         if (newZone && newZone.lat !== undefined && newZone.lng !== undefined) {
-             console.log("here")
             setZones((prevZones) => [...prevZones, newZone]);
             renderZone(zones)
         }
@@ -18,12 +15,12 @@ export default function Map({ newZone }) {
     const renderZone = () => {
         return zones.map((z, i) => {
             if (!z || z.lat === undefined || z.lng === undefined) return null;
-            return <Circle key={i} center={[z.lat, z.lng]} radius={300} />
+            return <Circle key={i} center={[z.lat, z.lng]} radius={1200}/>
         })
     }
 
     return (
-        <MapContainer style={styles.map} center={[45.750, 4.850]} zoom={13} scrollWheelZoom={false}>
+        <MapContainer style={styles.map} center={[45.750, 4.850]} zoom={12} scrollWheelZoom={false}>
             <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

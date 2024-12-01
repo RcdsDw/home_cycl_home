@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../../context/user";
 
 import { Button, Form, Input, Tabs, Card, message } from "antd";
 
@@ -10,14 +11,15 @@ export default function Auth() {
   const [activeTab, setActiveTab] = useState("login");
   const [form] = Form.useForm();
   const nav = useNavigate();
-
+  const { setUser } = useContext(UserContext); 
 
   // Login
   const onFinishLogin = (values) => {
     authLogin(values)
       .then((res) => {
         message.success(`Connecté`)
-        nav('/dashboard', { state: { userId: res.user.id } })
+        setUser(res.user);
+        nav('/dashboard')
       })
       .catch(() => {
         message.error("Identifiants invalides")
@@ -32,7 +34,7 @@ export default function Auth() {
     authRegister(values)
     .then((res) => {
       message.success(`Enregistré`)
-      nav('/dashboard', { state: { userId: res.user.id } })
+      nav('/')
     })
     .catch(() => {
       message.error("Erreur ?")

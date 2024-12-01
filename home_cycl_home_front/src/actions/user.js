@@ -13,3 +13,20 @@ export async function getUserById(id) {
         throw error;
     }
 }
+
+export async function getUsers() {
+    try {
+        const response = await fetch(`http://localhost:3333/api/v1/users`, {
+            method: 'GET',
+            headers: {
+            'Content-Type': 'application/json',
+            },
+        });
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        throw error;
+    }
+}
+

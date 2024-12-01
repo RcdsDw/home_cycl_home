@@ -16,7 +16,6 @@ export default function SearchBar({ setNewZone }) {
             lat: address.geo.coordinates[1],
             lng: address.geo.coordinates[0]
           }
-          console.log("upodatedAddress", updatedAddress)
           setAddress(updatedAddress)
         }}
       />

@@ -1,18 +1,24 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import Auth from './containers/auth/Auth';
-import Dashboard from './containers/dashboard/Dashboard';
-import Users from './containers/lists/Users';
+import { UserProvider } from './context/user.js';
 
-function App() {
+import Auth from './containers/auth/auth.js';
+import Dashboard from './containers/dashboard/dashboard.js';
+import Users from './containers/lists/users.js';
+import MainLayout from "./MainLayout"
+
+export default function App() {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Auth />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/users" element={<Users />} />
-      </Routes>
-    </Router>
+    <UserProvider>
+      <Router>
+        <Routes>
+          <Route path="/" element={<Auth />} />
+          
+          <Route element={<MainLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/users" element={<Users />} />
+          </Route>
+        </Routes>
+      </Router>
+    </UserProvider>
   );
 }
-
-export default App;
