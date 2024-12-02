@@ -6,7 +6,7 @@ const AuthController = () => import('#controllers/auth_controller')
 
 router.get('/', async () => {
   return {
-    hello: 'world',
+    quoi: 'coubeh',
   }
 })
 
@@ -21,11 +21,14 @@ router
       .prefix('auth')
 
     router.put('/users/new', [UserController, 'create'])
+    router.patch('/users/:id', [UserController, 'update'])
     router.delete('/users/:id', [UserController, 'delete'])
     router.get('/users', [UserController, 'getAll'])
     router.get('/users/:id', [UserController, 'getOne'])
 
     router.put('/zones/new', [ZonesController, 'create'])
+    router.patch('/zones/:id', [ZonesController, 'update'])
+    router.delete('/zones/:id', [ZonesController, 'delete'])
     router.get('/zones', [ZonesController, 'getAll'])
     router.get('/zones/:id', [ZonesController, 'getOne'])
   })

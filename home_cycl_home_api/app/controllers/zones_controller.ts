@@ -15,6 +15,37 @@ export default class ZonesController {
     }
   }
 
+  public async update({ params, request, response }: HttpContext) {
+    const { id } = params
+    try {
+      const zone = await Zone.findOrFail(id)
+      const data = request.only(['name', 'width', 'lon', 'lan'])
+      zone.name = data.name
+      zone.width = data.width
+      zone.lon = data.lon
+      zone.lan = data.lan
+      zone.save()
+      return response.created({ message: 'Zone modifiée avec succès', data: zone })
+    } catch (error) {
+      return response.badRequest({
+        message: 'Erreur lors de la modification de la zone',
+        error: error.message,
+      })
+    }
+  }
+
+  public async delete({ params, response }: HttpContext) {
+    const { id } = params
+
+    try {
+      const zone = await Zone.findOrFail(id)
+      await zone.delete()
+      return response.ok({ message: 'Zone supprimé avec succès' })
+    } catch (error) {
+      return response.notFound({ message: 'Zone non trouvée', error: error.message })
+    }
+  }
+
   public async getAll({ response }: HttpContext) {
     try {
       const zones = await Zone.all()

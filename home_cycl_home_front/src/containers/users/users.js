@@ -1,13 +1,16 @@
 import { useNavigate } from "react-router-dom";
 
-import { DeleteOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 
-import { Button, Table, Tag } from "antd";
+import { Button, message, Modal, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { deleteUser, getUsers } from "../../actions/user";
 
 export default function Users() {
   const [datas, setDatas] = useState([])
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [currentId, setCurrentId] = useState(null);
+
   const nav = useNavigate()
 
     useEffect(() => {
@@ -18,8 +21,26 @@ export default function Users() {
       await getUsers().then((res) => setDatas(res.data))
     }
 
-    const handleDelete = () => {
-      deleteUser()
+    const showModal = (id) => {
+      setCurrentId(id)
+      setIsModalOpen(true);
+    };
+    
+    const handleOk = () => {
+      handleDelete(currentId)
+      message.success("Utilisateur supprimé")
+      setCurrentId(null)
+      setIsModalOpen(false);
+    };
+
+    const handleCancel = () => {
+      setCurrentId(null)
+      setIsModalOpen(false);
+    };
+
+    const handleDelete = (id) => {
+      deleteUser(id)
+      setDatas((prevDatas) => prevDatas.filter(user => user.id !== id))
     }
 
     const columns = [
@@ -64,30 +85,30 @@ export default function Users() {
           ),
         },
         {
+          key: 'show',
+          dataIndex: 'show',
+          render: (_, column) => (
+            <Button type="primary" onClick={() => nav(`/showUser/${column.id}`)} >
+              <EyeOutlined/>
+            </Button>
+          ),
+        },
+        {
           key: 'delete',
           dataIndex: 'delete',
-          render: () => (
-            <Button type="danger" onClick={() => handleDelete} >
+          render: (_, column) => (
+            <Button type="primary" danger onClick={() => showModal(column.id)} >
               <DeleteOutlined/>
             </Button>
           ),
         },
-        // {
-        //   title: 'Action',
-        //   key: 'action',
-        //   render: (_, record) => (
-        //     <Space size="middle">
-        //       <a>Invite {record.name}</a>
-        //       <a>Delete</a>
-        //     </Space>
-        //   ),
-        // },
       ];
 
     return (
       <>
-        <Button style={styles.button} type="primary" onClick={() => nav('/newUser')}>Ajouter</Button>
+        <Button type="primary" style={styles.button} onClick={() => nav('/newUser')}>Ajouter</Button>
         <Table columns={columns} dataSource={datas} />
+        <Modal okType="danger" okText="Valider" cancelText="Annuler" title="Supprimer définitivement l'utilisateur ?" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}/>
       </>
     )
 }

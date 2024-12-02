@@ -23,6 +23,36 @@ export default class UserController {
     }
   }
 
+  public async update({ params, request, response }: HttpContext) {
+    const { id } = params
+    try {
+      const user = await User.findOrFail(id)
+      const data = request.only([
+        'firstname',
+        'lastname',
+        'number',
+        'address',
+        'email',
+        'password',
+        'role',
+      ])
+      user.firstname = data.firstname
+      user.lastname = data.lastname
+      user.number = data.number
+      user.address = data.address
+      user.email = data.email
+      user.password = data.password
+      user.role = data.role
+      user.save()
+      return response.created({ message: 'Utilisateur modifié avec succès', data: user })
+    } catch (error) {
+      return response.badRequest({
+        message: "Erreur lors de la modification de l'utilisateur",
+        error: error.message,
+      })
+    }
+  }
+
   public async delete({ params, response }: HttpContext) {
     const { id } = params
 
