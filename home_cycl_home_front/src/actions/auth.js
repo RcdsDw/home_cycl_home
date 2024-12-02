@@ -1,7 +1,7 @@
 export async function authRegister(values) {
     try {
       const response = await fetch('http://localhost:3333/api/v1/auth/register', {
-        method: 'POST',
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },

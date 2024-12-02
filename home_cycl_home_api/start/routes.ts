@@ -14,16 +14,18 @@ router
   .group(() => {
     router
       .group(() => {
-        router.post('/register', [AuthController, 'register'])
+        router.put('/register', [AuthController, 'register'])
         router.post('/login', [AuthController, 'login'])
         router.post('/logout', [AuthController, 'logout'])
       })
       .prefix('auth')
 
+    router.put('/users/new', [UserController, 'create'])
+    router.delete('/users/:id', [UserController, 'delete'])
     router.get('/users', [UserController, 'getAll'])
     router.get('/users/:id', [UserController, 'getOne'])
 
-    router.post('/zones/new', [ZonesController, 'create'])
+    router.put('/zones/new', [ZonesController, 'create'])
     router.get('/zones', [ZonesController, 'getAll'])
     router.get('/zones/:id', [ZonesController, 'getOne'])
   })

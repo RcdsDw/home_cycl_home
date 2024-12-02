@@ -1,10 +1,14 @@
-import { Table, Tag } from "antd";
+import { useNavigate } from "react-router-dom";
+
+import { DeleteOutlined } from '@ant-design/icons';
+
+import { Button, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
-import { getUsers } from "../../actions/user";
+import { deleteUser, getUsers } from "../../actions/user";
 
 export default function Users() {
   const [datas, setDatas] = useState([])
-  console.log("🚀 ~ Users ~ datas:", datas)
+  const nav = useNavigate()
 
     useEffect(() => {
       fetchUsers()
@@ -12,6 +16,10 @@ export default function Users() {
 
     const fetchUsers = async() => {
       await getUsers().then((res) => setDatas(res.data))
+    }
+
+    const handleDelete = () => {
+      deleteUser()
     }
 
     const columns = [
@@ -55,6 +63,15 @@ export default function Users() {
             </Tag>
           ),
         },
+        {
+          key: 'delete',
+          dataIndex: 'delete',
+          render: () => (
+            <Button type="danger" onClick={() => handleDelete} >
+              <DeleteOutlined/>
+            </Button>
+          ),
+        },
         // {
         //   title: 'Action',
         //   key: 'action',
@@ -68,6 +85,15 @@ export default function Users() {
       ];
 
     return (
+      <>
+        <Button style={styles.button} type="primary" onClick={() => nav('/newUser')}>Ajouter</Button>
         <Table columns={columns} dataSource={datas} />
+      </>
     )
+}
+
+const styles = {
+  button: {
+    marginBottom: 20
+  }
 }

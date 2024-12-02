@@ -23,6 +23,18 @@ export default class UserController {
     }
   }
 
+  public async delete({ params, response }: HttpContext) {
+    const { id } = params
+
+    try {
+      const user = await User.findOrFail(id)
+      await user.delete()
+      return response.ok({ message: 'Utilisateur supprimé avec succès' })
+    } catch (error) {
+      return response.notFound({ message: 'Utilisateur non trouvée', error: error.message })
+    }
+  }
+
   public async getAll({ response }: HttpContext) {
     try {
       const users = await User.all()
