@@ -9,15 +9,19 @@ export default function NewUser() {
     const nav = useNavigate()
 
     const onFinishRegister = (values) => {
-        createUser(values)
-        .then((res) => {
-            message.success(`Nouvel utilisateur crée`)
-            nav('/users')
-        })
-        .catch(() => {
-            message.error("Erreur ?")
-        })
-    };
+      createUser(values)
+      .then(() => {
+          message.success(`Nouvel utilisateur créé`);
+          nav('/users');
+      })
+      .catch((err) => {
+          if (err.status === 406) {
+              message.error(err.data.message);
+          } else {
+              message.error("Erreur lors de la création.");
+          }
+      });
+  };
 
     const onFinishFailed = (info) => {
         message.error(`Erreur lors de ${info}`)
@@ -76,7 +80,7 @@ export default function NewUser() {
             <Form.Item
               label="Numéro de téléphone"
               name="number"
-              rules={[{ required: true, message: 'Entrez le numéro de téléphone.' }]}
+              rules={[{ required: true, min: 10, max: 10, message: 'Entrez le numéro de téléphone.' }]}
             >
               <Input type="tel"/>
             </Form.Item>

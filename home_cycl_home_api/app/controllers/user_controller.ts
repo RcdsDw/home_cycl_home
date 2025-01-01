@@ -14,8 +14,22 @@ export default class UserController {
         'role',
       ])
       const user = await User.create(data)
-      return response.created({ message: 'Utilisateur créée avec succès', data: user })
+      return response.created({ message: 'Utilisateur créé avec succès', data: user })
     } catch (error) {
+      if (error.code === '23505') {
+        if (error.detail.includes('number')) {
+          return response.status(406).send({
+            field: 'number',
+            message: 'Le numéro de téléphone existe déjà.',
+          })
+        }
+        if (error.detail.includes('email')) {
+          return response.status(406).send({
+            field: 'email',
+            message: "L'adresse email existe déjà.",
+          })
+        }
+      }
       return response.badRequest({
         message: "Erreur lors de la création de l'utilisateur",
         error: error.message,
@@ -85,6 +99,18 @@ export default class UserController {
       return response.ok({ message: 'Utilisateur récupérée avec succès', data: user })
     } catch (error) {
       return response.notFound({ message: 'Utilisateur non trouvée', error: error.message })
+    }
+  }
+
+  public async getTechUsers({ response }: HttpContext) {
+    try {
+      const techUsers = await User.query().where('role', '=', 'tech').select('id', 'name')
+      return response.ok({ data: techUsers })
+    } catch (error) {
+      return response.badRequest({
+        message: 'Erreur lors de la récupération des utilisateurs avec le rôle "tech"',
+        error: error.message,
+      })
     }
   }
 }

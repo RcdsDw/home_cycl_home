@@ -1,5 +1,7 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
+import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import User from '#models/user'
 
 export default class Zone extends BaseModel {
   @column({ isPrimary: true })
@@ -8,14 +10,16 @@ export default class Zone extends BaseModel {
   @column()
   declare name: string
 
-  @column()
-  declare width: string
+  @column({
+    serializeAs: 'coordinates',
+  })
+  declare coordinates: { lat: number; lng: number }[]
 
   @column()
-  declare lon: string
+  declare user_id: number
 
-  @column()
-  declare lan: string
+  @belongsTo(() => User)
+  declare user: BelongsTo<typeof User>
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

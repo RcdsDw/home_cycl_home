@@ -79,7 +79,7 @@ export default function Users() {
           key: 'role',
           dataIndex: 'role',
           render: (role) => (
-            <Tag color="geekblue" key={role}>
+            <Tag color={role === "admin" ? "red" : role === "tech" ? "orange" : "geekblue"} key={role}>
                 {role.toUpperCase()}
             </Tag>
           ),

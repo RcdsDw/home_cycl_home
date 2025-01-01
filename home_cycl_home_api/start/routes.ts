@@ -25,6 +25,7 @@ router
     router.delete('/users/:id', [UserController, 'delete'])
     router.get('/users', [UserController, 'getAll'])
     router.get('/users/:id', [UserController, 'getOne'])
+    router.get('/users/tech', [UserController, 'getTechUsers'])
 
     router.put('/zones/new', [ZonesController, 'create'])
     router.patch('/zones/:id', [ZonesController, 'update'])
