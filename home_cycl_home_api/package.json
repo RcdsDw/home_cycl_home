@@ -8,6 +8,8 @@
     "start": "node bin/server.js",
     "build": "node ace build",
     "dev": "node ace serve --hmr",
+    "migrateup": "node ace migration:run",
+    "migratedown": "node ace migration:reset",
     "test": "node ace test",
     "lint": "eslint .",
     "format": "prettier --write .",

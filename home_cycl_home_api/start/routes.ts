@@ -15,7 +15,7 @@ router
     router
       .group(() => {
         router.put('/register', [AuthController, 'register'])
-        router.post('/login', [AuthController, 'login'])
+        router.post('/', [AuthController, 'login'])
         router.post('/logout', [AuthController, 'logout'])
       })
       .prefix('auth')

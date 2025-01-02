@@ -96,7 +96,7 @@ export default class UserController {
 
     try {
       const user = await User.findOrFail(id)
-      return response.ok({ message: 'Utilisateur récupérée avec succès', data: user })
+      return response.ok({ message: 'Utilisateur récupéré avec succès', data: user })
     } catch (error) {
       return response.notFound({ message: 'Utilisateur non trouvée', error: error.message })
     }
@@ -104,8 +104,8 @@ export default class UserController {
 
   public async getTechUsers({ response }: HttpContext) {
     try {
-      const techUsers = await User.query().where('role', '=', 'tech').select('id', 'name')
-      return response.ok({ data: techUsers })
+      const techUsers = await User.query().where('role', 'tech').exec()
+      return response.ok({ message: 'Utilisateurs récupérés avec succès', data: techUsers })
     } catch (error) {
       return response.badRequest({
         message: 'Erreur lors de la récupération des utilisateurs avec le rôle "tech"',
