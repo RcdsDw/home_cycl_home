@@ -7,6 +7,7 @@ import Users from './containers/users/users.js';
 import MainLayout from "./MainLayout"
 import NewUser from './containers/users/new.js';
 import ShowUser from './containers/users/show.js';
+import Planning from './containers/planning/planning.js';
 
 export default function App() {
   return (
@@ -20,6 +21,7 @@ export default function App() {
             <Route path="/users" element={<Users />} />
             <Route path="/newUser" element={<NewUser />} />
             <Route path="/showUser/:id" element={<ShowUser />} />
+            <Route path="/planning" element={<Planning />} />
           </Route>
         </Routes>
       </Router>

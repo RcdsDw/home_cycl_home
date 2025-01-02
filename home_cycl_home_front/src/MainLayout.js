@@ -3,7 +3,7 @@ import { Outlet, useNavigate } from 'react-router-dom';
 import Logo from './assets/logo.png'
 
 import { Layout, Menu, theme, message, Breadcrumb, Image } from 'antd';
-import { BarChartOutlined, FundOutlined, UserOutlined, UserDeleteOutlined, UnorderedListOutlined } from '@ant-design/icons';
+import { BarChartOutlined, FundOutlined, UserOutlined, UserDeleteOutlined, UnorderedListOutlined, QqOutlined } from '@ant-design/icons';
 
 import { authLogout } from './actions/auth';
 import { Content } from 'antd/es/layout/layout';
@@ -36,6 +36,7 @@ export default function Dashboard () {
   }
 
   const onClick = (e) => {
+    console.log("🚀 ~ onClick ~ e.key:", e.key)
     switch(e.key) {
         case 'logout':
             handleLogout()
@@ -45,6 +46,9 @@ export default function Dashboard () {
             break;
         case 'map':
             nav('/dashboard')
+            break;
+        case 'plan':
+            nav('/planning')
             break;
         default:
             break;
@@ -70,6 +74,7 @@ export default function Dashboard () {
     return [
         { label: 'Carte', key: 'map', icon: <FundOutlined /> },
         { label: 'Planning', key: 'plan', icon: <BarChartOutlined /> },
+        { label: 'Test', key: 'test', icon: <QqOutlined /> },
         { 
           label: 'Listes', 
           key: "lists", 
@@ -126,8 +131,8 @@ export default function Dashboard () {
                         title: 'App',
                     },
                     ]}
-                    style={{
-                    margin: '16px 0',
+                      style={{
+                      margin: '16px 0',
                     }}
                 />
                 <Content

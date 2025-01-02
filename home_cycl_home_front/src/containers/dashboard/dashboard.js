@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Card } from 'antd';
 
-import Map from '../../components/dashboard/Map';
+import Map from "../../components/dashboard/map";
 
 export default function Dashboard () {
 
