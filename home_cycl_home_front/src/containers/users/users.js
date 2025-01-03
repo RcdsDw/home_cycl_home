@@ -8,9 +8,11 @@ import { deleteUser, getUsers } from "../../actions/user";
 
 export default function Users() {
   const [datas, setDatas] = useState([])
+  console.log("🚀 ~ Users ~ datas:", datas)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
 
+  
   const nav = useNavigate()
 
     useEffect(() => {
@@ -88,7 +90,7 @@ export default function Users() {
           key: 'show',
           dataIndex: 'show',
           render: (_, column) => (
-            <Button type="primary" onClick={() => nav(`/showUser/${column.id}`)} >
+            <Button type="primary" onClick={() => nav(`/user/show/${column.id}`)} >
               <EyeOutlined/>
             </Button>
           ),
@@ -106,7 +108,7 @@ export default function Users() {
 
     return (
       <>
-        <Button type="primary" style={styles.button} onClick={() => nav('/newUser')}>Ajouter</Button>
+        <Button type="primary" style={styles.button} onClick={() => nav('/user/new')}>Ajouter</Button>
         <Table columns={columns} dataSource={datas} />
         <Modal okType="danger" okText="Valider" cancelText="Annuler" title="Supprimer définitivement l'utilisateur ?" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}/>
       </>

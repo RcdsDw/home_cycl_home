@@ -24,6 +24,31 @@ export async function createUser(values) {
     }
 }
 
+export async function updateUser(id, values) {
+    try {
+        const response = await fetch(`http://localhost:3333/api/v1/users/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(values),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw {
+                status: response.status,
+                data: data,
+            };
+        }
+
+        return data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export async function deleteUser(id) {
     try {
         const response = await fetch(`http://localhost:3333/api/v1/users/${id}`, {

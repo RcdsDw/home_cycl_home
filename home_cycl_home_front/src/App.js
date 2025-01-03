@@ -8,6 +8,7 @@ import MainLayout from "./MainLayout"
 import NewUser from './containers/users/new.js';
 import ShowUser from './containers/users/show.js';
 import Planning from './containers/planning/planning.js';
+import EditUser from './containers/users/update.js';
 
 export default function App() {
   return (
@@ -19,8 +20,9 @@ export default function App() {
           <Route element={<MainLayout />}>
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/users" element={<Users />} />
-            <Route path="/newUser" element={<NewUser />} />
-            <Route path="/showUser/:id" element={<ShowUser />} />
+            <Route path="/user/new" element={<NewUser />} />
+            <Route path="/user/show/:id" element={<ShowUser />} />
+            <Route path="/users/edit/:id" element={<EditUser />} />
             <Route path="/planning" element={<Planning />} />
           </Route>
         </Routes>

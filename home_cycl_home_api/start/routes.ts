@@ -43,4 +43,4 @@ router.group(() => {
   router.delete('/interventions/:id', [InterventionsController, 'delete']) // Suppression intervention
   router.get('/interventions', [InterventionsController, 'getAll']) // Liste des interventions
   router.get('/interventions/:id', [InterventionsController, 'getOne']) // Détails d'une intervention
-})
+}).prefix('api/v1')

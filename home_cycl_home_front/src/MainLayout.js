@@ -1,10 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Logo from './assets/logo.png'
-
-import { Layout, Menu, theme, message, Breadcrumb, Image } from 'antd';
-import { BarChartOutlined, FundOutlined, UserOutlined, UserDeleteOutlined, UnorderedListOutlined, QqOutlined } from '@ant-design/icons';
-
+import { Layout, Menu, message } from 'antd';
+import { BarChartOutlined, FundOutlined, UserDeleteOutlined, UnorderedListOutlined, QqOutlined, UserOutlined } from '@ant-design/icons';
 import { authLogout } from './actions/auth';
 import { Content } from 'antd/es/layout/layout';
 
@@ -14,7 +12,6 @@ export default function Dashboard () {
   const [collapsed, setCollapsed] = useState(false);
   const [menuItems, setMenuItems] = useState([]);
   const [navItems, setNavItems] = useState([]);
-  const { token: { colorBgContainer, borderRadiusLG } } = theme.useToken();
 
   const nav = useNavigate();
 
@@ -27,6 +24,12 @@ export default function Dashboard () {
       setNavItems(navItems);
     };
     loadMenuItems();
+
+    document.body.style.overflow = 'hidden';
+    
+    return () => {
+      document.body.style.overflow = '';
+    };
   }, []);
 
   const handleLogout = () => {
@@ -36,7 +39,6 @@ export default function Dashboard () {
   }
 
   const onClick = (e) => {
-    console.log("🚀 ~ onClick ~ e.key:", e.key)
     switch(e.key) {
         case 'logout':
             handleLogout()
@@ -58,15 +60,15 @@ export default function Dashboard () {
   const fetchNavItems = async () => {
     return [
       { 
-        label: 'Profil', 
-        key: 'profil',
-        icon: <UserOutlined />
-      },
-      { 
-        label: 'Déconnexion', 
+        label: '', 
         key: 'logout', 
-        icon: <UserDeleteOutlined /> 
+        icon: <UserDeleteOutlined title='Déconnexion' /> 
       },
+      // { 
+      //   label: 'Profil', 
+      //   key: 'profil',
+      //   icon: <UserOutlined />
+      // },
     ];
   };
   
@@ -80,77 +82,75 @@ export default function Dashboard () {
           key: "lists", 
           icon: <UnorderedListOutlined/>,
           children: [
-            { label: 'Liste des utilisateurs', key: 'users' },
+            { label: 'Utilisateurs', key: 'users', icon: <UserOutlined/>,},
           ] 
         },
     ];
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-        <Header
-            style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-            }}
-        >
-            <div style={{ flex: 7 }}>
-                <Image width={50} height={50} src={Logo} />
-            </div>
+    <Layout style={styles.layout}>
+        <Header style={styles.header}>
+            <img width={50} height={50} src={Logo}  />
             <Menu
                 onClick={onClick}
                 theme="dark"
                 mode="horizontal"
                 defaultSelectedKeys={['2']}
                 items={navItems}
-                style={{
-                    flex: 1,
-                    minWidth: 0,
-                }}
+                style={styles.headerMenu}
             />
         </Header>
         <Layout>
             <Sider collapsible collapsed={collapsed} onCollapse={(value) => setCollapsed(value)}>
                 <Menu onClick={onClick} theme="dark" defaultSelectedKeys={['1']} mode="inline" items={menuItems} />
             </Sider>
-            <Layout
-                style={{
-                    padding: '0 24px 24px',
-                }}
-            >
-                <Breadcrumb
-                    items={[
-                    {
-                        title: 'Home',
-                    },
-                    {
-                        title: 'List',
-                    },
-                    {
-                        title: 'App',
-                    },
-                    ]}
-                      style={{
-                      margin: '16px 0',
-                    }}
-                />
-                <Content
-                    style={{
-                    padding: 24,
-                    margin: 0,
-                    minHeight: 280,
-                    background: colorBgContainer,
-                    borderRadius: borderRadiusLG,
-                    }}
-                >
+            <Layout style={styles.contentLayout}>
+                {/* <Breadcrumb items={breadcrumbItems} style={styles.breadcrumb} /> */}
+                <Content style={styles.content}>
                     <Outlet/>
                 </Content>
             </Layout>
         </Layout>
-        <Footer style={{ textAlign: 'center' }}>
-            Home Cycl'Home ©{new Date().getFullYear()}
+        <Footer style={styles.footer}>
+            Home Cycl'Home ©2024-{new Date().getFullYear()}
         </Footer>
     </Layout>
   );
+};
+
+// Styles définis à la fin du fichier
+const styles = {
+    layout: {
+        minHeight: '100vh',
+        overflow: 'hidden',
+    },
+    header: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    headerMenu: {
+        minWidth: 0,
+    },
+    contentLayout: {
+        height: 'calc(100vh - 64px)',
+        overflow: 'auto',
+    },
+    breadcrumb: {
+        margin: '16px 0',
+    },
+    content: {
+        padding: 24,
+        margin: 0,
+        overflow: 'auto',
+        flex: 1,
+    },
+    footer: {
+        textAlign: 'center',
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        padding: '10px 0',
+    }
 };
