@@ -52,6 +52,9 @@ export default function Dashboard () {
         case 'plan':
             nav('/planning')
             break;
+        case 'inter':
+            nav('/interventions/new')
+            break;
         default:
             break;
     }
@@ -76,7 +79,7 @@ export default function Dashboard () {
     return [
         { label: 'Carte', key: 'map', icon: <FundOutlined /> },
         { label: 'Planning', key: 'plan', icon: <BarChartOutlined /> },
-        { label: 'Test', key: 'test', icon: <QqOutlined /> },
+        { label: 'Commander', key: 'inter', icon: <QqOutlined /> },
         { 
           label: 'Listes', 
           key: "lists", 

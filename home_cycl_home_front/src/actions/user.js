@@ -139,7 +139,7 @@ export async function getTechUsers() {
                 data: data,
             };
         }
-
+        
         return data;
     } catch (error) {
         throw error;

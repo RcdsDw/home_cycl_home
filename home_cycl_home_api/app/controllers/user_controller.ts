@@ -91,6 +91,18 @@ export default class UserController {
     }
   }
 
+  public async getTechUsers({ response }: HttpContext) {
+    try {
+      const techUsers = await User.query().where('role', 'tech')
+      return response.ok({ message: 'Utilisateurs récupérés avec succès', data: techUsers })
+    } catch (error) {
+      return response.badRequest({
+        message: 'Erreur lors de la récupération des utilisateurs avec le rôle "tech"',
+        error: error.message,
+      })
+    }
+  }
+
   public async getOne({ params, response }: HttpContext) {
     const { id } = params
 
@@ -99,18 +111,6 @@ export default class UserController {
       return response.ok({ message: 'Utilisateur récupéré avec succès', data: user })
     } catch (error) {
       return response.notFound({ message: 'Utilisateur non trouvée', error: error.message })
-    }
-  }
-
-  public async getTechUsers({ response }: HttpContext) {
-    try {
-      const techUsers = await User.query().where('role', 'tech').exec()
-      return response.ok({ message: 'Utilisateurs récupérés avec succès', data: techUsers })
-    } catch (error) {
-      return response.badRequest({
-        message: 'Erreur lors de la récupération des utilisateurs avec le rôle "tech"',
-        error: error.message,
-      })
     }
   }
 }

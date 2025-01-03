@@ -1,6 +1,5 @@
 /* eslint-disable no-throw-literal */
 
-// Fonction pour créer une intervention
 export async function createIntervention(values) {
     try {
         const response = await fetch(`http://localhost:3333/api/v1/interventions`, {
@@ -12,6 +11,7 @@ export async function createIntervention(values) {
         });
 
         const data = await response.json();
+        console.log("🚀 ~ createIntervention ~ data:", data)
 
         if (!response.ok) {
             throw {
@@ -26,7 +26,6 @@ export async function createIntervention(values) {
     }
 }
 
-// Fonction pour mettre à jour une intervention
 export async function updateIntervention(id, values) {
     try {
         const response = await fetch(`http://localhost:3333/api/v1/interventions/${id}`, {
@@ -52,7 +51,6 @@ export async function updateIntervention(id, values) {
     }
 }
 
-// Fonction pour supprimer une intervention
 export async function deleteIntervention(id) {
     try {
         const response = await fetch(`http://localhost:3333/api/v1/interventions/${id}`, {
@@ -77,7 +75,6 @@ export async function deleteIntervention(id) {
     }
 }
 
-// Fonction pour récupérer une intervention par son ID
 export async function getInterventionById(id) {
     try {
         const response = await fetch(`http://localhost:3333/api/v1/interventions/${id}`, {
@@ -102,7 +99,6 @@ export async function getInterventionById(id) {
     }
 }
 
-// Fonction pour récupérer toutes les interventions
 export async function getInterventions() {
     try {
         const response = await fetch(`http://localhost:3333/api/v1/interventions`, {

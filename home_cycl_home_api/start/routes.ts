@@ -27,8 +27,8 @@ router.group(() => {
   router.patch('/users/:id', [UserController, 'update']) // Mise à jour utilisateur
   router.delete('/users/:id', [UserController, 'delete']) // Suppression utilisateur
   router.get('/users', [UserController, 'getAll']) // Liste des utilisateurs
+  router.get('/users/tech', [UserController, 'getTechUsers']) // Liste des utilisateurs ayant le rôle "tech"
   router.get('/users/:id', [UserController, 'getOne']) // Détails d'un utilisateur
-  router.get('/users/tech', [UserController, 'getTechUsers']) // Utilisateurs avec rôle 'tech'
 
   // Zones
   router.put('/zones/new', [ZonesController, 'create']) // Création zone

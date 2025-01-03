@@ -2,19 +2,16 @@ import Intervention from '#models/intervention'
 import type { HttpContext } from '@adonisjs/core/http'
 
 export default class InterventionsController {
-  // Création d'une intervention
   public async create({ request, response }: HttpContext) {
     try {
-      const data = request.only(['started_at', 'ended_at', 'price', 'category'])
+      const data = request.only(['started_at', 'ended_at', 'price', 'service', 'bike', 'user_id'])
 
-      // Vérification que les données sont valides
-      if (!data.started_at || !data.ended_at || !data.price || !data.category) {
+      if (!data.started_at || !data.ended_at || !data.price || !data.service || !data.bike || !data.user_id) {
         return response.badRequest({
-          message: 'Tous les champs sont requis : started_at, ended_at, price, category.',
+          message: 'Tous les champs sont requis : started_at, ended_at, price, service, bike, user_id.',
         })
       }
 
-      // Création de l'intervention
       const intervention = await Intervention.create(data)
 
       return response.created({ message: 'Intervention créée avec succès', data: intervention })
@@ -26,17 +23,15 @@ export default class InterventionsController {
     }
   }
 
-  // Mise à jour d'une intervention
   public async update({ params, request, response }: HttpContext) {
     const { id } = params
     try {
       const intervention = await Intervention.findOrFail(id)
-      const data = request.only(['started_at', 'ended_at', 'price', 'category'])
+      const data = request.only(['started_at', 'ended_at', 'price', 'service', 'bike', 'user_id'])
 
-      // Vérification que les données sont valides
-      if (!data.started_at || !data.ended_at || !data.price || !data.category) {
+      if (!data.started_at || !data.ended_at || !data.price || !data.service || !data.bike || !data.user_id) {
         return response.badRequest({
-          message: 'Tous les champs sont requis : started_at, ended_at, price, category.',
+          message: 'Tous les champs sont requis : started_at, ended_at, price, service, bike, user_id.',
         })
       }
 
@@ -52,7 +47,6 @@ export default class InterventionsController {
     }
   }
 
-  // Suppression d'une intervention
   public async delete({ params, response }: HttpContext) {
     const { id } = params
     try {
@@ -64,7 +58,6 @@ export default class InterventionsController {
     }
   }
 
-  // Récupération de toutes les interventions
   public async getAll({ response }: HttpContext) {
     try {
       const interventions = await Intervention.all()
@@ -80,7 +73,6 @@ export default class InterventionsController {
     }
   }
 
-  // Récupération d'une intervention par son ID
   public async getOne({ params, response }: HttpContext) {
     const { id } = params
     try {

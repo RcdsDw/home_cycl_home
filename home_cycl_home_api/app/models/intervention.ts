@@ -15,7 +15,13 @@ export default class Intervention extends BaseModel {
   declare price: number
 
   @column()
-  declare category: string
+  declare bike: string
+
+  @column()
+  declare service: string
+
+  @column()
+  declare user_id: number
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime

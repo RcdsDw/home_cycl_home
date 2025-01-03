@@ -24,6 +24,31 @@ export async function createZone(values) {
     }
 }
 
+export async function updateZone(id, values) {
+    try {
+        const response = await fetch(`http://localhost:3333/api/v1/zones/${id}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(values),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw {
+                status: response.status,
+                data: data,
+            };
+        }
+
+        return data;
+    } catch (error) {
+        throw error;
+    }
+}
+
 export async function deleteZone(id) {
     try {
         const response = await fetch(`http://localhost:3333/api/v1/zones/${id}`, {

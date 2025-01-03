@@ -47,15 +47,15 @@ export default function Users() {
 
     const columns = [
         {
-            title: 'Nom',
-            dataIndex: 'lastname',
-            key: 'lastname',
-            render: (text) => <div>{text}</div>,
-        },
-        {
             title: 'Prénom',
             dataIndex: 'firstname',
             key: 'firstname',
+            render: (text) => <div>{text}</div>,
+        },
+        {
+            title: 'Nom',
+            dataIndex: 'lastname',
+            key: 'lastname',
             render: (text) => <div>{text}</div>,
         },
         {

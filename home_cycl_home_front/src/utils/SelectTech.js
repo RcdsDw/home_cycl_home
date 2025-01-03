@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
+import { Select } from 'antd';
 import { getTechUsers } from '../actions/user';
 
-export default function SelectTech() {
+const { Option } = Select;
+
+export default function SelectTech({selectedTechUser, setSelectedTechUser}) {
     const [techUsers, setTechUsers] = useState([]);
-    const [selectedTechUser, setSelectedTechUser] = useState('');
 
     useEffect(() => {
         fetchTechUsers();
@@ -11,25 +13,31 @@ export default function SelectTech() {
 
     const fetchTechUsers = async () => {
         try {
-            const users = await getTechUsers();
-            setTechUsers(users);
+            const res = await getTechUsers();
+            setTechUsers(res.data);
         } catch (error) {
             console.error("Erreur lors de la récupération des techniciens", error);
         }
     };
 
-    const handleTechUserChange = (e) => {
-        setSelectedTechUser(e.target.value);
+    const handleTechUserChange = (value) => {
+        setSelectedTechUser(value);
     };
 
     return (
-        <select onChange={handleTechUserChange} value={selectedTechUser}>
-            <option value="">Sélectionnez un utilisateur</option>
-            {techUsers.map((user) => (
-                <option key={user.id} value={user.id}>
-                    {user.name}
-                </option>
+        <Select
+            value={selectedTechUser}
+            onChange={handleTechUserChange}
+            style={{ width: '100%', margin: "5px" }}
+            placeholder="Sélectionnez un utilisateur"
+        >
+            <Option disabled value={null}>Sélectionnez un utilisateur</Option>
+
+            {techUsers && techUsers.map((user) => (
+                <Option key={user.id} value={user.id}>
+                    {user.firstname} {user.lastname}
+                </Option>
             ))}
-        </select>
+        </Select>
     );
 }

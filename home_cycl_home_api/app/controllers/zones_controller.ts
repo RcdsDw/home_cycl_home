@@ -47,13 +47,7 @@ export default class ZonesController {
     const { id } = params
     try {
       const zone = await Zone.findOrFail(id)
-      const data = request.only(['name', 'coordinates'])
-
-      if (!Array.isArray(data.coordinates) || data.coordinates.length === 0) {
-        return response.badRequest({
-          message: 'Les coordonnées doivent être un tableau non vide.',
-        })
-      }
+      const data = request.only(['name', 'user_id'])
 
       zone.merge(data)
       await zone.save()
