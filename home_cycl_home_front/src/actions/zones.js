@@ -7,6 +7,7 @@ export async function createZone(values) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
+            credentials: 'include'
         });
 
         const data = await response.json();
@@ -32,6 +33,7 @@ export async function updateZone(id, values) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
+            credentials: 'include'
         });
 
         const data = await response.json();
@@ -56,6 +58,7 @@ export async function deleteZone(id) {
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include'
         });
 
         const data = await response.json();
@@ -80,6 +83,7 @@ export async function getZoneById(id) {
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include'
         });
 
         const data = await response.json();
@@ -104,6 +108,7 @@ export async function getZones() {
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include'
         });
 
         const data = await response.json();

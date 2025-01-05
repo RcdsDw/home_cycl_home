@@ -13,7 +13,8 @@ export default class Intervention extends BaseSchema {
       table.float('price').notNullable()
       table.string('service').notNullable()
       table.string('bike').notNullable()
-      table.integer('user_id').unsigned().references('id').inTable('users').notNullable()
+      table.integer('tech_id').unsigned().references('id').inTable('users').notNullable()
+      table.integer('client_id').unsigned().references('id').inTable('users').notNullable()
 
       table.timestamp('created_at')
       table.timestamp('updated_at')

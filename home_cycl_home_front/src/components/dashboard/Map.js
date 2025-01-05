@@ -9,6 +9,7 @@ import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import SelectTech from '../../utils/SelectTech';
 import { getUserById } from '../../actions/user';
 import L from 'leaflet';
+import getRandomColor from '../../utils/RandomColor';
 
 export default function Map() {
     const [zones, setZones] = useState([]);
@@ -105,7 +106,7 @@ export default function Map() {
     const handleEditZone = (zone) => {
         setEditingZone(zone.id);
         setNewZoneName(zone.name);
-        setNewTechUser(zone.user_id);
+        setNewTechUser(zone.userId);
     };
 
     const handleCancelEdit = () => {
@@ -153,18 +154,6 @@ export default function Map() {
                 }
             },
         });
-    };
-
-    const getRandomColor = () => {
-        const letters = '0123456789ABCDEF';
-        let color = '#';
-        
-        for (let i = 0; i < 6; i++) {
-            const randomValue = Math.floor(Math.random() * 128);
-            color += letters[randomValue % 16];
-        }
-    
-        return color;
     };
 
     const renderZones = () => {

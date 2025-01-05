@@ -48,7 +48,6 @@ export default function Auth() {
   return (
     <Card style={{ maxWidth: 600, margin: "auto", marginTop: "200px" }}>
       <Tabs activeKey={activeTab} onChange={setActiveTab} centered>
-        {/* Onglet Se connecter */}
         <Tabs.Items tab="Se connecter" key="login">
           <Form
             form={form}
@@ -86,7 +85,6 @@ export default function Auth() {
           </Form>
         </Tabs.Items>
 
-        {/* Onglet S'enregistrer */}
         <Tabs.Items tab="S'enregistrer" key="register">
           <Form
             form={form}

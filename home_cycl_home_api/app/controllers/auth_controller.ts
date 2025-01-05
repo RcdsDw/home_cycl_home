@@ -19,13 +19,6 @@ export default class AuthController {
     }
 
     const user = await User.create({ firstname, lastname, number, address, email, password, role })
-    const token = await User.accessTokens.create(user)
-
-    response.cookie('token', token, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax',
-    })
 
     return response.json({
       user: user.serialize(),

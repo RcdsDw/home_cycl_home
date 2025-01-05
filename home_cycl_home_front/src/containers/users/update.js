@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Form, Input, Select, message } from "antd";
 import { getUserById, updateUser } from "../../actions/user";

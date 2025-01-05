@@ -2,13 +2,13 @@ import { useNavigate } from "react-router-dom";
 
 import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 
-import { Button, message, Modal, Table, Tag } from "antd";
+import { Button, Empty, message, Modal, Spin, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { deleteUser, getUsers } from "../../actions/user";
 
 export default function Users() {
+  const [loading, setLoading] = useState(true)
   const [datas, setDatas] = useState([])
-  console.log("🚀 ~ Users ~ datas:", datas)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
 
@@ -20,7 +20,10 @@ export default function Users() {
     }, [])
 
     const fetchUsers = async() => {
-      await getUsers().then((res) => setDatas(res.data))
+      await getUsers().then((res) => {
+          setDatas(res.data)
+          setLoading(false)
+      });
     }
 
     const showModal = (id) => {
@@ -106,16 +109,33 @@ export default function Users() {
         },
       ];
 
+    if (loading) {
+      return <Spin size="large" style={styles.spinner} />;
+    }
+
     return (
       <>
         <Button type="primary" style={styles.button} onClick={() => nav('/user/new')}>Ajouter</Button>
-        <Table columns={columns} dataSource={datas} />
-        <Modal okType="danger" okText="Valider" cancelText="Annuler" title="Supprimer définitivement l'utilisateur ?" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}/>
+        <Table columns={columns} dataSource={datas} locale={{
+          emptyText: <Empty description="Aucun utilisateur trouvé" />,
+        }}/>
+        <Modal 
+          okType="danger" 
+          okText="Valider" 
+          cancelText="Annuler" 
+          title="Supprimer définitivement l'utilisateur ?" 
+          open={isModalOpen} 
+          onOk={handleOk} 
+          onCancel={handleCancel}/>
       </>
     )
 }
 
 const styles = {
+  spinner: {
+    display: 'block',
+    margin: '100px auto'
+  },
   button: {
     marginBottom: 20
   }

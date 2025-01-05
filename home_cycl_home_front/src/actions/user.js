@@ -7,6 +7,7 @@ export async function createUser(values) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
+            credentials: 'include'
         });
 
         const data = await response.json();
@@ -32,6 +33,7 @@ export async function updateUser(id, values) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
+            credentials: 'include'
         });
 
         const data = await response.json();
@@ -56,6 +58,7 @@ export async function deleteUser(id) {
             headers: {
             'Content-Type': 'application/json',
             },
+            credentials: 'include'
         });
 
         const data = await response.json();
@@ -81,6 +84,7 @@ export async function getUsers() {
             headers: {
             'Content-Type': 'application/json',
             },
+            credentials: 'include'
         });
 
         const data = await response.json();
@@ -103,8 +107,9 @@ export async function getUserById(id) {
         const response = await fetch(`http://localhost:3333/api/v1/users/${id}`, {
             method: 'GET',
             headers: {
-            'Content-Type': 'application/json',
+                'Content-Type': 'application/json',
             },
+            credentials: 'include'
         });
 
         const data = await response.json();
@@ -129,6 +134,7 @@ export async function getTechUsers() {
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include'
         });
 
         const data = await response.json();

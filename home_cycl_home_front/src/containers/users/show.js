@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Card, Descriptions, Empty, Tag, Spin, Row, Col } from "antd";
 import { getUserById } from "../../actions/user";

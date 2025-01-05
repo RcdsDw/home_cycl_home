@@ -1,15 +1,16 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { Form, Input, Select, Button, Col, Row, DatePicker, message, Card } from 'antd';
-import { createIntervention } from '../../actions/interventions';
+import { getInterventionById, updateIntervention } from '../../actions/interventions';
 import SelectTech from '../../utils/SelectTech';
 import dayjs from 'dayjs';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { UserContext } from '../../context/user';
 import bikeOptions from '../../data/bikeOptions.json';
 import serviceOptions from '../../data/serviceOptions.json';
 import { getProducts } from '../../actions/products';
+import { getUserById } from '../../actions/user';
 
-export default function NewIntervention() {
+export default function EditIntervention() {
   const [form] = Form.useForm();
   const [price, setPrice] = useState(0);
   const [selectedTechUser, setSelectedTechUser] = useState();
@@ -18,9 +19,11 @@ export default function NewIntervention() {
   const [selectedProducts, setSelectedProducts] = useState([]);
 
   const { user } = useContext(UserContext);
+  const { id } = useParams();
   const nav = useNavigate();
 
   useEffect(() => {
+    fetchIntervention();
     fetchProducts();
   }, []);
 
@@ -34,6 +37,25 @@ export default function NewIntervention() {
       setProducts(res.data);
     } catch (err) {
       message.error('Erreur lors de la récupération des produits.');
+    }
+  };
+
+  const fetchIntervention = async () => {
+    try {
+      const res = await getInterventionById(id);
+      const intervention = res.data;
+
+      form.setFieldsValue({
+        ...intervention,
+        started_at: intervention.startedAt ? dayjs(intervention.startedAt) : null,
+      });
+
+      setSelectedTechUser(intervention.techId);
+      setSelectedProducts(intervention.products?.map((product) => product.id) || []);
+      setEndDate(intervention.endedAt ? dayjs(intervention.endedAt) : null);
+      setPrice(intervention.price.toFixed(2));
+    } catch (err) {
+      message.error('Erreur lors de la récupération de l\'intervention.');
     }
   };
 
@@ -92,13 +114,11 @@ export default function NewIntervention() {
     };
 
     try {
-      const res = await createIntervention(interventionData);
-      form.resetFields();
-      setSelectedProducts([]);
-      message.success('Intervention créée avec succès !');
-      nav(`/interventions/show/${res.data.id}`);
+      await updateIntervention(id, interventionData);
+      message.success('Intervention mise à jour avec succès !');
+      nav(`/interventions/show/${id}`);
     } catch (err) {
-      message.error('Erreur lors de la création de l\'intervention.');
+      message.error('Erreur lors de la mise à jour de l\'intervention.');
     }
   };
 
@@ -189,6 +209,7 @@ export default function NewIntervention() {
               <Select
                 mode="multiple"
                 placeholder="Sélectionnez des produits"
+                value={selectedProducts}
                 onChange={handleProductChange}
                 options={products.map((product) => ({
                   label: `${product.name} (${product.price.toFixed(2)} €)`,
@@ -206,7 +227,7 @@ export default function NewIntervention() {
 
           <Form.Item style={styles.formItem}>
             <Button type="primary" htmlType="submit" style={styles.button}>
-              Soumettre l'intervention
+              Mettre à jour l'intervention
             </Button>
           </Form.Item>
         </Row>

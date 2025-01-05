@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Logo from './assets/logo.png'
 import { Layout, Menu, message } from 'antd';
-import { BarChartOutlined, FundOutlined, UserDeleteOutlined, UnorderedListOutlined, QqOutlined, UserOutlined } from '@ant-design/icons';
+import { BarChartOutlined, FundOutlined, UserDeleteOutlined, UnorderedListOutlined, QqOutlined, UserOutlined, FormOutlined } from '@ant-design/icons';
 import { authLogout } from './actions/auth';
 import { Content } from 'antd/es/layout/layout';
 
@@ -52,7 +52,10 @@ export default function Dashboard () {
         case 'plan':
             nav('/planning')
             break;
-        case 'inter':
+        case 'inters':
+            nav('/interventions')
+            break;
+        case 'newInter':
             nav('/interventions/new')
             break;
         default:
@@ -67,11 +70,6 @@ export default function Dashboard () {
         key: 'logout', 
         icon: <UserDeleteOutlined title='Déconnexion' /> 
       },
-      // { 
-      //   label: 'Profil', 
-      //   key: 'profil',
-      //   icon: <UserOutlined />
-      // },
     ];
   };
   
@@ -79,13 +77,14 @@ export default function Dashboard () {
     return [
         { label: 'Carte', key: 'map', icon: <FundOutlined /> },
         { label: 'Planning', key: 'plan', icon: <BarChartOutlined /> },
-        { label: 'Commander', key: 'inter', icon: <QqOutlined /> },
+        { label: 'Commander', key: 'newInter', icon: <QqOutlined /> },
         { 
           label: 'Listes', 
           key: "lists", 
           icon: <UnorderedListOutlined/>,
           children: [
             { label: 'Utilisateurs', key: 'users', icon: <UserOutlined/>,},
+            { label: 'Interventions', key: 'inters', icon: <FormOutlined/>,},
           ] 
         },
     ];
@@ -94,7 +93,7 @@ export default function Dashboard () {
   return (
     <Layout style={styles.layout}>
         <Header style={styles.header}>
-            <img width={50} height={50} src={Logo}  />
+            <img width={50} height={50} src={Logo} alt="logo de l'entreprise" />
             <Menu
                 onClick={onClick}
                 theme="dark"
@@ -109,7 +108,6 @@ export default function Dashboard () {
                 <Menu onClick={onClick} theme="dark" defaultSelectedKeys={['1']} mode="inline" items={menuItems} />
             </Sider>
             <Layout style={styles.contentLayout}>
-                {/* <Breadcrumb items={breadcrumbItems} style={styles.breadcrumb} /> */}
                 <Content style={styles.content}>
                     <Outlet/>
                 </Content>
@@ -122,7 +120,6 @@ export default function Dashboard () {
   );
 };
 
-// Styles définis à la fin du fichier
 const styles = {
     layout: {
         minHeight: '100vh',
