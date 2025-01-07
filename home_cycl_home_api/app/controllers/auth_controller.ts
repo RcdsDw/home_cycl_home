@@ -48,4 +48,16 @@ export default class AuthController {
   async logout({ response }: HttpContext) {
     response.clearCookie('token')
   }
+
+  async me({ auth, response }: HttpContext) {
+    try {
+      const user = auth.user
+      if (!user) {
+        return response.unauthorized('Non authentifié')
+      }
+      return response.json({ user: user.serialize() })
+    } catch {
+      return response.internalServerError('Erreur serveur')
+    }
+  }
 }

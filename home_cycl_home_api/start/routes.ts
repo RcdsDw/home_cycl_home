@@ -1,5 +1,5 @@
 import router from '@adonisjs/core/services/router'
-import { middleware } from '#start/kernel'
+// import { middleware } from '#start/kernel'
 
 const UserController = () => import('#controllers/user_controller')
 const ZonesController = () => import('#controllers/zones_controller')
@@ -21,6 +21,7 @@ router
     router
       .group(() => {
         router.post('/logout', [AuthController, 'logout']) // Déconnexion
+        router.get('/me', [AuthController, 'me'])
       })
       .prefix('auth')
     // Utilisateurs
@@ -49,4 +50,4 @@ router
     router.get('/products', [ProductsController, 'getAll']) // Liste des produits
   })
   .prefix('api/v1')
-// .use(middleware.auth())
+  // .use(middleware.auth())

@@ -1,10 +1,9 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Form, Input, Select, Button, Col, Row, DatePicker, message, Card } from 'antd';
 import { createIntervention } from '../../actions/interventions';
 import SelectTech from '../../utils/SelectTech';
 import dayjs from 'dayjs';
 import { useNavigate } from 'react-router-dom';
-import { UserContext } from '../../context/user';
 import bikeOptions from '../../data/bikeOptions.json';
 import serviceOptions from '../../data/serviceOptions.json';
 import { getProducts } from '../../actions/products';
@@ -17,7 +16,7 @@ export default function NewIntervention() {
   const [products, setProducts] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
 
-  const { user } = useContext(UserContext);
+  const user = JSON.parse(localStorage.getItem('user'));
   const nav = useNavigate();
 
   useEffect(() => {
