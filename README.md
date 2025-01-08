@@ -3,7 +3,7 @@
 
 Ce projet utilise Docker Compose pour orchestrer plusieurs services :
 
-- **backend** : API Node.js pour la logique serveur.
+- **backend** : API Node.js avec Adonis.
 - **frontend** : Interface utilisateur développée en React.
 - **db** : Base de données PostgreSQL.
 - **pgadmin** : Interface graphique pour gérer la base de données PostgreSQL.
@@ -36,13 +36,13 @@ Ce projet utilise Docker Compose pour orchestrer plusieurs services :
 ### Frontend
 
 - Dossier : `home_cycl_home_front`
-- Exposé sur le port : `3000`
+- Exposé sur le port : `4000`
 - Démarre avec la commande : `npm start`
 
 ### Base de données (PostgreSQL)
 
 - Image : `postgres:14`
-- Exposé sur le port : `5444`
+- Exposé sur le port : `5544`
 - Volume pour persister les données : `pgdata:/var/lib/postgresql/data`
 - Variables d'environnement :
   - `POSTGRES_DB`: Nom de la base de données (home_cycl_home).
@@ -58,9 +58,6 @@ Ce projet utilise Docker Compose pour orchestrer plusieurs services :
   - `PGADMIN_DEFAULT_EMAIL`: Email de connexion à pgAdmin ([admin@admin.com](mailto:admin@admin.com)).
   - `PGADMIN_DEFAULT_PASSWORD`: Mot de passe pgAdmin (admin).
 
-## Réseau
-
-Un réseau Docker personnalisé est utilisé pour permettre aux services de communiquer entre eux : `custom_network`.
 
 ## Installation et exécution
 
@@ -100,30 +97,50 @@ Les volumes Docker permettent de persister les données entre les redémarrages 
 - `pgdata` : Données PostgreSQL.
 - `pgadmin-data` : Données pgAdmin.
 
+## Migrations
+
+- **Lancer les migrations** :
+
+Pour entrer dans le container "backend" :
+```
+  docker compose exec backend bash
+```
+puis
+
+```
+  npm run migrateup
+```
+
+- **Lancer les seeders**
+
+```
+  node ace db:seed
+```
+
 ## Commandes utiles
 
 - **Démarrer les services** :
 
   ```bash
-  docker-compose up
+  docker compose up
   ```
 
 - **Arrêter les services** :
 
   ```bash
-  docker-compose down
+  docker compose down
   ```
 
 - **Reconstruire les images Docker** :
 
   ```bash
-  docker-compose up --build
+  docker compose up --build
   ```
 
 - **Vérifier les logs des services** :
 
   ```bash
-  docker-compose logs -f
+  docker compose logs -f
   ```
 
 ## Notes
