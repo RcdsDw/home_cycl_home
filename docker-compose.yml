@@ -1,51 +1,21 @@
+version: '3.8'
+
 services:
-  symfony:
-    build:
-      context: ./home_cycl_home_api_sf
-      dockerfile: Dockerfile
-    ports:
-      - "8000:8000"
-    volumes:
-      - ./home_cycl_home_api_sf:/var/www/html
-    depends_on:
-      - db
-    environment:
-      DATABASE_URL: "pgsql://postgres:password@db:5432/home_cycl_home"
-    command: php -S 0.0.0.0:8000 -t public
-
-  frontend:
-    build:
-      context: ./home_cycl_home_front
-    ports:
-      - "4000:3000"
-    volumes:
-      - ./home_cycl_home_front:/app
-      - /app/node_modules
-    command: npm start
-
   db:
     image: postgres:14
     ports:
       - "5544:5432"
     environment:
-      POSTGRES_DB: home_cycl_home
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - pgdata:/var/lib/postgresql/data
-
-  pgadmin:
-    image: dpage/pgadmin4
-    ports:
-      - "5050:80"
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    depends_on:
-      - db
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
+    networks:
+      - app-network
 
 volumes:
   pgdata:
-  pgadmin-data:
+
+networks:
+  app-network:

@@ -1,23 +1,26 @@
 <?php
-// src/Entity/User.php
 
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use App\Repository\UserRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
-use App\Controller\RegisterController;
-use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+use App\Traits\Timestampable;
 
 #[ApiResource(
     operations: [
-        new Post(),
+        new Post(
+            controller: RegisterController::class,
+            validationContext: ['groups' => ['create']],
+            denormalizationContext: ['groups' => ['create']]
+        ),
         new GetCollection(),
         new Get(),
         new Put(),
@@ -26,55 +29,131 @@ use Symfony\Component\Serializer\Annotation\Groups;
     normalizationContext: ['groups' => ['read']],
     denormalizationContext: ['groups' => ['write']]
 )]
-#[ORM\Entity]
+#[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: "users")]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\HasLifecycleCallbacks]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
+    use Timestampable;
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column(type: "integer")]
-    private ?int $id = null;
+    #[ORM\Column]
+    private ?int $id;
 
-    #[ORM\Column(type: "string", length: 255, nullable: true)]
-    private ?string $firstname = null;
+    #[ORM\Column(length: 180)]
+    private ?string $email;
 
-    #[ORM\Column(type: "string", length: 255, nullable: true)]
-    private ?string $lastname = null;
-
-    #[ORM\Column(type: "string", length: 15, unique: true)]
-    private string $number;
-
-    #[ORM\Column(type: "json")]
-    private array $address = [];
-
-    #[ORM\Column(type: "string", length: 254, unique: true)]
-    #[Groups(['read', 'write'])]
-    private string $email;
-
-    #[ORM\Column(type: "string")]
-    private string $password;
-
-    #[ORM\Column(type: "json")]
+    /**
+     * @var list<string> The user roles
+     */
+    #[ORM\Column]
     private array $roles = [];
 
-    #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $createdAt;
+    /**
+     * @var string The hashed password
+     */
+    #[ORM\Column]
+    private ?string $password;
 
-    #[ORM\Column(type: "datetime")]
-    private \DateTimeInterface $updatedAt;
+    #[ORM\Column(length: 140)]
+    private ?string $firstname;
 
-    public function __construct()
+    #[ORM\Column(length: 240)]
+    private ?string $lastname;
+
+    #[ORM\Column(length: 20)]
+    private ?string $number;
+
+    #[ORM\Column(length: 255)]
+    private ?string $address;
+
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
     {
-        $this->createdAt = new \DateTimeImmutable();
-        $this->updatedAt = new \DateTimeImmutable();
-        $this->roles = ['ROLE_USER'];
+        $now = new \DateTimeImmutable();
+        $this->setCreatedAt($now);
+        $this->setUpdatedAt($now);
     }
 
-    // Getters & setters
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->setUpdatedAt(new \DateTime());
+    }
 
     public function getId(): ?int
     {
         return $this->id;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * A visual identifier that represents this user.
+     *
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function getRoles(): array
+    {
+        $roles = $this->roles;
+
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+
+    /**
+     * @param list<string> $roles
+     */
+    public function setRoles(array $roles): static
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
+
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
+
+        return $this;
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // If you store any temporary, sensitive data on the user, clear it here
+        // $this->plainPassword;
     }
 
     public function getFirstname(): ?string
@@ -82,9 +161,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->firstname;
     }
 
-    public function setFirstname(?string $firstname): self
+    public function setFirstname(string $firstname): static
     {
         $this->firstname = $firstname;
+
         return $this;
     }
 
@@ -93,102 +173,34 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->lastname;
     }
 
-    public function setLastname(?string $lastname): self
+    public function setLastname(string $lastname): static
     {
         $this->lastname = $lastname;
+
         return $this;
     }
 
-    public function getNumber(): string
+    public function getNumber(): ?string
     {
         return $this->number;
     }
 
-    public function setNumber(string $number): self
+    public function setNumber(string $number): static
     {
         $this->number = $number;
+
         return $this;
     }
 
-    public function getAddress(): array
+    public function getAddress(): ?string
     {
         return $this->address;
     }
 
-    public function setAddress(array $address): self
+    public function setAddress(string $address): static
     {
         $this->address = $address;
+
         return $this;
-    }
-
-    public function getEmail(): string
-    {
-        return $this->email;
-    }
-
-    public function setEmail(string $email): self
-    {
-        $this->email = $email;
-        return $this;
-    }
-
-    public function getPassword(): string
-    {
-        return $this->password;
-    }
-
-    public function setPassword(string $password): self
-    {
-        $this->password = $password;
-        return $this;
-    }
-
-    public function getRoles(): array
-    {
-        $roles = $this->roles;
-        if (!in_array('ROLE_USER', $roles)) {
-            $roles[] = 'ROLE_USER';
-        }
-        return array_unique($roles);
-    }
-
-    public function setRoles(array $roles): self
-    {
-        $this->roles = $roles;
-        return $this;
-    }
-
-    public function getCreatedAt(): \DateTimeInterface
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(\DateTimeInterface $createdAt): self
-    {
-        $this->createdAt = $createdAt;
-        return $this;
-    }
-
-    public function getUpdatedAt(): \DateTimeInterface
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(\DateTimeInterface $updatedAt): self
-    {
-        $this->updatedAt = $updatedAt;
-        return $this;
-    }
-
-    // UserInterface methods
-
-    public function getUserIdentifier(): string
-    {
-        return $this->email;
-    }
-
-    public function eraseCredentials(): void
-    {
-        // Si tu stockes des infos sensibles temporaires, ici tu les nettoies
     }
 }
