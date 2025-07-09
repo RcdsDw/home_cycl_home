@@ -6,10 +6,10 @@ use Doctrine\ORM\Mapping as ORM;
 
 trait Timestampable
 {
-    #[ORM\Column]
+    #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $updatedAt = null;
 
     public function getCreatedAt(): ?\DateTimeInterface

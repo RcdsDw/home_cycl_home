@@ -73,7 +73,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function onPrePersist(): void
     {
         $now = new \DateTime();
-        dump($now);
         $this->setCreatedAt($now);
         $this->setUpdatedAt($now);
     }

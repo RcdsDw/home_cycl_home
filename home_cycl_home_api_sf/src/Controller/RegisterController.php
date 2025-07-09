@@ -24,7 +24,6 @@ class RegisterController
     {
         $data = json_decode($request->getContent(), true);
 
-        $logger->debug("ouiiiiiiiiiii");
         if (!isset($data['email'], $data['password'], $data['firstname'], $data['lastname'], $data['number'], $data['address'])) {
             return new JsonResponse(['error' => 'Missing parameters'], 400);
         }

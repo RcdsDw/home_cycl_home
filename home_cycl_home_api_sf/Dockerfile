@@ -1,4 +1,4 @@
-FROM php:8.2-cli
+FROM php:8.4-fpm
 
 # Install tools + extensions
 RUN apt-get update && apt-get install -y \
@@ -7,10 +7,6 @@ RUN apt-get update && apt-get install -y \
 
 # Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-# Install Symfony CLI
-RUN curl -sS https://get.symfony.com/cli/installer | bash && \
-    mv /root/.symfony*/bin/symfony /usr/local/bin/symfony
 
 # Set workdir
 WORKDIR /app
@@ -24,8 +20,5 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 # Permissions
 RUN chown -R www-data:www-data var
 
-# Expose dev port
-EXPOSE 8000
-
 # Start Symfony dev server
-CMD ["symfony", "serve", "--no-tls", "--allow-http", "--port=8000"]
+CMD ["php-fpm"]

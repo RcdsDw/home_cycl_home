@@ -36,15 +36,15 @@ restart:
 
 # Cache clear
 cache-clear:
-	$(COMPOSE) exec symfony php bin/console cache:clear
+	$(COMPOSE) exec backend php bin/console cache:clear
 
 # Migrations
 migration:
-	$(COMPOSE) exec symfony php bin/console make:migration
+	$(COMPOSE) exec backend php bin/console make:migration
 
 # Migrate
 migrate:
-	$(COMPOSE) exec symfony php bin/console doctrine:migrations:migrate
+	$(COMPOSE) exec backend php bin/console doctrine:migrations:migrate
 
 # Connect to db
 db: 

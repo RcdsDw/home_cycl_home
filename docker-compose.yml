@@ -14,13 +14,25 @@ services:
     networks:
       - app-network
 
-  symfony:
+  http:
     build:
       context: ./home_cycl_home_api_sf
-    ports:
-      - "8000:8000"
+      dockerfile: nginx/Dockerfile
     volumes:
       - ./home_cycl_home_api_sf:/app
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+
+  backend:
+    build:
+      context: ./home_cycl_home_api_sf
+    volumes:
+      - ./home_cycl_home_api_sf:/app
+      - symfony_vendor:/app/vendor
     depends_on:
       - db
     environment:
@@ -42,6 +54,7 @@ services:
 
 volumes:
   pgdata:
+  symfony_vendor:
 
 networks:
   app-network:
