@@ -14,6 +14,32 @@ services:
     networks:
       - app-network
 
+  symfony:
+    build:
+      context: ./home_cycl_home_api_sf
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./home_cycl_home_api_sf:/app
+    depends_on:
+      - db
+    environment:
+      DATABASE_URL: ${DATABASE_URL}
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ./home_cycl_home_front
+    ports:
+      - "4000:3000"
+    volumes:
+      - ./home_cycl_home_front:/app
+      - /app/node_modules
+    command: npm start
+    networks:
+      - app-network
+
 volumes:
   pgdata:
 

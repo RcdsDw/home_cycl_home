@@ -33,3 +33,19 @@ logs:
 restart:
 	$(COMPOSE) down
 	$(COMPOSE) up --build
+
+# Cache clear
+cache-clear:
+	$(COMPOSE) exec symfony php bin/console cache:clear
+
+# Migrations
+migration:
+	$(COMPOSE) exec symfony php bin/console make:migration
+
+# Migrate
+migrate:
+	$(COMPOSE) exec symfony php bin/console doctrine:migrations:migrate
+
+# Connect to db
+db: 
+	$(COMPOSE) exec db psql -U postgres -d home_cycl_home

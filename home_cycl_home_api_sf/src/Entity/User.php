@@ -12,14 +12,14 @@ use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Controller\RegisterController;
 use App\Traits\Timestampable;
 
 #[ApiResource(
     operations: [
         new Post(
+            uriTemplate: '/users',
             controller: RegisterController::class,
-            validationContext: ['groups' => ['create']],
-            denormalizationContext: ['groups' => ['create']]
         ),
         new GetCollection(),
         new Get(),
@@ -72,7 +72,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
-        $now = new \DateTimeImmutable();
+        $now = new \DateTime();
+        dump($now);
         $this->setCreatedAt($now);
         $this->setUpdatedAt($now);
     }

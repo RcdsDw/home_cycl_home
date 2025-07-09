@@ -22,10 +22,9 @@ class RegisterController
 
     public function __invoke(Request $request, LoggerInterface $logger): JsonResponse
     {
-        dd('Entrée dans __invoke');
         $data = json_decode($request->getContent(), true);
 
-
+        $logger->debug("ouiiiiiiiiiii");
         if (!isset($data['email'], $data['password'], $data['firstname'], $data['lastname'], $data['number'], $data['address'])) {
             return new JsonResponse(['error' => 'Missing parameters'], 400);
         }
@@ -45,8 +44,6 @@ class RegisterController
 
         $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
         $user->setPassword($hashedPassword);
-
-        $logger->debug('DATA', $data);
 
         $this->em->persist($user);
         $this->em->flush();
