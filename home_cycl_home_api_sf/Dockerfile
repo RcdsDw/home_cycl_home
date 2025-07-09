@@ -1,42 +1,31 @@
-FROM php:8.2-fpm
+FROM php:8.2-cli
 
-# Installer les dépendances système
+# Install tools + extensions
 RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    zip \
-    libpq-dev \
-    libsodium-dev \
-    libicu-dev \
-    libonig-dev \
-    libzip-dev \
-    libxml2-dev \
-    acl \
-    g++ \
-    make \
-    && docker-php-ext-install pdo pdo_pgsql sodium intl zip opcache \
-    && apt-get clean
+    git unzip zip curl libpq-dev libsodium-dev libicu-dev libonig-dev libzip-dev libxml2-dev acl g++ make procps \
+    && docker-php-ext-install pdo pdo_pgsql sodium intl zip opcache
 
-# Installer Composer
+# Install Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
 
-# Définir le dossier de travail
+# Install Symfony CLI
+RUN curl -sS https://get.symfony.com/cli/installer | bash && \
+    mv /root/.symfony*/bin/symfony /usr/local/bin/symfony
+
+# Set workdir
 WORKDIR /app
 
-# Copier le code source
+# Copy source
 COPY . .
 
-# Installer les dépendances PHP
+# Install PHP dependencies
 RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Donner les bons droits à var/cache et var/log
+# Permissions
 RUN chown -R www-data:www-data var
 
-# Supprimer le cache Symfony pour éviter les erreurs de build
-RUN rm -rf var/cache/*
+# Expose dev port
+EXPOSE 8000
 
-# Exposer le port FPM
-EXPOSE 9000
-
-# Démarrer php-fpm
-CMD ["php-fpm"]
+# Start Symfony dev server
+CMD ["symfony", "serve", "--no-tls", "--allow-http", "--port=8000"]

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -19,11 +20,12 @@ class RegisterController
         $this->passwordHasher = $passwordHasher;
     }
 
-    public function __invoke(Request $request): JsonResponse
+    public function __invoke(Request $request, LoggerInterface $logger): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 
-        if (!isset($data['email'], $data['password'], $data['firstname'], $data['lastname'])) {
+        $logger->debug("ouiiiiiiiiiii");
+        if (!isset($data['email'], $data['password'], $data['firstname'], $data['lastname'], $data['number'], $data['address'])) {
             return new JsonResponse(['error' => 'Missing parameters'], 400);
         }
 
@@ -36,8 +38,8 @@ class RegisterController
         $user->setEmail($data['email']);
         $user->setFirstname($data['firstname']);
         $user->setLastname($data['lastname']);
-        $user->setNumber($data['number'] ?? null);
-        $user->setAddress($data['address'] ?? null);
+        $user->setNumber($data['number']);
+        $user->setAddress($data['address']);
         $user->setRoles($data['role'] ?? ['ROLE_USER']);
 
         $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
