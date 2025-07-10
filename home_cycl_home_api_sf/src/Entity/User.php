@@ -18,7 +18,7 @@ use App\Traits\Timestampable;
 #[ApiResource(
     operations: [
         new Post(
-            uriTemplate: '/users',
+            uriTemplate: '/register',
             controller: RegisterController::class,
         ),
         new GetCollection(),
@@ -42,7 +42,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id;
 
-    #[ORM\Column(length: 180)]
+    #[ORM\Column(length: 50)]
     private ?string $email;
 
     /**
@@ -57,16 +57,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password;
 
-    #[ORM\Column(length: 140)]
+    #[ORM\Column(length: 50)]
     private ?string $firstname;
 
-    #[ORM\Column(length: 240)]
+    #[ORM\Column(length: 50)]
     private ?string $lastname;
 
     #[ORM\Column(length: 20)]
     private ?string $number;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 150)]
     private ?string $address;
 
     #[ORM\PrePersist]
