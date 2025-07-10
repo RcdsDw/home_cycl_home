@@ -44,11 +44,16 @@ services:
     build:
       context: ./home_cycl_home_front
     ports:
-      - "4000:3000"
+      - "3000:3000"
     volumes:
-      - ./home_cycl_home_front:/app
+      - ./home_cycl_home_front:/home_cycl_home_front
       - /app/node_modules
     command: npm start
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+      - WATCHPACK_POLLING=true
+      - FAST_REFRESH=true
+      - NODE_ENV=development
     networks:
       - app-network
 
