@@ -1,7 +1,9 @@
 /* eslint-disable no-throw-literal */
+const API_URL = process.env.REACT_APP_API_URL;
+
 export async function createUser(values) {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/users/new`, {
+        const response = await fetch(`${API_URL}/users/new`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -27,7 +29,7 @@ export async function createUser(values) {
 
 export async function updateUser(id, values) {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/users/${id}`, {
+        const response = await fetch(`${API_URL}/users/${id}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -53,7 +55,7 @@ export async function updateUser(id, values) {
 
 export async function deleteUser(id) {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/users/${id}`, {
+        const response = await fetch(`${API_URL}/users/${id}`, {
             method: 'DELETE',
             headers: {
             'Content-Type': 'application/json',
@@ -79,7 +81,7 @@ export async function deleteUser(id) {
 
 export async function getUsers() {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/users`, {
+        const response = await fetch(`${API_URL}/users`, {
             method: 'GET',
             headers: {
             'Content-Type': 'application/json',
@@ -104,7 +106,7 @@ export async function getUsers() {
 
 export async function getUserById(id) {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/users/${id}`, {
+        const response = await fetch(`${API_URL}/users/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -129,7 +131,7 @@ export async function getUserById(id) {
 
 export async function getTechUsers() {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/users/tech`, {
+        const response = await fetch(`${API_URL}/users/tech`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',

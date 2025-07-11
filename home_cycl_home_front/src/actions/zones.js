@@ -1,7 +1,9 @@
 /* eslint-disable no-throw-literal */
+const API_URL = process.env.REACT_APP_API_URL;
+
 export async function createZone(values) {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/zones/new`, {
+        const response = await fetch(`${API_URL}/zones/new`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

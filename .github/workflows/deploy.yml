@@ -1,0 +1,40 @@
+name: Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Sync files to VPS
+        run: |
+          rsync -avz --delete --exclude='.git/' ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/${{ secrets.VPS_USER }}/
+          rsync -avz --delete \
+            home_cycl_home_api_sf/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/${{ secrets.VPS_USER }}/home_cycl_home_api_sf/
+          rsync -avz --delete \
+            home_cycl_home_frontend/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/${{ secrets.VPS_USER }}/home_cycl_home_frontend/
+
+      - name: Deploy backend & frontend
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            cd /home/${{ secrets.VPS_USER }}
+
+            # Rebuild et relance les conteneurs Docker
+            docker compose up -d --build
+
+            # Front avec pm2 (redémarre si déjà lancé, sinon démarre)
+            cd home_cycl_home_frontend
+            pm2 restart front || pm2 start npm --name front -- start
+          EOF
