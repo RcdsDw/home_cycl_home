@@ -1,15 +1,17 @@
+const API_URL = process.env.REACT_APP_API_URL;
+
 export async function authRegister(values) {
     try {
-      const response = await fetch('http://localhost/api/register', {
+      const response = await fetch(`${API_URL}/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(values),
       });
+      console.log("DATA REGISTER", data)
 
       const data = await response.json();
-      console.log("DATA REGISTER", data)
       return data;
     } catch (error) {
       throw error;
@@ -18,23 +20,24 @@ export async function authRegister(values) {
 
 export async function authLogin(values) {
     try {
-      console.log('je suis bien dans le code')
-      const response = await fetch('http://localhost/api/login', {
+      console.log('je suis bien dans le code', values)
+      const response = await fetch(`${API_URL}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(values),
       });
-
-      if (response.ok) {
-              console.log("DATA RESPONSE", data)
-        localStorage.setItem('user', JSON.stringify(data.user));
-    } else {
-        throw new Error(data.message || 'Erreur lors de la connexion');
-    }
       
       const data = await response.json();
+      console.log("DATA RESPONSE", data)
+
+      if (response.ok) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+      } else {
+          throw new Error(data.message || 'Erreur lors de la connexion');
+      }
+      
       console.log("DATA LOGiN", data)
       return data;
     } catch (error) {
@@ -44,7 +47,7 @@ export async function authLogin(values) {
   
 export async function authLogout() {
     try {
-      await fetch('http://localhost/api/logout', {
+      await fetch(`${API_URL}/logout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -15,6 +15,7 @@ export default function Auth() {
 
   // Login
   const onFinishLogin = (values) => {
+    console.log("values", values)
     authLogin(values)
       .then((res) => {
         message.success(`Connecté`)
