@@ -1,12 +1,13 @@
 /* eslint-disable no-throw-literal */
+const API_URL = process.env.REACT_APP_API_URL;
+
 export async function getProducts() {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/products`, {
+        const response = await fetch(`${API_URL}/products`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();

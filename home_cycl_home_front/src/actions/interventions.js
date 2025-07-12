@@ -1,13 +1,14 @@
 /* eslint-disable no-throw-literal */
+const API_URL = process.env.REACT_APP_API_URL;
+
 export async function createIntervention(values) {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/interventions`, {
+        const response = await fetch(`${API_URL}/interventions`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -27,13 +28,12 @@ export async function createIntervention(values) {
 
 export async function updateIntervention(id, values) {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/interventions/${id}`, {
+        const response = await fetch(`${API_URL}/interventions/${id}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -53,12 +53,11 @@ export async function updateIntervention(id, values) {
 
 export async function deleteIntervention(id) {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/interventions/${id}`, {
+        const response = await fetch(`${API_URL}/interventions/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -78,12 +77,11 @@ export async function deleteIntervention(id) {
 
 export async function getInterventionById(id) {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/interventions/${id}`, {
+        const response = await fetch(`${API_URL}/interventions/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -103,12 +101,11 @@ export async function getInterventionById(id) {
 
 export async function getInterventions() {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/interventions`, {
+        const response = await fetch(`${API_URL}/interventions`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();
