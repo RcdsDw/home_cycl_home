@@ -16,6 +16,7 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Provider\CurrentUserProvider;
 use App\Controller\RegisterController;
+use App\Provider\RoleTechProvider;
 use App\Traits\Timestampable;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -26,6 +27,11 @@ use Symfony\Component\Serializer\Attribute\Groups;
             controller: RegisterController::class,
         ),
         new GetCollection(),
+        new GetCollection(
+            uriTemplate: '/users/tech',
+            provider: RoleTechProvider::class,
+            openapi: new Operation(summary: 'Return users with role: ROLE_TECH.'),
+        ),
         new Get(),
         new Get(
             uriTemplate: '/me',
