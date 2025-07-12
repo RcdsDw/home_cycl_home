@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Ramsey\Uuid\UuidInterface;
 use App\Repository\UserRepository;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
@@ -10,10 +11,13 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\OpenApi\Model\Operation;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use App\Provider\CurrentUserProvider;
 use App\Controller\RegisterController;
 use App\Traits\Timestampable;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
@@ -23,6 +27,11 @@ use App\Traits\Timestampable;
         ),
         new GetCollection(),
         new Get(),
+        new Get(
+            uriTemplate: '/me',
+            provider: CurrentUserProvider::class,
+            openapi: new Operation(summary: 'Return the current user.'),
+        ),
         new Put(),
         new Delete(),
     ],
@@ -38,36 +47,44 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     use Timestampable;
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id;
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'Ramsey\Uuid\Doctrine\UuidGenerator')]
+    private ?UuidInterface $id;
 
     #[ORM\Column(length: 50)]
+    #[Groups('read', 'write')]
     private ?string $email;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
+    #[Groups('read', 'write')]
     private array $roles = [];
 
     /**
      * @var string The hashed password
      */
     #[ORM\Column]
+    #[Groups('write')]
     private ?string $password;
 
     #[ORM\Column(length: 50)]
+    #[Groups('read', 'write')]
     private ?string $firstname;
 
     #[ORM\Column(length: 50)]
+    #[Groups('read', 'write')]
     private ?string $lastname;
 
     #[ORM\Column(length: 20)]
+    #[Groups('read', 'write')]
     private ?string $number;
 
-    #[ORM\Column(length: 150)]
-    private ?string $address;
+    #[ORM\Column(length: 255, type: 'json')]
+    #[Groups('read', 'write')]
+    private ?array $address;
 
     #[ORM\PrePersist]
     public function onPrePersist(): void
@@ -83,7 +100,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->setUpdatedAt(new \DateTime());
     }
 
-    public function getId(): ?int
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }
@@ -192,12 +209,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getAddress(): ?string
+    public function getAddress(): ?array
     {
         return $this->address;
     }
 
-    public function setAddress(string $address): static
+    public function setAddress(array  $address): static
     {
         $this->address = $address;
 

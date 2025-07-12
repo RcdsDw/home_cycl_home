@@ -46,6 +46,10 @@ migration:
 migrate:
 	$(COMPOSE) exec backend php bin/console doctrine:migrations:migrate
 
+# Fixtures
+fixtures:
+	${COMPOSE} exec backend php bin/console doctrine:fixtures:load
+
 # Connect to db
 db: 
 	$(COMPOSE) exec db psql -U postgres -d home_cycl_home

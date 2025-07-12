@@ -9,7 +9,6 @@ export async function createUser(values) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -35,7 +34,6 @@ export async function updateUser(id, values) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -58,9 +56,8 @@ export async function deleteUser(id) {
         const response = await fetch(`${API_URL}/users/${id}`, {
             method: 'DELETE',
             headers: {
-            'Content-Type': 'application/json',
+                'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -84,9 +81,8 @@ export async function getUsers() {
         const response = await fetch(`${API_URL}/users`, {
             method: 'GET',
             headers: {
-            'Content-Type': 'application/json',
+                'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -97,7 +93,7 @@ export async function getUsers() {
                 data: data,
             };
         }
-        
+
         return data;
     } catch (error) {
         throw error;
@@ -111,7 +107,6 @@ export async function getUserById(id) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -136,7 +131,6 @@ export async function getTechUsers() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -147,7 +141,7 @@ export async function getTechUsers() {
                 data: data,
             };
         }
-        
+
         return data;
     } catch (error) {
         throw error;

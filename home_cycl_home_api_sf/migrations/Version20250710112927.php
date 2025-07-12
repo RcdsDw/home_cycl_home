@@ -33,7 +33,7 @@ final class Version20250710112927 extends AbstractMigration
             ALTER TABLE zones ALTER COLUMN updated_at TYPE TIMESTAMP(0) WITHOUT TIME ZONE USING updated_at::timestamp(0) without time zone
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE products ALTER created_at TYPE TIMESTAMP(0) WITHOUT TIME ZONE
+            ALTER TABLE products ALTER COLUMN created_at TYPE TIMESTAMP(0) WITHOUT TIME ZONE USING created_at::timestamp(0) without time zone
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE products ALTER COLUMN updated_at TYPE TIMESTAMP(0) WITHOUT TIME ZONE USING updated_at::timestamp(0) without time zone
@@ -54,7 +54,7 @@ final class Version20250710112927 extends AbstractMigration
             ALTER TABLE users ALTER address TYPE VARCHAR(150)
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE users ALTER created_at TYPE TIMESTAMP(0) WITHOUT TIME ZONE
+            ALTER TABLE users ALTER COLUMN created_at TYPE TIMESTAMP(0) WITHOUT TIME ZONE USING created_at::timestamp(0) without time zone
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE users ALTER COLUMN updated_at TYPE TIMESTAMP(0) WITHOUT TIME ZONE USING updated_at::timestamp(0) without time zone

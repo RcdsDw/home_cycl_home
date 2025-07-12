@@ -8,7 +8,6 @@ export async function getProducts() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();

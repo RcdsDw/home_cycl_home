@@ -3,7 +3,6 @@
 namespace App\Controller;
 
 use App\Entity\User;
-use Psr\Log\LoggerInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -20,7 +19,7 @@ class RegisterController
         $this->passwordHasher = $passwordHasher;
     }
 
-    public function __invoke(Request $request, LoggerInterface $logger): JsonResponse
+    public function __invoke(Request $request): JsonResponse
     {
         $data = json_decode($request->getContent(), true);
 

@@ -9,7 +9,6 @@ export async function createIntervention(values) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -35,7 +34,6 @@ export async function updateIntervention(id, values) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -60,7 +58,6 @@ export async function deleteIntervention(id) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -85,7 +82,6 @@ export async function getInterventionById(id) {
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -110,7 +106,6 @@ export async function getInterventions() {
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();

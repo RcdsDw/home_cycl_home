@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "server": "localhost",
+            "port": 5544,
+            "driver": "PostgreSQL",
+            "name": "home_cycl_home",
+            "username": "postgres",
+            "password": "password",
+            "database": "home_cycl_home"
+        }
+    ]
+}

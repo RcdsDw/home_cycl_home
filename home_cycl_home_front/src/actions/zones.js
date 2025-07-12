@@ -9,7 +9,6 @@ export async function createZone(values) {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -29,13 +28,12 @@ export async function createZone(values) {
 
 export async function updateZone(id, values) {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/zones/${id}`, {
+        const response = await fetch(`${API_URL}/zones/${id}`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify(values),
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -55,12 +53,11 @@ export async function updateZone(id, values) {
 
 export async function deleteZone(id) {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/zones/${id}`, {
+        const response = await fetch(`${API_URL}/zones/${id}`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -80,12 +77,11 @@ export async function deleteZone(id) {
 
 export async function getZoneById(id) {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/zones/${id}`, {
+        const response = await fetch(`${API_URL}/zones/${id}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -105,12 +101,11 @@ export async function getZoneById(id) {
 
 export async function getZones() {
     try {
-        const response = await fetch(`http://localhost:3333/api/v1/zones`, {
+        const response = await fetch(`${API_URL}/zones`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
             },
-            credentials: 'include'
         });
 
         const data = await response.json();
@@ -121,7 +116,7 @@ export async function getZones() {
                 data: data,
             };
         }
-        
+
         return data;
     } catch (error) {
         throw error;
