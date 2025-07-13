@@ -1,6 +1,0 @@
-{
-    "require": {
-        "ramsey/uuid-doctrine": "^2.1",
-        "ramsey/uuid": "^4.9"
-    }
-}
