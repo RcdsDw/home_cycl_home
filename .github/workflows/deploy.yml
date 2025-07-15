@@ -11,7 +11,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Add SSH known hosts
         run: |
@@ -19,27 +19,133 @@ jobs:
           echo "${{ secrets.SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
 
       - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.5.4
+        uses: webfactory/ssh-agent@v0.9.0
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Sync files to VPS
+      - name: Create project directory and sync files
         run: |
-          rsync -avz --exclude='.git/' ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/${{ secrets.VPS_USER }}/home_cycl_home/
-          rsync -avz \
-            home_cycl_home_api_sf/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/${{ secrets.VPS_USER }}/home_cycl_home/home_cycl_home_api_sf/
-          rsync -avz \
-            home_cycl_home_front/ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/${{ secrets.VPS_USER }}/home_cycl_home/home_cycl_home_front/
+          # Créer le dossier de destination s'il n'existe pas
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p /home/${{ secrets.VPS_USER }}/home_cycl_home"
+          
+          # Synchroniser seulement dans le dossier du projet
+          rsync -avz --delete \
+            --exclude='.git/' \
+            --exclude='node_modules/' \
+            --exclude='*.log' \
+            --exclude='.env' \
+            --exclude='.env.local' \
+            ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/${{ secrets.VPS_USER }}/home_cycl_home/
 
-      - name: Deploy backend & frontend
+      - name: Deploy to VPS
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
+            set -e  # Arrêter le script si une commande échoue
+            
+            mkdir -p "/home/${{ secrets.VPS_USER }}/backups"
             cd /home/${{ secrets.VPS_USER }}/home_cycl_home
+            
+            echo "🔄 Début du déploiement..."
+            
+            # Backup de l'ancienne version
+            if [ -d "../backups/backup_$(date +%Y%m%d)" ]; then
+              rm -rf "../backups/backup_$(date +%Y%m%d)"
+            fi
+            cp -r . "../backups/backup_$(date +%Y%m%d)" || echo "⚠️  Backup échoué, mais on continue"
+            
+            # Arrêt des services existants
+            echo "🛑 Arrêt des containers Docker..."
+            docker compose down || echo "Aucun container à arrêter"
+            
+            # Libération du port si occupé
+            sudo fuser -k 82/tcp || true
+            
+            # Rebuild et lancement des containers
+            echo "🐳 Construction et lancement des containers..."
+            docker compose up -d --build --remove-orphans
+            
+            # Attendre que les containers soient prêts
+            sleep 10
+            
+            # Lancer les migrations Doctrine
+            echo "📦 Lancement des migrations Doctrine..."
+            docker compose exec -T backend php bin/console doctrine:migrations:migrate --no-interaction
 
-            # Rebuild et relance les conteneurs Docker
-            docker compose up -d --build
-
-            # Front avec pm2 (redémarre si déjà lancé, sinon démarre)
-            cd home_cycl_home_front
-            pm2 restart front || pm2 start npm --name front -- start
+            # Vérifier le statut Docker
+            DOCKER_STATUS=$(docker compose ps --format "table {{.Service}}\t{{.Status}}" | tail -n +2)
+            DOCKER_SUCCESS=true
+            
+            if ! docker compose ps | grep -q "Up"; then
+              DOCKER_SUCCESS=false
+              echo "❌ Erreur: Aucun container Docker n'est actif"
+            fi
+            
+            # Déploiement du front (si pas dans Docker)
+            FRONT_STATUS="Non déployé"
+            FRONT_SUCCESS=true
+            
+            if [ -d "home_cycl_home_front" ]; then
+              echo "🎨 Déploiement du front..."
+              cd home_cycl_home_front
+              
+              # Installation des dépendances si package.json a changé
+              if [ package.json -nt node_modules/.package-lock.json ] || [ ! -d node_modules ]; then
+                echo "📦 Installation des dépendances..."
+                timeout 300 npm install --omit=dev || {
+                  echo "❌ Installation des dépendances échouée"
+                  FRONT_SUCCESS=false
+                  FRONT_STATUS="Erreur installation npm"
+                }
+              else
+                echo "📦 Dépendances déjà à jour"
+              fi
+              
+              # Restart avec PM2
+              if pm2 describe front > /dev/null 2>&1; then
+                pm2 restart front
+                FRONT_STATUS="Redémarré avec PM2"
+              else
+                pm2 start npm --name front -- start
+                FRONT_STATUS="Démarré avec PM2"
+              fi
+              
+              # Vérifier que le processus PM2 fonctionne
+              if ! pm2 describe front | grep -q "online"; then
+                FRONT_SUCCESS=false
+                FRONT_STATUS="Erreur PM2"
+              fi
+              
+              cd ..
+            fi
+            
+            # Déterminer le statut global
+            if [ "$DOCKER_SUCCESS" = true ] && [ "$FRONT_SUCCESS" = true ]; then
+              DEPLOY_STATUS="✅ Succès"
+              EMBED_COLOR=3066993
+            else
+              DEPLOY_STATUS="❌ Échec partiel"
+              EMBED_COLOR=15158332
+            fi
+            
+            # Formatage du statut Docker pour Discord
+            DOCKER_STATUS_FORMATTED=$(echo "$DOCKER_STATUS" | sed 's/$/\\n/g' | tr -d '\n')
+            
+            # Notification Discord
+            curl -H "Content-Type: application/json" \
+                -X POST \
+                -d "{
+                  \"content\": \"<@246753473587052555>\",
+                  \"embeds\": [{
+                    \"title\": \"🚀 Déploiement terminé\",
+                    \"description\": \"**Statut global:** $DEPLOY_STATUS\\n\\n**Front:** $FRONT_STATUS\\n\\n**Docker:**\\n\`\`\`\\n$DOCKER_STATUS_FORMATTED\`\`\`\",
+                    \"color\": $EMBED_COLOR,
+                    \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
+                    \"footer\": {
+                      \"text\": \"Déploiement automatique\"
+                    }
+                  }]
+                }" \
+                ${{ secrets.DISCORD_WEBHOOK_URL }}
+            
+            echo "✅ Déploiement terminé !"
           EOF
