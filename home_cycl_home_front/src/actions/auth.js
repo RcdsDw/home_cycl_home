@@ -64,3 +64,25 @@ export async function authLogout() {
     throw error;
   }
 }
+
+
+// import { getReq, postReq } from "./api";
+
+// export async function authRegister(values) {
+//   return postReq("/register", values, false)
+// }
+
+// export async function authLogin(values) {
+//   const data = postReq("/login", values, false)
+
+//   if (data) {
+//     localStorage.setItem('token', data.token);
+//     const user = getReq("/me")
+//     localStorage.setItem("user", JSON.stringify(user))
+//     return user;
+//   }
+// }
+
+// export async function authLogout() {
+//   getReq("/logout", false)
+// }
