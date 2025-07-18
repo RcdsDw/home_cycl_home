@@ -21,5 +21,5 @@ export async function getUserById(id) {
 }
 
 export async function getTechUsers() {
-    return await getReq(`/users/tech`)
+    return await getReq(`/users?roles=ROLE_TECH`)
 }

@@ -39,7 +39,7 @@ export default function Map() {
         try {
             const res = await getZones();
             setZones(res.data);
-    
+
             const techData = {};
             for (let zone of res.data) {
                 if (zone.userId) {
@@ -118,17 +118,17 @@ export default function Map() {
             message.error("Veuillez saisir un nom pour la zone.");
             return;
         }
-    
+
         if (!newTechUser) {
             message.error("Veuillez sélectionner un technicien.");
             return;
         }
-    
+
         const updatedZone = {
             name: newZoneName,
             user_id: newTechUser,
         };
-    
+
         try {
             await updateZone(editingZone, updatedZone);
             fetchZones();
@@ -159,11 +159,11 @@ export default function Map() {
     const renderZones = () => {
         return zones.map((zone, index) => {
             if (!Array.isArray(zone.coordinates) || zone.coordinates.length === 0) return null;
-    
+
             const randomColor = getRandomColor();
 
             const positions = zone.coordinates.map(coord => [coord.lat, coord.lng])
-    
+
             return (
                 <Polygon
                     key={index}
@@ -191,7 +191,7 @@ export default function Map() {
                         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                         url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                     />
-                    <Marker title="Magasin" position={[45.750, 4.850]} icon={storeIcon}/>
+                    <Marker title="Magasin" position={[45.750, 4.850]} icon={storeIcon} />
 
                     <FeatureGroup>
                         <EditControl
@@ -213,7 +213,7 @@ export default function Map() {
                 <div style={styles.zoneList}>
                     <h3>Zones créées</h3>
                     <ul>
-                        {zones.map((zone) => (
+                        {zones && zones.map((zone) => (
                             <li key={zone.id} style={styles.zoneItem}>
                                 {editingZone !== zone.id && (
                                     <>
@@ -224,12 +224,12 @@ export default function Map() {
                                             <small style={styles.description}>Pris en charge par : {techUsers[zone.userId] || 'Inconnu'}</small>
                                         </div>
                                         <EditOutlined
-                                            style={styles.editIcon} 
+                                            style={styles.editIcon}
                                             onClick={() => handleEditZone(zone)}
                                         />
-                                        <DeleteOutlined 
-                                            style={styles.deleteIcon} 
-                                            onClick={() => handleDeleteZone(zone.id)} 
+                                        <DeleteOutlined
+                                            style={styles.deleteIcon}
+                                            onClick={() => handleDeleteZone(zone.id)}
                                         />
                                     </>
                                 )}
@@ -247,9 +247,9 @@ export default function Map() {
                                                 setSelectedTechUser={setNewTechUser}
                                             />
                                         </div>
-                                        <div style={{ display: "flex", justifyContent: "space-between"}}>
-                                            <button onClick={handleSaveZone} style={{...styles.button, ...styles.editButton}}>Modifier</button>
-                                            <button onClick={handleCancelEdit} style={{...styles.button, ...styles.cancelButton}}>Annuler</button>
+                                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                                            <button onClick={handleSaveZone} style={{ ...styles.button, ...styles.editButton }}>Modifier</button>
+                                            <button onClick={handleCancelEdit} style={{ ...styles.button, ...styles.cancelButton }}>Annuler</button>
                                         </div>
                                     </div>
                                 )}
@@ -275,7 +275,7 @@ export default function Map() {
                         <SelectTech selectedTechUser={selectedTechUser} setSelectedTechUser={setSelectedTechUser} />
                         <small style={styles.description}>Choisissez un technicien à affecter à cette zone.</small>
                     </div>
-                    <button style={{...styles.button, ...styles.addButton}} onClick={handleAddZone}>
+                    <button style={{ ...styles.button, ...styles.addButton }} onClick={handleAddZone}>
                         Ajouter Zone
                     </button>
                 </div>
