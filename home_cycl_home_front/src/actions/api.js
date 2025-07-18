@@ -41,7 +41,7 @@ export function getReq(endpoint, token = true) {
 /**
  * @param {string} method - "POST"
  * @param {string} endpoint - "/route"
- * @param {object|null} payload - datas to send (default = null
+ * @param {object|null} payload - datas to send (default = null)
  * @param {boolean} token - default = true
  */
 export function postReq(endpoint, payload, token = true) {
@@ -50,7 +50,7 @@ export function postReq(endpoint, payload, token = true) {
 /**
  * @param {string} method - "PATCH"
  * @param {string} endpoint - "/route"
- * @param {object|null} payload - datas to send (default = null
+ * @param {object|null} payload - datas to send (default = null)
  * @param {boolean} token - default = true
  */
 export function patchReq(endpoint, payload, token = true) {
