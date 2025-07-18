@@ -1,26 +1,21 @@
-/* eslint-disable no-throw-literal */
-const API_URL = process.env.REACT_APP_API_URL;
+import { deleteReq, getReq, patchReq, postReq } from "./api";
+
+export async function createProduct(values) {
+    return await postReq("/products/new", values)
+}
+
+export async function updateProduct(values, id) {
+    return await patchReq(`/products/${id}`, values)
+}
+
+export async function deleteProduct(id) {
+    return await deleteReq(`/products/${id}`)
+}
 
 export async function getProducts() {
-    try {
-        const response = await fetch(`${API_URL}/products`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
+    return await getReq("/products")
+}
 
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw {
-                status: response.status,
-                data: data,
-            };
-        }
-
-        return data;
-    } catch (error) {
-        throw error;
-    }
+export async function getProductById(id) {
+    return await getReq(`/products/${id}`)
 }
