@@ -1,21 +1,27 @@
-import React from "react";
+import React, { useState } from "react";
 import { Form, Input, Button, message } from "antd";
 import { authLogin } from "../../actions/auth";
 import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
+    const [loading, setLoading] = useState();
     const [form] = Form.useForm();
     const nav = useNavigate();
 
-    const onFinish = (values) => {
-        authLogin(values)
-            .then(() => {
-                message.success(`Connecté`);
-                nav("/dashboard");
-            })
-            .catch(() => {
-                message.error("Identifiants invalides");
-            });
+    const onFinish = async (values) => {
+        setLoading(true)
+        try {
+            await authLogin(values)
+                .then(() => {
+                    message.success(`Connecté`);
+                    nav("/dashboard");
+                })
+        } catch (err) {
+            message.error("Identifiants invalides");
+            console.error(err)
+        } finally {
+            setLoading(false)
+        }
     };
 
     return (
@@ -48,7 +54,7 @@ export default function LoginForm() {
             </Form.Item>
 
             <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                <Button type="primary" htmlType="submit">
+                <Button type="primary" htmlType="submit" loading={loading}>
                     Se connecter
                 </Button>
             </Form.Item>
