@@ -88,7 +88,7 @@ export default function Interventions() {
       key: 'bike',
       render: (text) => (
         <Tag color={text === "ville" ? "green" : text === "electrique" ? "geekblue" : "orange"} key={text}>
-            {text.toUpperCase()}
+          {text.toUpperCase()}
         </Tag>
       ),
     },
@@ -98,7 +98,7 @@ export default function Interventions() {
       key: 'service',
       render: (text) => (
         <Tag color={text === "reparation" ? "red" : "orange"} key={text}>
-            {text.toUpperCase()}
+          {text.toUpperCase()}
         </Tag>
       ),
     },

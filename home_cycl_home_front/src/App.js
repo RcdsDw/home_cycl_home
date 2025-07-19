@@ -22,8 +22,8 @@ export default function App() {
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/users" element={<Users />} />
-          <Route path="/user/new" element={<NewUser />} />
-          <Route path="/user/show/:id" element={<ShowUser />} />
+          <Route path="/users/new" element={<NewUser />} />
+          <Route path="/users/show/:id" element={<ShowUser />} />
           <Route path="/users/edit/:id" element={<EditUser />} />
           <Route path="/planning" element={<Planning />} />
           <Route path="/interventions" element={<Interventions />} />

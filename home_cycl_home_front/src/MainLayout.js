@@ -13,7 +13,6 @@ export default function Dashboard() {
   const [menuItems, setMenuItems] = useState([]);
   const [navItems, setNavItems] = useState([]);
   const [currentUser, setCurrentUser] = useState({})
-  console.log("🚀 ~ Dashboard ~ currentUser:", currentUser, JSON.parse(localStorage.getItem('user')))
 
   const nav = useNavigate();
 

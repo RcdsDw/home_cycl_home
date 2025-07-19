@@ -189,7 +189,7 @@ export default function NewIntervention() {
                 mode="multiple"
                 placeholder="Sélectionnez des produits"
                 onChange={handleProductChange}
-                options={products.map((product) => ({
+                options={products && products.map((product) => ({
                   label: `${product.name} (${product.price.toFixed(2)} €)`,
                   value: product.id,
                 }))}

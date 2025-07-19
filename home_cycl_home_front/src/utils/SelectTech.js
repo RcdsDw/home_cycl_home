@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Select } from 'antd';
 import { getTechUsers } from '../actions/user';
+import { parseID } from './ParseID';
 
 const { Option } = Select;
 
-export default function SelectTech({selectedTechUser, setSelectedTechUser}) {
+export default function SelectTech({ selectedTechUser, setSelectedTechUser }) {
     const [techUsers, setTechUsers] = useState([]);
 
     useEffect(() => {
@@ -14,7 +15,7 @@ export default function SelectTech({selectedTechUser, setSelectedTechUser}) {
     const fetchTechUsers = async () => {
         try {
             const res = await getTechUsers();
-            setTechUsers(res.data);
+            setTechUsers(res.member);
         } catch (error) {
             console.error("Erreur lors de la récupération des techniciens", error);
         }
@@ -34,7 +35,7 @@ export default function SelectTech({selectedTechUser, setSelectedTechUser}) {
             <Option disabled value={null}>Sélectionnez un utilisateur</Option>
 
             {techUsers && techUsers.map((user) => (
-                <Option key={user.id} value={user.id}>
+                <Option key={parseID(user)} value={parseID(user)}>
                     {user.firstname} {user.lastname}
                 </Option>
             ))}
