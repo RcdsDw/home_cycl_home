@@ -1,6 +1,7 @@
 const API_URL = process.env.REACT_APP_API_URL;
 
 async function api(method, endpoint, payload = null, token = true) {
+    console.log(localStorage.getItem('token'))
     const headers = {
         'Content-Type': 'application/json',
         ...(token && { 'Authorization': `Bearer ${localStorage.getItem('token')}` }),
