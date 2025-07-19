@@ -1,13 +1,15 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useNavigate, useParams } from "react-router-dom";
-import { Button, Card, Descriptions, Empty, Tag, Spin, Row, Col } from "antd";
-import { getUserById } from "../../actions/user";
 import React, { useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+
+import { Button, Card, Descriptions, Empty, Tag, Spin, Row, Col } from "antd";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from 'leaflet';
-
 import 'leaflet/dist/leaflet.css';
 import dayjs from "dayjs";
+
+import { getUserById } from "../../actions/user";
+import TagRoles from "../../utils/TagRoles";
 
 export default function ShowUser() {
     const [loading, setLoading] = useState(true);
@@ -22,7 +24,7 @@ export default function ShowUser() {
     const fetchUser = async () => {
         try {
             const res = await getUserById(id);
-            setUser(res.data);
+            setUser(res);
         } catch (error) {
             console.error("Erreur lors de la récupération de l'utilisateur", error);
         } finally {
@@ -58,10 +60,10 @@ export default function ShowUser() {
             <Button type="primary" style={styles.button} onClick={() => nav("/users")}>
                 Retour à la liste
             </Button>
-            <Button 
+            <Button
                 type="primary"
                 color="danger"
-                style={styles.button} 
+                style={styles.button}
                 onClick={() => nav(`/users/edit/${id}`)}
             >
                 Modifier
@@ -80,9 +82,7 @@ export default function ShowUser() {
                                 {user.lastname || "Non renseigné"}
                             </Descriptions.Item>
                             <Descriptions.Item label="Rôle">
-                                <Tag color={user.role === "admin" ? "red" : user.role === "tech" ? "orange" : "geekblue"}>
-                                    {user.role.toUpperCase()}
-                                </Tag>
+                                <TagRoles roles={user.roles} />
                             </Descriptions.Item>
                             <Descriptions.Item label="Numéro de téléphone">
                                 {user.number || "Non renseigné"}
@@ -91,7 +91,7 @@ export default function ShowUser() {
                                 {user.email || "Non renseigné"}
                             </Descriptions.Item>
                             <Descriptions.Item label="Adresse">
-                                {user.address?.value || "Non renseignée"}
+                                {user.address.street + ", " + user.address.code + " " + user.address.city || "Non renseignée"}
                             </Descriptions.Item>
                             <Descriptions.Item label="Date de création">
                                 {dayjs(user.created_at).format("DD/MM/YYYY HH:mm")}

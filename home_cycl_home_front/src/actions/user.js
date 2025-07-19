@@ -1,149 +1,25 @@
-/* eslint-disable no-throw-literal */
-const API_URL = process.env.REACT_APP_API_URL;
+import { deleteReq, getReq, patchReq, postReq } from "./api";
 
 export async function createUser(values) {
-    try {
-        const response = await fetch(`${API_URL}/users/new`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(values),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw {
-                status: response.status,
-                data: data,
-            };
-        }
-
-        return data;
-    } catch (error) {
-        throw error;
-    }
+    return await postReq("/users/new", values)
 }
 
-export async function updateUser(id, values) {
-    try {
-        const response = await fetch(`${API_URL}/users/${id}`, {
-            method: 'PATCH',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(values),
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw {
-                status: response.status,
-                data: data,
-            };
-        }
-
-        return data;
-    } catch (error) {
-        throw error;
-    }
+export async function updateUser(values, id) {
+    return await patchReq(`/users/${id}`, values)
 }
 
 export async function deleteUser(id) {
-    try {
-        const response = await fetch(`${API_URL}/users/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw {
-                status: response.status,
-                data: data,
-            };
-        }
-
-        return data;
-    } catch (error) {
-        throw error;
-    }
+    return await deleteReq(`/users/${id}`)
 }
 
-
 export async function getUsers() {
-    try {
-        const response = await fetch(`${API_URL}/users`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw {
-                status: response.status,
-                data: data,
-            };
-        }
-
-        return data;
-    } catch (error) {
-        throw error;
-    }
+    return await getReq("/users")
 }
 
 export async function getUserById(id) {
-    try {
-        const response = await fetch(`${API_URL}/users/${id}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw {
-                status: response.status,
-                data: data,
-            };
-        }
-
-        return data;
-    } catch (error) {
-        throw error;
-    }
+    return await getReq(`/users/${id}`)
 }
 
 export async function getTechUsers() {
-    try {
-        const response = await fetch(`${API_URL}/users/tech`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-        });
-
-        const data = await response.json();
-
-        if (!response.ok) {
-            throw {
-                status: response.status,
-                data: data,
-            };
-        }
-
-        return data;
-    } catch (error) {
-        throw error;
-    }
+    return await getReq(`/users?roles=ROLE_TECH`)
 }

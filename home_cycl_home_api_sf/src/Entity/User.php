@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use Doctrine\ORM\Mapping as ORM;
 use Ramsey\Uuid\UuidInterface;
 use App\Repository\UserRepository;
@@ -16,7 +18,6 @@ use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Provider\CurrentUserProvider;
 use App\Controller\RegisterController;
-use App\Provider\RoleTechProvider;
 use App\Traits\Timestampable;
 use Symfony\Component\Serializer\Attribute\Groups;
 
@@ -27,11 +28,6 @@ use Symfony\Component\Serializer\Attribute\Groups;
             controller: RegisterController::class,
         ),
         new GetCollection(),
-        new GetCollection(
-            uriTemplate: '/users/tech',
-            provider: RoleTechProvider::class,
-            openapi: new Operation(summary: 'Return users with role: ROLE_TECH.'),
-        ),
         new Get(),
         new Get(
             uriTemplate: '/me',
@@ -67,7 +63,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     #[Groups('read', 'write')]
-    private array $roles = [];
+    #[ApiFilter(SearchFilter::class, strategy: 'partial')]
+    private ?string $roles;
 
     /**
      * @var string The hashed password
@@ -133,22 +130,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return (string) $this->email;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function getRoles(): array
     {
         $roles = $this->roles;
 
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
+        return [$roles];
     }
 
     /**
-     * @param list<string> $roles
+     * @param string $roles
      */
-    public function setRoles(array $roles): static
+    public function setRoles(string $roles): static
     {
         $this->roles = $roles;
 
