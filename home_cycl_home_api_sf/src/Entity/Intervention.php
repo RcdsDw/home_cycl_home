@@ -3,13 +3,30 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Get;
 use App\Repository\InterventionRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Traits\Timestampable;
+use Symfony\Component\Serializer\Attribute\Groups;
 
+#[ApiResource(
+    operations: [
+        new Post(),
+        new GetCollection(),
+        new Get(),
+        new Put(),
+        new Delete(),
+    ],
+    normalizationContext: ['groups' => ['intervention:read']],
+    denormalizationContext: ['groups' => ['intervention:write']]
+)]
 #[ORM\Entity(repositoryClass: InterventionRepository::class)]
-#[ApiResource]
+#[ORM\Table(name: "interventions")]
 class Intervention
 {
     use Timestampable;
@@ -20,13 +37,24 @@ class Intervention
     private ?int $id = null;
 
     #[ORM\Column]
+    #[Groups('intervention:read', 'intervention:write')]
     private ?\DateTime $start_date = null;
 
     #[ORM\Column]
+    #[Groups('intervention:read', 'intervention:write')]
     private ?\DateTime $end_date = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups('intervention:read', 'intervention:write')]
     private ?string $comment = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'clientInterventions')]
+    #[Groups('intervention:read', 'intervention:write')]
+    private ?User $client = null;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'technicianInterventions')]
+    #[Groups('intervention:read', 'intervention:write')]
+    private ?User $technician = null;
 
     #[ORM\PrePersist]
     public function onPrePersist(): void
@@ -80,6 +108,28 @@ class Intervention
     {
         $this->comment = $comment;
 
+        return $this;
+    }
+
+    public function getClient(): ?User
+    {
+        return $this->client;
+    }
+
+    public function setClient(?User $client): static
+    {
+        $this->client = $client;
+        return $this;
+    }
+
+    public function getTechnician(): ?User
+    {
+        return $this->technician;
+    }
+
+    public function setTechnician(?User $technician): static
+    {
+        $this->technician = $technician;
         return $this;
     }
 }

@@ -19,7 +19,10 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use App\Provider\CurrentUserProvider;
 use App\Controller\RegisterController;
 use App\Traits\Timestampable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Serializer\Attribute\MaxDepth;
 
 #[ApiResource(
     operations: [
@@ -37,8 +40,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Put(),
         new Delete(),
     ],
-    normalizationContext: ['groups' => ['read']],
-    denormalizationContext: ['groups' => ['write']]
+    normalizationContext: ['groups' => ['user:read', 'intervention:read']],
+    denormalizationContext: ['groups' => ['user:write']]
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: "users")]
@@ -55,14 +58,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?UuidInterface $id;
 
     #[ORM\Column(length: 50)]
-    #[Groups('read', 'write')]
+    #[Groups('user:read', 'user:write')]
     private ?string $email;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    #[Groups('read', 'write')]
+    #[Groups('zone:read', 'intervention:read', 'user:read', 'user:write')]
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     private ?string $roles;
 
@@ -70,24 +73,46 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Groups('write')]
+    #[Groups('user:write')]
     private ?string $password;
 
     #[ORM\Column(length: 50)]
-    #[Groups('read', 'write')]
+    #[Groups('zone:read', 'intervention:read', 'user:read', 'user:write')]
     private ?string $firstname;
 
     #[ORM\Column(length: 50)]
-    #[Groups('read', 'write')]
+    #[Groups('zone:read', 'intervention:read', 'user:read', 'user:write')]
     private ?string $lastname;
 
     #[ORM\Column(length: 20)]
-    #[Groups('read', 'write')]
+    #[Groups('intervention:read', 'user:read', 'user:write')]
     private ?string $number;
 
     #[ORM\Column(length: 255, type: 'json')]
-    #[Groups('read', 'write')]
+    #[Groups('intervention:read', 'user:read', 'user:write')]
     private ?array $address;
+
+    #[ORM\OneToOne(inversedBy: 'technician', cascade: ['persist'])]
+    #[ORM\JoinColumn(name: 'technician_zone_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[MaxDepth(1)]
+    #[Groups(['user:read'])]
+    private ?Zone $technicianZone = null;
+
+    #[ORM\ManyToOne(inversedBy: 'clients')]
+    #[ORM\JoinColumn(name: 'client_zone_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
+    #[MaxDepth(1)]
+    #[Groups(['user:read'])]
+    private ?Zone $clientZone = null;
+
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Bicycles::class)]
+    #[Groups(['intervention:read', 'user:read'])]
+    private Collection $bicycles;
+
+    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Intervention::class)]
+    private Collection $clientInterventions;
+
+    #[ORM\OneToMany(mappedBy: 'technician', targetEntity: Intervention::class)]
+    private Collection $technicianInterventions;
 
     #[ORM\PrePersist]
     public function onPrePersist(): void
@@ -101,6 +126,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function onPreUpdate(): void
     {
         $this->setUpdatedAt(new \DateTime());
+    }
+
+    public function __construct()
+    {
+        $this->bicycles = new ArrayCollection();
+        $this->clientInterventions = new ArrayCollection();
+        $this->technicianInterventions = new ArrayCollection();
     }
 
     public function getId(): ?UuidInterface
@@ -217,5 +249,58 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->address = $address;
 
         return $this;
+    }
+
+    public function getTechnicianZone(): ?Zone
+    {
+        return $this->technicianZone;
+    }
+
+    public function setTechnicianZone(?Zone $technicianZone): static
+    {
+        $this->technicianZone = $technicianZone;
+        return $this;
+    }
+
+    public function getClientZone(): ?Zone
+    {
+        return $this->clientZone;
+    }
+
+    public function setClientZone(?Zone $clientZone): static
+    {
+        $this->clientZone = $clientZone;
+        return $this;
+    }
+
+    public function addBicycle(Bicycles $bicycle): static
+    {
+        if (!$this->bicycles->contains($bicycle)) {
+            $this->bicycles[] = $bicycle;
+            $bicycle->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeBicycle(Bicycles $bicycle): static
+    {
+        if ($this->bicycles->removeElement($bicycle)) {
+            if ($bicycle->getOwner() === $this) {
+                $bicycle->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getClientInterventions(): Collection
+    {
+        return $this->clientInterventions;
+    }
+
+    public function getTechnicianInterventions(): Collection
+    {
+        return $this->technicianInterventions;
     }
 }

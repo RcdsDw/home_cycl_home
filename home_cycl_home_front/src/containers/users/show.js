@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { Button, Card, Descriptions, Empty, Tag, Spin, Row, Col } from "antd";
+import { Button, Card, Descriptions, Empty, Spin, Row, Col } from "antd";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
