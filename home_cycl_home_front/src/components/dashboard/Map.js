@@ -20,7 +20,7 @@ export default function MapView({ zones, onZoneCreated }) {
     return (
         <MapContainer
             style={{ width: '100%', height: '500px' }}
-            center={[45.750, 4.850]}
+            center={[43.750, 4.650]}
             zoom={12}
             scrollWheelZoom={false}
             ref={mapRef}
@@ -30,7 +30,7 @@ export default function MapView({ zones, onZoneCreated }) {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            <Marker title="Magasin" position={[45.750, 4.850]} icon={storeIcon} />
+            <Marker title="Magasin" position={[43.750, 4.650]} icon={storeIcon} />
 
             <FeatureGroup>
                 <EditControl
@@ -46,10 +46,10 @@ export default function MapView({ zones, onZoneCreated }) {
             </FeatureGroup>
 
             {zones && zones.length > 0 && zones.map((zone, index) => {
-                if (!Array.isArray(zone.coordinates) || zone.coordinates.length === 0) return null;
+                if (!Array.isArray(zone.coords) || zone.coords.length === 0) return null;
 
                 const randomColor = getRandomColor();
-                const positions = zone.coordinates.map(coord => [coord.lat, coord.lng]);
+                const positions = zone.coords.map(coord => [coord.lat, coord.lng]);
 
                 return (
                     <Polygon key={index} positions={positions} color={randomColor}>

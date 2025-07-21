@@ -2,7 +2,7 @@ const API_URL = process.env.REACT_APP_API_URL;
 
 async function api(method, endpoint, payload = null, token = true) {
     const headers = {
-        'Content-Type': 'application/json',
+        'Content-Type': 'application/ld+json',
         ...(token && { 'Authorization': `Bearer ${localStorage.getItem('token')}` }),
     };
 

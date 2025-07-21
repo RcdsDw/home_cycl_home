@@ -15,40 +15,16 @@ class UserFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $clients = [];
-        $technicians = [];
-
-        // 2 USERS
-        for ($i = 1; $i <= 2; $i++) {
-            $user = $this->createUser("user$i@example.com", 'password', 'ROLE_USER', "User$i", "Test", "060000000$i");
-            $manager->persist($user);
-            $clients[] = $user;
-        }
-
-        // 2 ADMINS
-        for ($i = 1; $i <= 2; $i++) {
-            $admin = $this->createUser("admin$i@example.com", 'adminpass', 'ROLE_ADMIN', "Admin$i", "Boss", "061111111$i");
-            $manager->persist($admin);
-        }
-
-        // 6 TECHS
-        for ($i = 1; $i <= 6; $i++) {
-            $tech = $this->createUser("tech$i@example.com", 'techpass', 'ROLE_TECH', "Tech$i", "Support", "062222222$i");
-            $manager->persist($tech);
-            $technicians[] = $tech;
-        }
-
-        // Flush first to have IDs
-        $manager->flush();
-
         // Create 5 zones
         $zones = [];
         for ($i = 1; $i <= 5; $i++) {
             $zone = new Zone();
             $zone->setName("Zone $i");
             $zone->setCoords([
-                ['lat' => 48.85 + $i * 0.01, 'lng' => 2.35 + $i * 0.01],
-                ['lat' => 48.86 + $i * 0.01, 'lng' => 2.36 + $i * 0.01],
+                ['lat' => 43.46 + $i / 10 * 0.01, 'lng' => 4.69 + $i / 10 * 0.01],
+                ['lat' => 43.36 + $i / 10 * 0.01, 'lng' => 4.59 + $i / 10 * 0.01],
+                ['lat' => 43.26 + $i / 10 * 0.01, 'lng' => 4.49 + $i / 10 * 0.01],
+                ['lat' => 43.16 + $i / 10 * 0.01, 'lng' => 4.39 + $i / 10 * 0.01],
             ]);
             $now = new \DateTime();
             $zone->setCreatedAt($now);
@@ -58,6 +34,33 @@ class UserFixtures extends Fixture
             $zones[] = $zone;
         }
 
+        $manager->flush();
+
+        $clients = [];
+        $technicians = [];
+
+        // 2 USERS
+        for ($i = 1; $i <= 10; $i++) {
+            $user = $this->createUser("user$i@example.com", 'password', 'ROLE_USER', "User$i", "Test$i$i$i", "060000000$i");
+            $manager->persist($user);
+            $clients[] = $user;
+        }
+
+        // 2 ADMINS
+        for ($i = 1; $i <= 3; $i++) {
+            $admin = $this->createUser("admin$i@example.com", 'adminpass', 'ROLE_ADMIN', "Admin$i", "Boss$i$i$i", "061111111$i");
+            $manager->persist($admin);
+        }
+
+        // 6 TECHS
+        for ($i = 1; $i <= 5; $i++) {
+            $tech = $this->createUser("tech$i@example.com", 'techpass', 'ROLE_TECH', "Tech$i", "Support$i$i$i", "062222222$i");
+            $tech->setTechnicianZone($zones[$i - 1]);
+            $manager->persist($tech);
+            $technicians[] = $tech;
+        }
+
+        // Flush first to have IDs
         $manager->flush();
 
         // Create 20 interventions
@@ -99,7 +102,7 @@ class UserFixtures extends Fixture
             'street' => '123 rue Exemple',
             'city' => 'Paris',
             'code' => '75000',
-            'coords' => ['lat' => 48.8566, 'lng' => 2.3522]
+            'coords' => ['lat' => 43.2566, 'lng' => 4.5922]
         ]);
 
         return $user;

@@ -6,10 +6,10 @@ import ZoneList from '../../components/dashboard/ZoneList';
 import AddZoneForm from '../../components/dashboard/AddZoneForm';
 
 import { createZone, deleteZone, getZones, updateZone } from '../../actions/zones';
-import { getUserById } from '../../actions/user';
 
 export default function Dashboard() {
   const [zones, setZones] = useState([]);
+  console.log("🚀 ~ Dashboard ~ zones:", zones)
   const [zoneName, setZoneName] = useState('');
   const [currentCoordinates, setCurrentCoordinates] = useState([]);
   const [selectedTechUser, setSelectedTechUser] = useState('');
@@ -17,7 +17,6 @@ export default function Dashboard() {
   const [editingZone, setEditingZone] = useState(null);
   const [newZoneName, setNewZoneName] = useState('');
   const [newTechUser, setNewTechUser] = useState('');
-  const [techUsers, setTechUsers] = useState({});
 
   useEffect(() => {
     fetchZones();
@@ -26,16 +25,7 @@ export default function Dashboard() {
   const fetchZones = async () => {
     try {
       const res = await getZones();
-      setZones(res.data);
-
-      const techData = {};
-      for (let zone of res.data) {
-        if (zone.userId) {
-          const tech = await getUserById(zone.userId);
-          techData[zone.userId] = `${tech.data.firstname} ${tech.data.lastname}`;
-        }
-      }
-      setTechUsers(techData);
+      setZones(res.member);
     } catch (error) {
       console.error("Erreur lors de la récupération des zones", error);
     }
@@ -71,8 +61,8 @@ export default function Dashboard() {
 
     const zoneData = {
       name: `Zone ${zoneName}`,
-      coordinates: formattedCoordinates,
-      user_id: selectedTechUser,
+      coords: formattedCoordinates,
+      technician: `/api/users/${selectedTechUser}`,
     };
 
     try {
@@ -149,7 +139,6 @@ export default function Dashboard() {
 
         <ZoneList
           zones={zones}
-          techUsers={techUsers}
           editingZone={editingZone}
           newZoneName={newZoneName}
           newTechUser={newTechUser}

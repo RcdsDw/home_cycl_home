@@ -17,16 +17,21 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(
     operations: [
         new Post(),
-        new GetCollection(),
-        new Get(),
+        new GetCollection(
+            normalizationContext: ['groups' => ['intervention:list', 'intervention:users']]
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['intervention:read', 'intervention:users']]
+        ),
         new Put(),
         new Delete(),
     ],
-    normalizationContext: ['groups' => ['intervention:read']],
+    normalizationContext: ['groups' => ['intervention:read'], 'max_depth' => 2],
     denormalizationContext: ['groups' => ['intervention:write']]
 )]
 #[ORM\Entity(repositoryClass: InterventionRepository::class)]
 #[ORM\Table(name: "interventions")]
+#[ORM\HasLifecycleCallbacks]
 class Intervention
 {
     use Timestampable;
@@ -34,26 +39,29 @@ class Intervention
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['intervention:read', 'intervention:list', 'user:read'])]
     private ?int $id = null;
 
     #[ORM\Column]
-    #[Groups('intervention:read', 'intervention:write')]
+    #[Groups(['intervention:read', 'intervention:list', 'intervention:write', 'user:read'])]
     private ?\DateTime $start_date = null;
 
     #[ORM\Column]
-    #[Groups('intervention:read', 'intervention:write')]
+    #[Groups(['intervention:read', 'intervention:list', 'intervention:write', 'user:read'])]
     private ?\DateTime $end_date = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups('intervention:read', 'intervention:write')]
+    #[Groups(['intervention:read', 'intervention:write', 'user:read'])]
     private ?string $comment = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'clientInterventions')]
-    #[Groups('intervention:read', 'intervention:write')]
+    #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['intervention:read', 'intervention:list', 'intervention:write'])]
     private ?User $client = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'technicianInterventions')]
-    #[Groups('intervention:read', 'intervention:write')]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['intervention:read', 'intervention:list', 'intervention:write'])]
     private ?User $technician = null;
 
     #[ORM\PrePersist]
@@ -83,7 +91,6 @@ class Intervention
     public function setStartDate(\DateTime $start_date): static
     {
         $this->start_date = $start_date;
-
         return $this;
     }
 
@@ -95,7 +102,6 @@ class Intervention
     public function setEndDate(\DateTime $end_date): static
     {
         $this->end_date = $end_date;
-
         return $this;
     }
 
@@ -107,7 +113,6 @@ class Intervention
     public function setComment(?string $comment): static
     {
         $this->comment = $comment;
-
         return $this;
     }
 
@@ -131,5 +136,33 @@ class Intervention
     {
         $this->technician = $technician;
         return $this;
+    }
+
+    // Méthodes utilitaires pour éviter de sérialiser les objets User complets
+    #[Groups(['intervention:list'])]
+    public function getClientName(): ?string
+    {
+        return $this->client ?
+            $this->client->getFirstname() . ' ' . $this->client->getLastname() :
+            null;
+    }
+
+    #[Groups(['intervention:list'])]
+    public function getTechnicianName(): ?string
+    {
+        return $this->technician ?
+            $this->technician->getFirstname() . ' ' . $this->technician->getLastname() :
+            null;
+    }
+
+    #[Groups(['intervention:read', 'intervention:list'])]
+    public function getDuration(): ?string
+    {
+        if (!$this->start_date || !$this->end_date) {
+            return null;
+        }
+
+        $interval = $this->start_date->diff($this->end_date);
+        return $interval->format('%h heures %i minutes');
     }
 }

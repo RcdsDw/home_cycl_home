@@ -22,7 +22,6 @@ use App\Traits\Timestampable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Attribute\Groups;
-use Symfony\Component\Serializer\Attribute\MaxDepth;
 
 #[ApiResource(
     operations: [
@@ -40,7 +39,7 @@ use Symfony\Component\Serializer\Attribute\MaxDepth;
         new Put(),
         new Delete(),
     ],
-    normalizationContext: ['groups' => ['user:read', 'intervention:read']],
+    normalizationContext: ['groups' => ['user:read']],
     denormalizationContext: ['groups' => ['user:write']]
 )]
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -58,14 +57,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?UuidInterface $id;
 
     #[ORM\Column(length: 50)]
-    #[Groups('user:read', 'user:write')]
+    #[Groups(['user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users'])]
     private ?string $email;
 
     /**
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    #[Groups('zone:read', 'intervention:read', 'user:read', 'user:write')]
+    #[Groups(['user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users'])]
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     private ?string $roles;
 
@@ -73,45 +72,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var string The hashed password
      */
     #[ORM\Column]
-    #[Groups('user:write')]
+    #[Groups(['user:write'])]
     private ?string $password;
 
     #[ORM\Column(length: 50)]
-    #[Groups('zone:read', 'intervention:read', 'user:read', 'user:write')]
+    #[Groups(['user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users'])]
     private ?string $firstname;
 
     #[ORM\Column(length: 50)]
-    #[Groups('zone:read', 'intervention:read', 'user:read', 'user:write')]
+    #[Groups(['user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users'])]
     private ?string $lastname;
 
     #[ORM\Column(length: 20)]
-    #[Groups('intervention:read', 'user:read', 'user:write')]
+    #[Groups(['user:read', 'user:write', 'intervention:users'])]
     private ?string $number;
 
     #[ORM\Column(length: 255, type: 'json')]
-    #[Groups('intervention:read', 'user:read', 'user:write')]
+    #[Groups(['user:read', 'user:write', 'intervention:users'])]
     private ?array $address;
 
     #[ORM\OneToOne(inversedBy: 'technician', cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'technician_zone_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    #[MaxDepth(1)]
     #[Groups(['user:read'])]
     private ?Zone $technicianZone = null;
 
     #[ORM\ManyToOne(inversedBy: 'clients')]
     #[ORM\JoinColumn(name: 'client_zone_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    #[MaxDepth(1)]
     #[Groups(['user:read'])]
     private ?Zone $clientZone = null;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Bicycles::class)]
-    #[Groups(['intervention:read', 'user:read'])]
+    #[Groups(['user:read'])]
     private Collection $bicycles;
 
     #[ORM\OneToMany(mappedBy: 'client', targetEntity: Intervention::class)]
+    #[Groups(['user:read'])]
     private Collection $clientInterventions;
 
     #[ORM\OneToMany(mappedBy: 'technician', targetEntity: Intervention::class)]
+    #[Groups(['user:read'])]
     private Collection $technicianInterventions;
 
     #[ORM\PrePersist]
@@ -148,15 +147,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
@@ -165,23 +158,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getRoles(): array
     {
         $roles = $this->roles;
-
         return [$roles];
     }
 
-    /**
-     * @param string $roles
-     */
     public function setRoles(string $roles): static
     {
         $this->roles = $roles;
-
         return $this;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -190,17 +175,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
         return $this;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function eraseCredentials(): void
     {
-        // If you store any temporary, sensitive data on the user, clear it here
-        // $this->plainPassword;
+        // Clear temporary sensitive data if any
     }
 
     public function getFirstname(): ?string
@@ -211,7 +191,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setFirstname(string $firstname): static
     {
         $this->firstname = $firstname;
-
         return $this;
     }
 
@@ -223,7 +202,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastname(string $lastname): static
     {
         $this->lastname = $lastname;
-
         return $this;
     }
 
@@ -235,7 +213,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setNumber(string $number): static
     {
         $this->number = $number;
-
         return $this;
     }
 
@@ -244,10 +221,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->address;
     }
 
-    public function setAddress(array  $address): static
+    public function setAddress(array $address): static
     {
         $this->address = $address;
-
         return $this;
     }
 
@@ -273,13 +249,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * @return Collection<int, Bicycles>
+     */
+    public function getBicycles(): Collection
+    {
+        return $this->bicycles;
+    }
+
     public function addBicycle(Bicycles $bicycle): static
     {
         if (!$this->bicycles->contains($bicycle)) {
             $this->bicycles[] = $bicycle;
             $bicycle->setOwner($this);
         }
-
         return $this;
     }
 
@@ -290,15 +273,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $bicycle->setOwner(null);
             }
         }
-
         return $this;
     }
 
+    /**
+     * @return Collection<int, Intervention>
+     */
     public function getClientInterventions(): Collection
     {
         return $this->clientInterventions;
     }
 
+    /**
+     * @return Collection<int, Intervention>
+     */
     public function getTechnicianInterventions(): Collection
     {
         return $this->technicianInterventions;

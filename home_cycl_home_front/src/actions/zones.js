@@ -1,7 +1,7 @@
 import { deleteReq, getReq, patchReq, postReq } from "./api";
 
 export async function createZone(values) {
-    return await postReq("/zones/new", values)
+    return await postReq("/zones", values)
 }
 
 export async function updateZone(values, id) {

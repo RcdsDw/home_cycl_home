@@ -5,7 +5,6 @@ import SelectTech from '../../utils/SelectTech';
 
 export default function ZoneList({
     zones,
-    techUsers,
     editingZone,
     newZoneName,
     newTechUser,
@@ -27,7 +26,7 @@ export default function ZoneList({
                                 <div style={styles.flexColumn}>
                                     <span style={styles.zoneName}>{zone.name}</span>
                                     <small style={styles.description}>
-                                        Pris en charge par : {techUsers[zone.userId] || 'Inconnu'}
+                                        Pris en charge par : {(zone.technician?.firstname && zone.technician?.lastname) || 'Inconnu'}
                                     </small>
                                 </div>
                                 <EditOutlined

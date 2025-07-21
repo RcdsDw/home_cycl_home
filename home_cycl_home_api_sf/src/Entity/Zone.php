@@ -18,15 +18,20 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(
     operations: [
         new Post(),
-        new GetCollection(),
-        new Get(),
+        new GetCollection(
+            normalizationContext: ['groups' => ['zone:list']]
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['zone:read', 'zone:list', 'zone:clients']]
+        ),
         new Put(),
         new Delete(),
     ],
-    normalizationContext: ['groups' => ['zone:read', 'user:read']],
+    normalizationContext: ['groups' => ['zone:read']],
     denormalizationContext: ['groups' => ['zone:write']]
 )]
 #[ORM\Entity(repositoryClass: ZoneRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Zone
 {
     use Timestampable;
@@ -34,22 +39,23 @@ class Zone
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['zone:read', 'zone:list', 'user:read'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
-    #[Groups(['user:read', 'zone:read', 'zone:write'])]
+    #[Groups(['zone:read', 'zone:list', 'zone:write', 'user:read'])]
     private ?string $name = null;
 
     #[ORM\Column]
-    #[Groups(['user:read', 'zone:read', 'zone:write'])]
+    #[Groups(['zone:read', 'zone:list', 'zone:write', 'user:read'])]
     private array $coords = [];
 
     #[ORM\OneToOne(mappedBy: 'technicianZone', cascade: ['persist'])]
-    // #[Groups(['zone:read', 'zone:write'])]
+    #[Groups(['zone:list', 'zone:write'])]
     private ?User $technician = null;
 
     #[ORM\OneToMany(mappedBy: 'clientZone', targetEntity: User::class)]
-    // #[Groups(['zone:read', 'zone:write'])]
+    #[Groups(['zone:clients'])]
     private Collection $clients;
 
     #[ORM\PrePersist]
@@ -84,7 +90,6 @@ class Zone
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -96,7 +101,6 @@ class Zone
     public function setCoords(array $coords): static
     {
         $this->coords = $coords;
-
         return $this;
     }
 
@@ -134,7 +138,6 @@ class Zone
             $this->clients[] = $client;
             $client->setClientZone($this);
         }
-
         return $this;
     }
 
@@ -145,12 +148,6 @@ class Zone
                 $client->setClientZone(null);
             }
         }
-
         return $this;
-    }
-
-    public function getClientsCount(): int
-    {
-        return $this->clients->count();
     }
 }
