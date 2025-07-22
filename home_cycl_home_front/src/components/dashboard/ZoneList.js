@@ -26,7 +26,7 @@ export default function ZoneList({
                                 <div style={styles.flexColumn}>
                                     <span style={styles.zoneName}>{zone.name}</span>
                                     <small style={styles.description}>
-                                        Pris en charge par : {(zone.technician?.firstname && zone.technician?.lastname) || 'Inconnu'}
+                                        Pris en charge par : {`${zone.technician?.firstname} ${zone.technician?.lastname}` || 'Inconnu'}
                                     </small>
                                 </div>
                                 <EditOutlined
