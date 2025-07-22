@@ -64,6 +64,11 @@ class Intervention
     #[Groups(['intervention:read', 'intervention:list', 'intervention:write'])]
     private ?User $technician = null;
 
+    #[ORM\ManyToOne(inversedBy: 'interventions')]
+    #[ORM\JoinColumn(onDelete: 'SET NULL')]
+    #[Groups(['intervention:read', 'intervention:list'])]
+    private ?TypeIntervention $typeIntervention = null;
+
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
@@ -138,8 +143,18 @@ class Intervention
         return $this;
     }
 
+    public function getTypeIntervention(): ?TypeIntervention
+    {
+        return $this->typeIntervention;
+    }
+
+    public function setTypeIntervention(?TypeIntervention $typeIntervention): static
+    {
+        $this->typeIntervention = $typeIntervention;
+        return $this;
+    }
+
     // Méthodes utilitaires pour éviter de sérialiser les objets User complets
-    #[Groups(['intervention:list'])]
     public function getClientName(): ?string
     {
         return $this->client ?
@@ -147,7 +162,6 @@ class Intervention
             null;
     }
 
-    #[Groups(['intervention:list'])]
     public function getTechnicianName(): ?string
     {
         return $this->technician ?
@@ -155,7 +169,7 @@ class Intervention
             null;
     }
 
-    #[Groups(['intervention:read', 'intervention:list'])]
+    // #[Groups(['intervention:read', 'intervention:list'])]
     public function getDuration(): ?string
     {
         if (!$this->start_date || !$this->end_date) {

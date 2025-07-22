@@ -5,11 +5,12 @@ namespace App\DataFixtures;
 use App\Entity\User;
 use App\Entity\Zone;
 use App\Entity\Intervention;
+use App\Entity\TypeIntervention;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class UserFixtures extends Fixture
+class Fixtures extends Fixture
 {
     public function __construct(private UserPasswordHasherInterface $hasher) {}
 
@@ -63,6 +64,33 @@ class UserFixtures extends Fixture
         // Flush first to have IDs
         $manager->flush();
 
+        // Create 2 type_intervention
+        $typeIntervention1 = new TypeIntervention();
+
+        // Random dates (start today + 0-10 days, end start + 1-3 days)
+        $start = new \DateTime();
+        $end = (clone $start)->modify("+" . rand(1, 3) . " days");
+
+        $typeIntervention1->setName("Réparation");
+        $typeIntervention1->setPrice(90);
+        $typeIntervention1->setDuration(7200);
+        $manager->persist($typeIntervention1);
+
+        $typeIntervention2 = new TypeIntervention();
+
+        // Random dates (start today + 0-10 days, end start + 1-3 days)
+        $start = new \DateTime();
+        $end = (clone $start)->modify("+" . rand(1, 3) . " days");
+
+        $typeIntervention2->setName("Entretien");
+        $typeIntervention2->setPrice(40);
+        $typeIntervention2->setDuration(3600);
+        $manager->persist($typeIntervention2);
+
+        $manager->flush();
+
+        $typeInterventions = [$typeIntervention1, $typeIntervention2];
+
         // Create 20 interventions
         for ($i = 1; $i <= 20; $i++) {
             $intervention = new Intervention();
@@ -78,6 +106,7 @@ class UserFixtures extends Fixture
             // Random client + technician from lists
             $intervention->setClient($clients[array_rand($clients)]);
             $intervention->setTechnician($technicians[array_rand($technicians)]);
+            $intervention->setTypeIntervention($typeInterventions[array_rand($typeInterventions)]);
 
             $now = new \DateTime();
             $intervention->setCreatedAt($now);

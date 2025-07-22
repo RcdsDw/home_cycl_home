@@ -3,7 +3,6 @@ import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
 import { Button, Empty, message, Modal, Spin, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { deleteIntervention, getInterventions } from "../../actions/interventions";
-import { getUserById } from "../../actions/user";
 import dayjs from "dayjs";
 
 export default function Interventions() {
@@ -21,19 +20,7 @@ export default function Interventions() {
   const fetchInterventions = async () => {
     try {
       const res = await getInterventions();
-      const interventionsWithDetails = await Promise.all(
-        res.data.map(async (intervention) => {
-          const client = await getUserById(intervention.clientId);
-          const technician = await getUserById(intervention.techId);
-          return {
-            ...intervention,
-            client: `${client.data.firstname} ${client.data.lastname}`,
-            technician: `${technician.data.firstname} ${technician.data.lastname}`,
-            productsCount: intervention.products?.length || 0,
-          };
-        })
-      );
-      setDatas(interventionsWithDetails);
+      setDatas(res.member);
     } catch (error) {
       console.error("Erreur lors de la récupération des interventions :", error);
     } finally {
@@ -66,39 +53,39 @@ export default function Interventions() {
   const columns = [
     {
       title: 'Début',
-      dataIndex: 'startedAt',
-      key: 'started_at',
+      dataIndex: 'start_date',
+      key: 'start_date',
       render: (text) => <div>{dayjs(text).format("DD/MM/YYYY HH:mm")}</div>,
     },
     {
       title: 'Fin',
-      dataIndex: 'endedAt',
-      key: 'ended_at',
+      dataIndex: 'end_date',
+      key: 'end_date',
       render: (text) => <div>{dayjs(text).format("DD/MM/YYYY HH:mm")}</div>,
     },
     {
       title: 'Prix',
-      dataIndex: 'price',
+      dataIndex: 'typeIntervention',
       key: 'price',
-      render: (text) => <div>{text} €</div>,
+      render: (text) => <div>{text?.price} €</div>,
     },
-    {
-      title: 'Vélo',
-      dataIndex: 'bike',
-      key: 'bike',
-      render: (text) => (
-        <Tag color={text === "ville" ? "green" : text === "electrique" ? "geekblue" : "orange"} key={text}>
-          {text.toUpperCase()}
-        </Tag>
-      ),
-    },
+    // {
+    //   title: 'Vélo',
+    //   dataIndex: 'bike',
+    //   key: 'bike',
+    //   render: (text) => (
+    //     <Tag color={text === "ville" ? "green" : text === "electrique" ? "geekblue" : "orange"} key={text}>
+    //       {text}
+    //     </Tag>
+    //   ),
+    // },
     {
       title: 'Service',
-      dataIndex: 'service',
+      dataIndex: 'typeIntervention',
       key: 'service',
       render: (text) => (
-        <Tag color={text === "reparation" ? "red" : "orange"} key={text}>
-          {text.toUpperCase()}
+        <Tag color={text?.name === "Réparation" ? "red" : "orange"} key={text}>
+          {text?.name}
         </Tag>
       ),
     },
@@ -106,20 +93,20 @@ export default function Interventions() {
       title: 'Technicien',
       dataIndex: 'technician',
       key: 'technician',
-      render: (text) => <div>{text || "Non renseigné"}</div>,
+      render: (text) => <div>{`${text.firstname} ${text.lastname}` || "Non renseigné"}</div>,
     },
     {
       title: 'Client',
       dataIndex: 'client',
       key: 'client',
-      render: (text) => <div>{text || "Non renseigné"}</div>,
+      render: (text) => <div>{`${text.firstname} ${text.lastname}` || "Non renseigné"}</div>,
     },
-    {
-      title: 'Nombre de produits',
-      dataIndex: 'productsCount',
-      key: 'products_count',
-      render: (text) => <div>{text} produit(s)</div>,
-    },
+    // {
+    //   title: 'Nombre de produits',
+    //   dataIndex: 'productsCount',
+    //   key: 'products_count',
+    //   render: (text) => <div>{text} produit(s)</div>,
+    // },
     {
       key: 'show',
       dataIndex: 'show',
@@ -146,7 +133,7 @@ export default function Interventions() {
 
   return (
     <>
-      <Button type="primary" style={styles.button} onClick={() => nav('/interventions/new')}>
+      <Button type="primary" style={styles.button} onClick={() => nav('/interventions')}>
         Ajouter
       </Button>
       <Table columns={columns} dataSource={datas} locale={{

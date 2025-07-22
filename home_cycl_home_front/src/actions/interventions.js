@@ -1,7 +1,7 @@
 import { deleteReq, getReq, patchReq, postReq } from "./api";
 
 export async function createIntervention(values) {
-    return await postReq("/interventions/new", values)
+    return await postReq("/interventions", values)
 }
 
 export async function updateIntervention(values, id) {

@@ -2,7 +2,6 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Button, Card, Descriptions, Empty, Spin, Row, Col, Tag, List, Divider } from "antd";
 import { getInterventionById } from "../../actions/interventions";
-import { getUserById } from "../../actions/user";
 import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import dayjs from "dayjs";
@@ -11,9 +10,8 @@ import L from "leaflet";
 export default function ShowIntervention() {
     const [loading, setLoading] = useState(true);
     const [intervention, setIntervention] = useState(null);
-    const [client, setClient] = useState(null);
-    const [technician, setTechnician] = useState(null);
-    const [totalProductsPrice, setTotalProductsPrice] = useState(0);
+    console.log("🚀 ~ ShowIntervention ~ intervention:", intervention)
+    // const [totalProductsPrice, setTotalProductsPrice] = useState(0);
 
     const { id } = useParams();
     const nav = useNavigate();
@@ -25,21 +23,15 @@ export default function ShowIntervention() {
     const fetchIntervention = async () => {
         try {
             const res = await getInterventionById(id);
-            setIntervention(res.data);
+            console.log("🚀 ~ fetchIntervention ~ res:", res)
+            setIntervention(res);
 
-            const clientPromise = getUserById(res.data.clientId);
-            const technicianPromise = getUserById(res.data.techId);
-
-            const [clientRes, technicianRes] = await Promise.all([clientPromise, technicianPromise]);
-            setClient(clientRes.data);
-            setTechnician(technicianRes.data);
-
-            // Calculer le prix total des produits
-            const productsPrice = res.data.products?.reduce(
-                (total, product) => total + product.price * (product.quantity || 1),
-                0
-            ) || 0;
-            setTotalProductsPrice(productsPrice.toFixed(2));
+            // // Calculer le prix total des produits
+            // const productsPrice = res.data.products?.reduce(
+            //     (total, product) => total + product.price * (product.quantity || 1),
+            //     0
+            // ) || 0;
+            // setTotalProductsPrice(productsPrice.toFixed(2));
         } catch (error) {
             console.error("Erreur lors de la récupération de l'intervention ou des utilisateurs", error);
         } finally {
@@ -62,8 +54,8 @@ export default function ShowIntervention() {
         return <Empty description="Intervention non trouvée" style={styles.empty} />;
     }
 
-    const hasGeoCoordinates = client?.address?.geo?.coordinates?.length === 2;
-    const [lng, lat] = hasGeoCoordinates ? client.address.geo.coordinates : [0, 0];
+    // const hasGeoCoordinates = intervention.client?.address?.coords?.length === 2;
+    const geoCoords = [intervention.client?.address?.coords.lng, intervention.client?.address?.coords.lat] || [0, 0];
 
     return (
         <>
@@ -81,53 +73,53 @@ export default function ShowIntervention() {
                 <Col span={12}>
                     <Card
                         style={styles.card}
-                        title={`Intervention chez ${client?.firstname} ${client?.lastname}`}
+                        title={`Intervention chez ${intervention.client?.firstname} ${intervention.client?.lastname}`}
                     >
                         <Descriptions bordered column={1}>
                             <Descriptions.Item label="Début">
-                                {dayjs(intervention.startedAt).format("DD/MM/YYYY HH:mm")}
+                                {dayjs(intervention.start_date).format("DD/MM/YYYY HH:mm")}
                             </Descriptions.Item>
                             <Descriptions.Item label="Fin">
-                                {intervention.endedAt
-                                    ? dayjs(intervention.endedAt).format("DD/MM/YYYY HH:mm")
+                                {intervention.end_date
+                                    ? dayjs(intervention.end_date).format("DD/MM/YYYY HH:mm")
                                     : "En cours"}
                             </Descriptions.Item>
                             <Descriptions.Item label="Prix Total Intervention">
-                                {intervention.price ? `${intervention.price} €` : "Non renseigné"}
+                                {intervention.typeIntervention.price ? `${intervention.typeIntervention.price} €` : "Non renseigné"}
                             </Descriptions.Item>
-                            <Descriptions.Item label="Vélo">
+                            {/* <Descriptions.Item label="Vélo">
                                 <Tag
                                     color={
                                         intervention.bike === "ville"
                                             ? "green"
                                             : intervention.bike === "electrique"
-                                            ? "geekblue"
-                                            : "orange"
+                                                ? "geekblue"
+                                                : "orange"
                                     }
                                 >
                                     {intervention.bike.toUpperCase() || "Non renseigné"}
                                 </Tag>
-                            </Descriptions.Item>
+                            </Descriptions.Item> */}
                             <Descriptions.Item label="Service">
                                 <Tag color={intervention.service === "reparation" ? "red" : "orange"}>
-                                    {intervention.service.toUpperCase() || "Non renseigné"}
+                                    {intervention.service || "Non renseigné"}
                                 </Tag>
                             </Descriptions.Item>
                             <Descriptions.Item label="Technicien">
-                                {technician
-                                    ? `${technician.firstname} ${technician.lastname}`
+                                {intervention.technician
+                                    ? `${intervention.technician.firstname} ${intervention.technician.lastname}`
                                     : "Non renseigné"}
                             </Descriptions.Item>
-                            <Descriptions.Item label="Créé le">
+                            {/* <Descriptions.Item label="Créé le">
                                 {dayjs(intervention.createdAt).format("DD/MM/YYYY HH:mm")}
                             </Descriptions.Item>
                             <Descriptions.Item label="Dernière mise à jour">
                                 {dayjs(intervention.updatedAt).format("DD/MM/YYYY HH:mm")}
-                            </Descriptions.Item>
+                            </Descriptions.Item> */}
                         </Descriptions>
                     </Card>
 
-                    {intervention.products?.length > 0 && (
+                    {/* {intervention.products?.length > 0 && (
                         <Card
                             title="Produits utilisés"
                             style={{ ...styles.card, marginTop: 20 }}
@@ -156,23 +148,23 @@ export default function ShowIntervention() {
                                 Prix total des produits: {totalProductsPrice} €
                             </h3>
                         </Card>
-                    )}
+                    )} */}
                 </Col>
 
                 <Col span={12}>
-                    {hasGeoCoordinates ? (
+                    {geoCoords ? (
                         <Card title="Localisation du client" style={styles.card}>
                             <MapContainer
-                                center={[lat, lng]}
+                                center={geoCoords}
                                 zoom={13}
                                 style={{ height: 400, width: "100%" }}
                             >
                                 <TileLayer
                                     url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                 />
-                                <Marker position={[lat, lng]} icon={markerIcon}>
+                                <Marker position={geoCoords} icon={markerIcon}>
                                     <Popup>
-                                        {client.firstname} {client.lastname}
+                                        {intervention.client.firstname} {intervention.client.lastname}
                                     </Popup>
                                 </Marker>
                             </MapContainer>
