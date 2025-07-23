@@ -40,7 +40,7 @@ class Brands
     private ?UuidInterface $id;
 
     #[ORM\Column(length: 120)]
-    #[Groups(['brands:read', 'brands:write', 'models:read'])]
+    #[Groups(['brands:read', 'brands:write', 'models:read', 'intervention:bicycle'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'brand', targetEntity: Models::class)]

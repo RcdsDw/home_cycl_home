@@ -39,20 +39,20 @@ class Bicycles
     private ?UuidInterface $id;
 
     #[ORM\Column(length: 120)]
-    #[Groups('bicycles:read', 'bicycles:write')]
+    #[Groups(['bicycles:read', 'bicycles:write', 'intervention:bicycle'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 3)]
-    #[Groups('bicycles:read', 'bicycles:write')]
+    #[Groups(['bicycles:read', 'bicycles:write', 'intervention:bicycle'])]
     private ?string $size = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups('bicycles:read', 'bicycles:write')]
+    #[Groups(['bicycles:read', 'bicycles:write', 'intervention:bicycle'])]
     private ?string $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'bicycles')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups('bicycles:read', 'bicycles:write', 'intervention:users')]
+    #[Groups(['bicycles:read', 'bicycles:write', 'intervention:bicycle'])]
     private ?User $owner = null;
 
     #[ORM\OneToMany(mappedBy: 'clientBicycle', targetEntity: Intervention::class)]
@@ -61,12 +61,12 @@ class Bicycles
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['bicycles:read', 'bicycles:write'])]
+    #[Groups(['bicycles:read', 'bicycles:write', 'intervention:bicycle'])]
     private ?Brands $brand = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['bicycles:read', 'bicycles:write'])]
+    #[Groups(['bicycles:read', 'bicycles:write', 'intervention:bicycle'])]
     private ?Models $model = null;
 
     #[ORM\PrePersist]

@@ -76,11 +76,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users'])]
+    #[Groups(['user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users', 'intervention:bicycle'])]
     private ?string $firstname;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users'])]
+    #[Groups(['user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users', 'intervention:bicycle'])]
     private ?string $lastname;
 
     #[ORM\Column(length: 20)]
@@ -88,7 +88,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $number;
 
     #[ORM\Column(length: 255, type: 'json')]
-    #[Groups(['user:read', 'user:write', 'intervention:users'])]
+    #[Groups(['user:read', 'user:write', 'intervention:users', 'intervention:bicycle'])]
     private ?array $address;
 
     #[ORM\OneToOne(inversedBy: 'technician', cascade: ['persist'])]

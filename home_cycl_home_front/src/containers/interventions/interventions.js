@@ -4,10 +4,13 @@ import { Button, Empty, message, Modal, Spin, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { deleteIntervention, getInterventions } from "../../actions/interventions";
 import dayjs from "dayjs";
+import BicycleCard from "../../utils/BicycleCard";
+import { parseID } from "../../utils/ParseID";
 
 export default function Interventions() {
   const [loading, setLoading] = useState(true);
   const [datas, setDatas] = useState([]);
+  console.log("🚀 ~ Interventions ~ datas:", datas)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
 
@@ -63,22 +66,13 @@ export default function Interventions() {
       key: 'end_date',
       render: (text) => <div>{dayjs(text).format("DD/MM/YYYY HH:mm")}</div>,
     },
+    // Todo faire une card hover avec les infos du vélo et cliquable pour aller sur le vélo
     {
-      title: 'Prix',
-      dataIndex: 'typeIntervention',
-      key: 'price',
-      render: (text) => <div>{text?.price} €</div>,
+      title: 'Vélo',
+      dataIndex: 'clientBicycle',
+      key: 'clientBicycle',
+      render: (text) => <BicycleCard bike={text} />,
     },
-    // {
-    //   title: 'Vélo',
-    //   dataIndex: 'bike',
-    //   key: 'bike',
-    //   render: (text) => (
-    //     <Tag color={text === "ville" ? "green" : text === "electrique" ? "geekblue" : "orange"} key={text}>
-    //       {text}
-    //     </Tag>
-    //   ),
-    // },
     {
       title: 'Service',
       dataIndex: 'typeIntervention',
@@ -90,6 +84,18 @@ export default function Interventions() {
       ),
     },
     {
+      title: 'Durée',
+      dataIndex: 'typeIntervention',
+      key: 'duration',
+      render: (text) => <div>{text?.duration / 60} min</div>,
+    },
+    {
+      title: 'Prix',
+      dataIndex: 'typeIntervention',
+      key: 'price',
+      render: (text) => <div>{text?.price} €</div>,
+    },
+    {
       title: 'Technicien',
       dataIndex: 'technician',
       key: 'technician',
@@ -97,9 +103,9 @@ export default function Interventions() {
     },
     {
       title: 'Client',
-      dataIndex: 'client',
-      key: 'client',
-      render: (text) => <div>{`${text.firstname} ${text.lastname}` || "Non renseigné"}</div>,
+      dataIndex: 'clientBicycle',
+      key: 'owner',
+      render: (text) => <div>{`${text.owner.firstname} ${text.owner.lastname}` || "Non renseigné"}</div>,
     },
     // {
     //   title: 'Nombre de produits',
@@ -111,7 +117,7 @@ export default function Interventions() {
       key: 'show',
       dataIndex: 'show',
       render: (_, column) => (
-        <Button type="primary" onClick={() => nav(`/interventions/show/${column.id}`)}>
+        <Button type="primary" onClick={() => nav(`/interventions/show/${parseID(column)}`)}>
           <EyeOutlined />
         </Button>
       ),
@@ -120,7 +126,7 @@ export default function Interventions() {
       key: 'delete',
       dataIndex: 'delete',
       render: (_, column) => (
-        <Button type="primary" danger onClick={() => showModal(column.id)}>
+        <Button type="primary" danger onClick={() => showModal(parseID(column))}>
           <DeleteOutlined />
         </Button>
       ),

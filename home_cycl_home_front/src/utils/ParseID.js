@@ -1,3 +1,3 @@
-export function parseID(user) {
-    return user['@id']?.split('/').pop();
+export function parseID(item) {
+    return item['@id']?.split('/').pop();
 }

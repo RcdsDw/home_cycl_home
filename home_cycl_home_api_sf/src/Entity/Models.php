@@ -38,7 +38,7 @@ class Models
     private ?UuidInterface $id;
 
     #[ORM\Column(length: 120)]
-    #[Groups(['models:read', 'models:write', 'brands:read'])]
+    #[Groups(['models:read', 'models:write', 'brands:read', 'intervention:bicycle'])]
     private ?string $name = null;
 
     #[ORM\ManyToOne(inversedBy: 'models')]

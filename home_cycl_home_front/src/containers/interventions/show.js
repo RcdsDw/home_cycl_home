@@ -6,10 +6,13 @@ import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import dayjs from "dayjs";
 import L from "leaflet";
+import BicycleCard from "../../utils/BicycleCard";
 
 export default function ShowIntervention() {
     const [loading, setLoading] = useState(true);
     const [intervention, setIntervention] = useState(null);
+    const [client, setClient] = useState(null)
+    console.log("🚀 ~ ShowIntervention ~ client:", client)
     console.log("🚀 ~ ShowIntervention ~ intervention:", intervention)
     // const [totalProductsPrice, setTotalProductsPrice] = useState(0);
 
@@ -25,6 +28,7 @@ export default function ShowIntervention() {
             const res = await getInterventionById(id);
             console.log("🚀 ~ fetchIntervention ~ res:", res)
             setIntervention(res);
+            setClient(res.clientBicycle?.owner)
 
             // // Calculer le prix total des produits
             // const productsPrice = res.data.products?.reduce(
@@ -55,7 +59,7 @@ export default function ShowIntervention() {
     }
 
     // const hasGeoCoordinates = intervention.client?.address?.coords?.length === 2;
-    const geoCoords = [intervention.client?.address?.coords.lng, intervention.client?.address?.coords.lat] || [0, 0];
+    const geoCoords = [client?.address?.coords.lng, client?.address?.coords.lat] || [0, 0];
 
     return (
         <>
@@ -73,7 +77,7 @@ export default function ShowIntervention() {
                 <Col span={12}>
                     <Card
                         style={styles.card}
-                        title={`Intervention chez ${intervention.client?.firstname} ${intervention.client?.lastname}`}
+                        title={`Intervention chez ${client?.firstname} ${client?.lastname}`}
                     >
                         <Descriptions bordered column={1}>
                             <Descriptions.Item label="Début">
@@ -84,38 +88,33 @@ export default function ShowIntervention() {
                                     ? dayjs(intervention.end_date).format("DD/MM/YYYY HH:mm")
                                     : "En cours"}
                             </Descriptions.Item>
+                            <Descriptions.Item label="Service">
+                                <Tag color={"orange"}>
+                                    {intervention.typeIntervention.name || "Non renseigné"}
+                                </Tag>
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Durée">
+                                <Tag color={"green"}>
+                                    {intervention.typeIntervention.duration / 60 + " min" || "Non renseigné"}
+                                </Tag>
+                            </Descriptions.Item>
                             <Descriptions.Item label="Prix Total Intervention">
                                 {intervention.typeIntervention.price ? `${intervention.typeIntervention.price} €` : "Non renseigné"}
                             </Descriptions.Item>
-                            {/* <Descriptions.Item label="Vélo">
-                                <Tag
-                                    color={
-                                        intervention.bike === "ville"
-                                            ? "green"
-                                            : intervention.bike === "electrique"
-                                                ? "geekblue"
-                                                : "orange"
-                                    }
-                                >
-                                    {intervention.bike.toUpperCase() || "Non renseigné"}
-                                </Tag>
-                            </Descriptions.Item> */}
-                            <Descriptions.Item label="Service">
-                                <Tag color={intervention.service === "reparation" ? "red" : "orange"}>
-                                    {intervention.service || "Non renseigné"}
-                                </Tag>
+                            <Descriptions.Item label="Vélo">
+                                <BicycleCard bike={intervention?.clientBicycle} />
                             </Descriptions.Item>
                             <Descriptions.Item label="Technicien">
                                 {intervention.technician
                                     ? `${intervention.technician.firstname} ${intervention.technician.lastname}`
                                     : "Non renseigné"}
                             </Descriptions.Item>
-                            {/* <Descriptions.Item label="Créé le">
-                                {dayjs(intervention.createdAt).format("DD/MM/YYYY HH:mm")}
+                            <Descriptions.Item label="Créé le">
+                                {dayjs(intervention.created_at).format("DD/MM/YYYY HH:mm")}
                             </Descriptions.Item>
                             <Descriptions.Item label="Dernière mise à jour">
-                                {dayjs(intervention.updatedAt).format("DD/MM/YYYY HH:mm")}
-                            </Descriptions.Item> */}
+                                {dayjs(intervention.updated_at).format("DD/MM/YYYY HH:mm")}
+                            </Descriptions.Item>
                         </Descriptions>
                     </Card>
 
@@ -164,7 +163,7 @@ export default function ShowIntervention() {
                                 />
                                 <Marker position={geoCoords} icon={markerIcon}>
                                     <Popup>
-                                        {intervention.client.firstname} {intervention.client.lastname}
+                                        {client.firstname} {client.lastname}
                                     </Popup>
                                 </Marker>
                             </MapContainer>

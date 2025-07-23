@@ -19,15 +19,15 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new Post(),
         new GetCollection(
-            normalizationContext: ['groups' => ['intervention:list', 'intervention:users']]
+            normalizationContext: ['groups' => ['intervention:list', 'intervention:users', 'intervention:bicycle']]
         ),
         new Get(
-            normalizationContext: ['groups' => ['intervention:read', 'intervention:users']]
+            normalizationContext: ['groups' => ['intervention:read', 'intervention:users', 'intervention:bicycle']]
         ),
         new Put(),
         new Delete(),
     ],
-    normalizationContext: ['groups' => ['intervention:read'], 'max_depth' => 2],
+    normalizationContext: ['groups' => ['intervention:read']],
     denormalizationContext: ['groups' => ['intervention:write']]
 )]
 #[ORM\Entity(repositoryClass: InterventionRepository::class)]
@@ -41,7 +41,6 @@ class Intervention
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'Ramsey\Uuid\Doctrine\UuidGenerator')]
-    #[Groups(['intervention:read', 'intervention:list', 'user:read'])]
     private ?UuidInterface $id;
 
     #[ORM\Column]
@@ -58,7 +57,7 @@ class Intervention
 
     #[ORM\ManyToOne(targetEntity: Bicycles::class, inversedBy: 'bicycleInterventions')]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['intervention:read', 'intervention:list', 'intervention:users', 'intervention:write'])]
+    #[Groups(['intervention:read', 'intervention:list', 'intervention:bicycle', 'intervention:write'])]
     private ?Bicycles $clientBicycle = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'technicianInterventions')]
@@ -123,14 +122,14 @@ class Intervention
         return $this;
     }
 
-    public function getBicycle(): ?Bicycles
+    public function getClientBicycle(): ?Bicycles
     {
         return $this->clientBicycle;
     }
 
-    public function setBicycle(?Bicycles $clientBicycle): static
+    public function setClientBicycle(?Bicycles $bicycle): static
     {
-        $this->clientBicycle = $clientBicycle;
+        $this->clientBicycle = $bicycle;
         return $this;
     }
 
