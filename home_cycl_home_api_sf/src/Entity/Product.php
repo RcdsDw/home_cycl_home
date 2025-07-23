@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
-use App\Repository\ProductRepository;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
@@ -11,6 +10,8 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
+use App\Repository\ProductRepository;
+use Ramsey\Uuid\UuidInterface;
 use App\Traits\Timestampable;
 
 #[ApiResource(
@@ -32,9 +33,10 @@ class Product
     use Timestampable;
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'Ramsey\Uuid\Doctrine\UuidGenerator')]
+    private ?UuidInterface $id;
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;
@@ -65,7 +67,7 @@ class Product
         $this->setUpdatedAt(new \DateTime());
     }
 
-    public function getId(): ?int
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }

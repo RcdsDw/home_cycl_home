@@ -7,6 +7,8 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use App\Repository\TypeInterventionRepository;
+use Ramsey\Uuid\UuidInterface;
+use App\Traits\Timestampable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -23,12 +25,16 @@ use Symfony\Component\Serializer\Attribute\Groups;
     denormalizationContext: ['groups' => ['type_intervention:write']]
 )]
 #[ORM\Entity(repositoryClass: TypeInterventionRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class TypeIntervention
 {
+    use Timestampable;
+
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'Ramsey\Uuid\Doctrine\UuidGenerator')]
+    private ?UuidInterface $id;
 
     #[Groups(['type_intervention:read', 'intervention:read', 'intervention:list'])]
     #[ORM\Column(length: 120)]
@@ -46,13 +52,27 @@ class TypeIntervention
     #[ORM\JoinColumn(nullable: true)]
     private Collection $interventions;
 
+    #[ORM\PrePersist]
+    public function onPrePersist(): void
+    {
+        $now = new \DateTime();
+        $this->setCreatedAt($now);
+        $this->setUpdatedAt($now);
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdate(): void
+    {
+        $this->setUpdatedAt(new \DateTime());
+    }
+
     public function __construct()
     {
         $this->interventions = new ArrayCollection();
     }
 
 
-    public function getId(): ?int
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }

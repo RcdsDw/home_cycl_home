@@ -2,9 +2,12 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Bicycles;
+use App\Entity\Brands;
 use App\Entity\User;
 use App\Entity\Zone;
 use App\Entity\Intervention;
+use App\Entity\Models;
 use App\Entity\TypeIntervention;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -16,6 +19,31 @@ class Fixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        // --- Création des marques ---
+        $brands = [];
+        for ($i = 1; $i <= 5; $i++) {
+            $brand = new Brands();
+            $brand->setName("Marque $i");
+            $brand->setCreatedAt(new \DateTime());
+            $brand->setUpdatedAt(new \DateTime());
+            $manager->persist($brand);
+            $brands[] = $brand;
+        }
+
+        // --- Création des modèles ---
+        $models = [];
+        foreach ($brands as $index => $brand) {
+            for ($j = 1; $j <= 2; $j++) {
+                $model = new Models();
+                $model->setName("Modèle " . ($index * 2 + $j));
+                $model->setBrand($brand);
+                $model->setCreatedAt(new \DateTime());
+                $model->setUpdatedAt(new \DateTime());
+                $manager->persist($model);
+                $models[$brand->getName()][] = $model;
+            }
+        }
+
         // Create 5 zones
         $zones = [];
         for ($i = 1; $i <= 5; $i++) {
@@ -39,10 +67,26 @@ class Fixtures extends Fixture
 
         $clients = [];
         $technicians = [];
+        $bikes = [];
 
         // 2 USERS
         for ($i = 1; $i <= 10; $i++) {
             $user = $this->createUser("user$i@example.com", 'password', 'ROLE_USER', "User$i", "Test$i$i$i", "060000000$i");
+            // Ajout d’un vélo
+            $bike = new Bicycles();
+            $bike->setName("Vélo $i");
+            $bike->setSize('M');
+            $bike->setType('VTC');
+            $bike->setOwner($user);
+
+            // Choix aléatoire d’une marque et d’un modèle de cette marque
+            $brand = $brands[array_rand($brands)];
+            $model = $models[$brand->getName()][array_rand($models[$brand->getName()])];
+
+            $bike->setBrand($brand);
+            $bike->setModel($model);
+            $manager->persist($bike);
+            $bikes[] = $bike;
             $manager->persist($user);
             $clients[] = $user;
         }
@@ -50,12 +94,42 @@ class Fixtures extends Fixture
         // 2 ADMINS
         for ($i = 1; $i <= 3; $i++) {
             $admin = $this->createUser("admin$i@example.com", 'adminpass', 'ROLE_ADMIN', "Admin$i", "Boss$i$i$i", "061111111$i");
+            // Ajout d’un vélo
+            $bike = new Bicycles();
+            $bike->setName("Vélo $i");
+            $bike->setSize('M');
+            $bike->setType('VTC');
+            $bike->setOwner($user);
+
+            // Choix aléatoire d’une marque et d’un modèle de cette marque
+            $brand = $brands[array_rand($brands)];
+            $model = $models[$brand->getName()][array_rand($models[$brand->getName()])];
+
+            $bike->setBrand($brand);
+            $bike->setModel($model);
+            $manager->persist($bike);
+            $bikes[] = $bike;
             $manager->persist($admin);
         }
 
         // 6 TECHS
         for ($i = 1; $i <= 5; $i++) {
             $tech = $this->createUser("tech$i@example.com", 'techpass', 'ROLE_TECH', "Tech$i", "Support$i$i$i", "062222222$i");
+            // Ajout d’un vélo
+            $bike = new Bicycles();
+            $bike->setName("Vélo $i");
+            $bike->setSize('M');
+            $bike->setType('VTC');
+            $bike->setOwner($user);
+
+            // Choix aléatoire d’une marque et d’un modèle de cette marque
+            $brand = $brands[array_rand($brands)];
+            $model = $models[$brand->getName()][array_rand($models[$brand->getName()])];
+
+            $bike->setBrand($brand);
+            $bike->setModel($model);
+            $manager->persist($bike);
+            $bikes[] = $bike;
             $tech->setTechnicianZone($zones[$i - 1]);
             $manager->persist($tech);
             $technicians[] = $tech;
@@ -104,7 +178,7 @@ class Fixtures extends Fixture
             $intervention->setComment("Intervention #$i description");
 
             // Random client + technician from lists
-            $intervention->setClient($clients[array_rand($clients)]);
+            $intervention->setBicycle($bikes[array_rand($bikes)]);
             $intervention->setTechnician($technicians[array_rand($technicians)]);
             $intervention->setTypeIntervention($typeInterventions[array_rand($typeInterventions)]);
 

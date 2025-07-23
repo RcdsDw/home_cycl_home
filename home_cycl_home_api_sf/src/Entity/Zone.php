@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Get;
 use App\Repository\ZoneRepository;
+use Ramsey\Uuid\UuidInterface;
 use Doctrine\ORM\Mapping as ORM;
 use App\Traits\Timestampable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -37,10 +38,11 @@ class Zone
     use Timestampable;
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'Ramsey\Uuid\Doctrine\UuidGenerator')]
     #[Groups(['zone:read', 'zone:list', 'user:read'])]
-    private ?int $id = null;
+    private ?UuidInterface $id;
 
     #[ORM\Column(length: 150)]
     #[Groups(['zone:read', 'zone:list', 'zone:write', 'user:read'])]
@@ -77,7 +79,7 @@ class Zone
         $this->clients = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }

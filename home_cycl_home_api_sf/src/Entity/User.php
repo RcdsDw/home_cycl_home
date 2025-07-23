@@ -105,10 +105,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read'])]
     private Collection $bicycles;
 
-    #[ORM\OneToMany(mappedBy: 'client', targetEntity: Intervention::class)]
-    #[Groups(['user:read'])]
-    private Collection $clientInterventions;
-
     #[ORM\OneToMany(mappedBy: 'technician', targetEntity: Intervention::class)]
     #[Groups(['user:read'])]
     private Collection $technicianInterventions;
@@ -130,7 +126,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function __construct()
     {
         $this->bicycles = new ArrayCollection();
-        $this->clientInterventions = new ArrayCollection();
         $this->technicianInterventions = new ArrayCollection();
     }
 
@@ -274,14 +269,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
         return $this;
-    }
-
-    /**
-     * @return Collection<int, Intervention>
-     */
-    public function getClientInterventions(): Collection
-    {
-        return $this->clientInterventions;
     }
 
     /**

@@ -9,6 +9,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Get;
 use App\Repository\InterventionRepository;
+use Ramsey\Uuid\UuidInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use App\Traits\Timestampable;
@@ -37,10 +38,11 @@ class Intervention
     use Timestampable;
 
     #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'uuid', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
+    #[ORM\CustomIdGenerator(class: 'Ramsey\Uuid\Doctrine\UuidGenerator')]
     #[Groups(['intervention:read', 'intervention:list', 'user:read'])]
-    private ?int $id = null;
+    private ?UuidInterface $id;
 
     #[ORM\Column]
     #[Groups(['intervention:read', 'intervention:list', 'intervention:write', 'user:read'])]
@@ -54,19 +56,19 @@ class Intervention
     #[Groups(['intervention:read', 'intervention:write', 'user:read'])]
     private ?string $comment = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'clientInterventions')]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['intervention:read', 'intervention:list', 'intervention:write'])]
-    private ?User $client = null;
+    #[ORM\ManyToOne(targetEntity: Bicycles::class, inversedBy: 'bicycleInterventions')]
+    #[ORM\JoinColumn(nullable: true)]
+    #[Groups(['intervention:read', 'intervention:list', 'intervention:users', 'intervention:write'])]
+    private ?Bicycles $clientBicycle = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'technicianInterventions')]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['intervention:read', 'intervention:list', 'intervention:write'])]
+    #[Groups(['intervention:read', 'intervention:list', 'intervention:users', 'intervention:write'])]
     private ?User $technician = null;
 
     #[ORM\ManyToOne(inversedBy: 'interventions')]
     #[ORM\JoinColumn(onDelete: 'SET NULL')]
-    #[Groups(['intervention:read', 'intervention:list'])]
+    #[Groups(['intervention:read', 'intervention:list', 'intervention:write'])]
     private ?TypeIntervention $typeIntervention = null;
 
     #[ORM\PrePersist]
@@ -83,7 +85,7 @@ class Intervention
         $this->setUpdatedAt(new \DateTime());
     }
 
-    public function getId(): ?int
+    public function getId(): ?UuidInterface
     {
         return $this->id;
     }
@@ -121,14 +123,14 @@ class Intervention
         return $this;
     }
 
-    public function getClient(): ?User
+    public function getBicycle(): ?Bicycles
     {
-        return $this->client;
+        return $this->clientBicycle;
     }
 
-    public function setClient(?User $client): static
+    public function setBicycle(?Bicycles $clientBicycle): static
     {
-        $this->client = $client;
+        $this->clientBicycle = $clientBicycle;
         return $this;
     }
 
@@ -154,14 +156,6 @@ class Intervention
         return $this;
     }
 
-    // Méthodes utilitaires pour éviter de sérialiser les objets User complets
-    public function getClientName(): ?string
-    {
-        return $this->client ?
-            $this->client->getFirstname() . ' ' . $this->client->getLastname() :
-            null;
-    }
-
     public function getTechnicianName(): ?string
     {
         return $this->technician ?
@@ -169,7 +163,6 @@ class Intervention
             null;
     }
 
-    // #[Groups(['intervention:read', 'intervention:list'])]
     public function getDuration(): ?string
     {
         if (!$this->start_date || !$this->end_date) {
