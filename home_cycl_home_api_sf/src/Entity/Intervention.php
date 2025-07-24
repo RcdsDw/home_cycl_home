@@ -9,6 +9,8 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Get;
 use App\Repository\InterventionRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Ramsey\Uuid\UuidInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -70,18 +72,16 @@ class Intervention
     #[Groups(['intervention:read', 'intervention:list', 'intervention:write'])]
     private ?TypeIntervention $typeIntervention = null;
 
-    #[ORM\PrePersist]
-    public function onPrePersist(): void
-    {
-        $now = new \DateTime();
-        $this->setCreatedAt($now);
-        $this->setUpdatedAt($now);
-    }
+    /**
+     * @var Collection<int, InterventionProduct>
+     */
+    #[ORM\OneToMany(mappedBy: 'intervention', targetEntity: InterventionProduct::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
+    #[Groups(['intervention:read', 'intervention:write'])]
+    private Collection $interventionProducts;
 
-    #[ORM\PreUpdate]
-    public function onPreUpdate(): void
+    public function __construct()
     {
-        $this->setUpdatedAt(new \DateTime());
+        $this->interventionProducts = new ArrayCollection();
     }
 
     public function getId(): ?UuidInterface
@@ -170,5 +170,34 @@ class Intervention
 
         $interval = $this->start_date->diff($this->end_date);
         return $interval->format('%h heures %i minutes');
+    }
+
+    /**
+     * @return Collection<int, InterventionProduct>
+     */
+    public function getInterventionProducts(): Collection
+    {
+        return $this->interventionProducts;
+    }
+
+    public function addInterventionProduct(InterventionProduct $interventionProduct): static
+    {
+        if (!$this->interventionProducts->contains($interventionProduct)) {
+            $this->interventionProducts->add($interventionProduct);
+            $interventionProduct->setIntervention($this);
+        }
+
+        return $this;
+    }
+
+    public function removeInterventionProduct(InterventionProduct $interventionProduct): static
+    {
+        if ($this->interventionProducts->removeElement($interventionProduct)) {
+            if ($interventionProduct->getIntervention() === $this) {
+                $interventionProduct->setIntervention(null);
+            }
+        }
+
+        return $this;
     }
 }

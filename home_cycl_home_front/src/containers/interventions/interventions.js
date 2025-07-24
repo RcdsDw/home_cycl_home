@@ -66,7 +66,6 @@ export default function Interventions() {
       key: 'end_date',
       render: (text) => <div>{dayjs(text).format("DD/MM/YYYY HH:mm")}</div>,
     },
-    // Todo faire une card hover avec les infos du vélo et cliquable pour aller sur le vélo
     {
       title: 'Vélo',
       dataIndex: 'clientBicycle',

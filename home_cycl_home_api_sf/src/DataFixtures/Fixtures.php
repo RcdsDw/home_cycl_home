@@ -7,6 +7,7 @@ use App\Entity\Brands;
 use App\Entity\User;
 use App\Entity\Zone;
 use App\Entity\Intervention;
+use App\Entity\InterventionProduct;
 use App\Entity\Models;
 use App\Entity\TypeIntervention;
 use Doctrine\Bundle\FixturesBundle\Fixture;
@@ -19,6 +20,23 @@ class Fixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        // --- Création de produits ---
+        $products = [];
+        $categories = ['Freins', 'Pneus', 'Chaîne', 'Selle', 'Pédales'];
+
+        for ($i = 1; $i <= 10; $i++) {
+            $product = new \App\Entity\Product();
+            $product->setName("Produit $i");
+            $product->setPrice(mt_rand(10, 100));
+            $product->setCategory($categories[array_rand($categories)]);
+            $product->setDescription("Description du produit $i");
+
+            $manager->persist($product);
+            $products[] = $product;
+        }
+
+        $manager->flush();
+
         // --- Création des marques ---
         $brands = [];
         for ($i = 1; $i <= 5; $i++) {
@@ -165,6 +183,7 @@ class Fixtures extends Fixture
 
         $typeInterventions = [$typeIntervention1, $typeIntervention2];
 
+
         // Create 20 interventions
         for ($i = 1; $i <= 20; $i++) {
             $intervention = new Intervention();
@@ -178,7 +197,7 @@ class Fixtures extends Fixture
             $intervention->setComment("Intervention #$i description");
 
             // Random client + technician from lists
-            $intervention->setBicycle($bikes[array_rand($bikes)]);
+            $intervention->setClientBicycle($bikes[array_rand($bikes)]);
             $intervention->setTechnician($technicians[array_rand($technicians)]);
             $intervention->setTypeIntervention($typeInterventions[array_rand($typeInterventions)]);
 
@@ -187,6 +206,20 @@ class Fixtures extends Fixture
             $intervention->setUpdatedAt($now);
 
             $manager->persist($intervention);
+
+            // 🆕 Ajout de 1 à 3 produits via l'entité pivot InterventionProduct
+            $randomProductIndexes = (array)array_rand($products, rand(1, 3));
+            foreach ($randomProductIndexes as $index) {
+                $product = $products[$index];
+
+                $interventionProduct = new InterventionProduct();
+                $interventionProduct->setIntervention($intervention);
+                $interventionProduct->setProduct($product);
+                $interventionProduct->setQuantity(rand(1, 5));
+                $interventionProduct->setProductPrice($product->getPrice()); // copie du prix actuel
+
+                $manager->persist($interventionProduct);
+            }
         }
 
         $manager->flush();

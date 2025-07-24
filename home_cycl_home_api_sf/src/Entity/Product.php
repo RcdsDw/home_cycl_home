@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\DBAL\Types\Types;
 use ApiPlatform\Metadata\ApiResource;
@@ -13,17 +15,22 @@ use ApiPlatform\Metadata\Delete;
 use App\Repository\ProductRepository;
 use Ramsey\Uuid\UuidInterface;
 use App\Traits\Timestampable;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
         new Post(),
-        new GetCollection(),
-        new Get(),
+        new GetCollection(
+            normalizationContext: ['groups' => ['product:read']]
+        ),
+        new Get(
+            normalizationContext: ['groups' => ['product:read']]
+        ),
         new Put(),
         new Delete(),
     ],
-    normalizationContext: ['groups' => ['read']],
-    denormalizationContext: ['groups' => ['write']]
+    normalizationContext: ['groups' => ['product:read']],
+    denormalizationContext: ['groups' => ['product:write']]
 )]
 #[ORM\Entity(repositoryClass: ProductRepository::class)]
 #[ORM\Table(name: "products")]
@@ -39,32 +46,34 @@ class Product
     private ?UuidInterface $id;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['product:read', 'product:write', 'intervention:read'])]
     private ?string $name = null;
 
     #[ORM\Column]
+    #[Groups(['product:read', 'product:write', 'intervention:read'])]
     private ?float $price = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Groups(['product:read', 'product:write', 'intervention:read'])]
     private ?string $description = null;
 
     #[ORM\Column(length: 140)]
+    #[Groups(['product:read', 'product:write', 'intervention:read'])]
     private ?string $category = null;
 
     #[ORM\Column(type: Types::BLOB, nullable: true)]
+    #[Groups(['product:read', 'product:write', 'intervention:read'])]
     private $img;
 
-    #[ORM\PrePersist]
-    public function onPrePersist(): void
-    {
-        $now = new \DateTimeImmutable();
-        $this->setCreatedAt($now);
-        $this->setUpdatedAt($now);
-    }
+    /**
+     * @var Collection<int, InterventionProduct>
+     */
+    #[ORM\OneToMany(mappedBy: 'product', targetEntity: InterventionProduct::class)]
+    private Collection $interventionProducts;
 
-    #[ORM\PreUpdate]
-    public function onPreUpdate(): void
+    public function __construct()
     {
-        $this->setUpdatedAt(new \DateTime());
+        $this->interventionProducts = new ArrayCollection();
     }
 
     public function getId(): ?UuidInterface
@@ -130,5 +139,10 @@ class Product
         $this->img = $img;
 
         return $this;
+    }
+
+    public function getInterventionProducts(): Collection
+    {
+        return $this->interventionProducts;
     }
 }

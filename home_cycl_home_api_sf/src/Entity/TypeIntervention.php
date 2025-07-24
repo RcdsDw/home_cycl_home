@@ -52,20 +52,6 @@ class TypeIntervention
     #[ORM\JoinColumn(nullable: true)]
     private Collection $interventions;
 
-    #[ORM\PrePersist]
-    public function onPrePersist(): void
-    {
-        $now = new \DateTime();
-        $this->setCreatedAt($now);
-        $this->setUpdatedAt($now);
-    }
-
-    #[ORM\PreUpdate]
-    public function onPreUpdate(): void
-    {
-        $this->setUpdatedAt(new \DateTime());
-    }
-
     public function __construct()
     {
         $this->interventions = new ArrayCollection();

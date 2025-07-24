@@ -69,20 +69,6 @@ class Bicycles
     #[Groups(['bicycles:read', 'bicycles:write', 'intervention:bicycle'])]
     private ?Models $model = null;
 
-    #[ORM\PrePersist]
-    public function onPrePersist(): void
-    {
-        $now = new \DateTime();
-        $this->setCreatedAt($now);
-        $this->setUpdatedAt($now);
-    }
-
-    #[ORM\PreUpdate]
-    public function onPreUpdate(): void
-    {
-        $this->setUpdatedAt(new \DateTime());
-    }
-
     public function getId(): ?UuidInterface
     {
         return $this->id;

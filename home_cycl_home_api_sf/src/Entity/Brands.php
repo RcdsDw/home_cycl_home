@@ -47,20 +47,6 @@ class Brands
     #[Groups(['brands:read'])]
     private Collection $models;
 
-    #[ORM\PrePersist]
-    public function onPrePersist(): void
-    {
-        $now = new \DateTime();
-        $this->setCreatedAt($now);
-        $this->setUpdatedAt($now);
-    }
-
-    #[ORM\PreUpdate]
-    public function onPreUpdate(): void
-    {
-        $this->setUpdatedAt(new \DateTime());
-    }
-
     public function __construct()
     {
         $this->models = new ArrayCollection();

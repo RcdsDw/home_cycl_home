@@ -46,20 +46,6 @@ class Models
     #[Groups(['models:read', 'brands:read'])]
     private ?Brands $brand = null;
 
-    #[ORM\PrePersist]
-    public function onPrePersist(): void
-    {
-        $now = new \DateTime();
-        $this->setCreatedAt($now);
-        $this->setUpdatedAt($now);
-    }
-
-    #[ORM\PreUpdate]
-    public function onPreUpdate(): void
-    {
-        $this->setUpdatedAt(new \DateTime());
-    }
-
     public function getId(): ?UuidInterface
     {
         return $this->id;

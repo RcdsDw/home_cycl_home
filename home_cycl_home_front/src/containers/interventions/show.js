@@ -7,14 +7,13 @@ import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import dayjs from "dayjs";
 import L from "leaflet";
 import BicycleCard from "../../utils/BicycleCard";
+import ProductCard from "../../utils/ProductCard";
 
 export default function ShowIntervention() {
     const [loading, setLoading] = useState(true);
     const [intervention, setIntervention] = useState(null);
     const [client, setClient] = useState(null)
-    console.log("🚀 ~ ShowIntervention ~ client:", client)
-    console.log("🚀 ~ ShowIntervention ~ intervention:", intervention)
-    // const [totalProductsPrice, setTotalProductsPrice] = useState(0);
+    const [products, setProducts] = useState(null)
 
     const { id } = useParams();
     const nav = useNavigate();
@@ -26,16 +25,9 @@ export default function ShowIntervention() {
     const fetchIntervention = async () => {
         try {
             const res = await getInterventionById(id);
-            console.log("🚀 ~ fetchIntervention ~ res:", res)
             setIntervention(res);
             setClient(res.clientBicycle?.owner)
-
-            // // Calculer le prix total des produits
-            // const productsPrice = res.data.products?.reduce(
-            //     (total, product) => total + product.price * (product.quantity || 1),
-            //     0
-            // ) || 0;
-            // setTotalProductsPrice(productsPrice.toFixed(2));
+            setProducts(res.interventionProducts)
         } catch (error) {
             console.error("Erreur lors de la récupération de l'intervention ou des utilisateurs", error);
         } finally {
@@ -43,6 +35,15 @@ export default function ShowIntervention() {
         }
     };
 
+    const totalPrice = () => {
+        let totalPrice = 0;
+
+        products && products.forEach(product => {
+            totalPrice += product.product_price * product.quantity
+        });
+
+        return totalPrice
+    }
     const markerIcon = new L.Icon({
         iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
         iconSize: [25, 41],
@@ -58,7 +59,6 @@ export default function ShowIntervention() {
         return <Empty description="Intervention non trouvée" style={styles.empty} />;
     }
 
-    // const hasGeoCoordinates = intervention.client?.address?.coords?.length === 2;
     const geoCoords = [client?.address?.coords.lng, client?.address?.coords.lat] || [0, 0];
 
     return (
@@ -118,24 +118,19 @@ export default function ShowIntervention() {
                         </Descriptions>
                     </Card>
 
-                    {/* {intervention.products?.length > 0 && (
+                    {products.length > 0 && (
                         <Card
-                            title="Produits utilisés"
+                            title="Produits Commandés"
                             style={{ ...styles.card, marginTop: 20 }}
                             bordered
                         >
                             <List
-                                dataSource={intervention.products}
+                                dataSource={products}
                                 renderItem={(product) => (
                                     <List.Item>
-                                        <List.Item.Meta
-                                            title={product.name}
-                                            description={`Prix: ${product.price.toFixed(
-                                                2
-                                            )} € | Quantité: ${1}`}
-                                        />
+                                        <ProductCard product={product} />
                                         <div>
-                                            Total: {(product.price * (1)).toFixed(
+                                            Total: {(product.product.price * product.quantity).toFixed(
                                                 2
                                             )} €
                                         </div>
@@ -144,10 +139,10 @@ export default function ShowIntervention() {
                             />
                             <Divider />
                             <h3 style={{ textAlign: "right" }}>
-                                Prix total des produits: {totalProductsPrice} €
+                                Prix total des produits: {totalPrice().toFixed(2)} €
                             </h3>
                         </Card>
-                    )} */}
+                    )}
                 </Col>
 
                 <Col span={12}>
