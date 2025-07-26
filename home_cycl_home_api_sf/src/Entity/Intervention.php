@@ -21,10 +21,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new Post(),
         new GetCollection(
-            normalizationContext: ['groups' => ['intervention:list', 'intervention:users', 'intervention:bicycle']]
+            normalizationContext: ['groups' => ['intervention:list', 'intervention:users', 'intervention:bike']]
         ),
         new Get(
-            normalizationContext: ['groups' => ['intervention:read', 'intervention:users', 'intervention:bicycle']]
+            normalizationContext: ['groups' => ['intervention:read', 'intervention:users', 'intervention:bike']]
         ),
         new Put(),
         new Delete(),
@@ -57,10 +57,10 @@ class Intervention
     #[Groups(['intervention:read', 'intervention:write', 'user:read'])]
     private ?string $comment = null;
 
-    #[ORM\ManyToOne(targetEntity: Bicycles::class, inversedBy: 'bicycleInterventions')]
+    #[ORM\ManyToOne(targetEntity: Bikes::class, inversedBy: 'bikeInterventions')]
     #[ORM\JoinColumn(nullable: true)]
-    #[Groups(['intervention:read', 'intervention:list', 'intervention:bicycle', 'intervention:write'])]
-    private ?Bicycles $clientBicycle = null;
+    #[Groups(['intervention:read', 'intervention:list', 'intervention:bike', 'intervention:write'])]
+    private ?Bikes $clientBike = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'technicianInterventions')]
     #[ORM\JoinColumn(nullable: true)]
@@ -122,14 +122,14 @@ class Intervention
         return $this;
     }
 
-    public function getClientBicycle(): ?Bicycles
+    public function getClientBike(): ?Bikes
     {
-        return $this->clientBicycle;
+        return $this->clientBike;
     }
 
-    public function setClientBicycle(?Bicycles $bicycle): static
+    public function setClientBike(?Bikes $bike): static
     {
-        $this->clientBicycle = $bicycle;
+        $this->clientBike = $bike;
         return $this;
     }
 

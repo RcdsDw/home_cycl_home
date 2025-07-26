@@ -9,7 +9,6 @@ import { createZone, deleteZone, getZones, updateZone } from '../../actions/zone
 
 export default function Dashboard() {
   const [zones, setZones] = useState([]);
-  console.log("🚀 ~ Dashboard ~ zones:", zones)
   const [zoneName, setZoneName] = useState('');
   const [currentCoordinates, setCurrentCoordinates] = useState([]);
   const [selectedTechUser, setSelectedTechUser] = useState('');

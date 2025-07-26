@@ -40,6 +40,8 @@ services:
       DATABASE_URL: ${DATABASE_URL}
     networks:
       - app-network
+    extra_hosts:       
+      - "host.docker.internal:host-gateway"
       
 volumes:
   pgdata:

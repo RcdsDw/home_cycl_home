@@ -16,7 +16,7 @@ class CurrentUserProvider implements ProviderInterface
         $user = $this->security->getUser();
 
         if (!$user) {
-            return new JsonResponse(['error' => 'Not authenticated'], 401);
+            return null;
         }
 
         return $user;

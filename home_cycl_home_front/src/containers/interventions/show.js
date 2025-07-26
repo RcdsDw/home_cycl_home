@@ -6,7 +6,7 @@ import React, { useEffect, useState } from "react";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import dayjs from "dayjs";
 import L from "leaflet";
-import BicycleCard from "../../utils/BicycleCard";
+import BikeCard from "../../utils/BikeCard";
 import ProductCard from "../../utils/ProductCard";
 
 export default function ShowIntervention() {
@@ -26,7 +26,7 @@ export default function ShowIntervention() {
         try {
             const res = await getInterventionById(id);
             setIntervention(res);
-            setClient(res.clientBicycle?.owner)
+            setClient(res.clientBike?.owner)
             setProducts(res.interventionProducts)
         } catch (error) {
             console.error("Erreur lors de la récupération de l'intervention ou des utilisateurs", error);
@@ -102,7 +102,7 @@ export default function ShowIntervention() {
                                 {intervention.typeIntervention.price ? `${intervention.typeIntervention.price} €` : "Non renseigné"}
                             </Descriptions.Item>
                             <Descriptions.Item label="Vélo">
-                                <BicycleCard bike={intervention?.clientBicycle} />
+                                <BikeCard bike={intervention?.clientBike} />
                             </Descriptions.Item>
                             <Descriptions.Item label="Technicien">
                                 {intervention.technician

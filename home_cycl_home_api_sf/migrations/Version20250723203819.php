@@ -21,28 +21,28 @@ final class Version20250723203819 extends AbstractMigration
     {
         // this up() migration is auto-generated, please modify it to your needs
         $this->addSql(<<<'SQL'
-            ALTER TABLE bicycles ADD brand_id UUID NOT NULL
+            ALTER TABLE bikes ADD brand_id UUID NOT NULL
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE bicycles ADD model_id UUID NOT NULL
+            ALTER TABLE bikes ADD model_id UUID NOT NULL
         SQL);
         $this->addSql(<<<'SQL'
-            COMMENT ON COLUMN bicycles.brand_id IS '(DC2Type:uuid)'
+            COMMENT ON COLUMN bikes.brand_id IS '(DC2Type:uuid)'
         SQL);
         $this->addSql(<<<'SQL'
-            COMMENT ON COLUMN bicycles.model_id IS '(DC2Type:uuid)'
+            COMMENT ON COLUMN bikes.model_id IS '(DC2Type:uuid)'
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE bicycles ADD CONSTRAINT FK_2AB85B1E44F5D008 FOREIGN KEY (brand_id) REFERENCES brands (id) NOT DEFERRABLE INITIALLY IMMEDIATE
+            ALTER TABLE bikes ADD CONSTRAINT FK_2AB85B1E44F5D008 FOREIGN KEY (brand_id) REFERENCES brands (id) NOT DEFERRABLE INITIALLY IMMEDIATE
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE bicycles ADD CONSTRAINT FK_2AB85B1E7975B7E7 FOREIGN KEY (model_id) REFERENCES models (id) NOT DEFERRABLE INITIALLY IMMEDIATE
+            ALTER TABLE bikes ADD CONSTRAINT FK_2AB85B1E7975B7E7 FOREIGN KEY (model_id) REFERENCES models (id) NOT DEFERRABLE INITIALLY IMMEDIATE
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE INDEX IDX_2AB85B1E44F5D008 ON bicycles (brand_id)
+            CREATE INDEX IDX_2AB85B1E44F5D008 ON bikes (brand_id)
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE INDEX IDX_2AB85B1E7975B7E7 ON bicycles (model_id)
+            CREATE INDEX IDX_2AB85B1E7975B7E7 ON bikes (model_id)
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE brands ADD brand_id UUID NOT NULL
@@ -65,10 +65,10 @@ final class Version20250723203819 extends AbstractMigration
             CREATE SCHEMA public
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE bicycles DROP CONSTRAINT FK_2AB85B1E44F5D008
+            ALTER TABLE bikes DROP CONSTRAINT FK_2AB85B1E44F5D008
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE bicycles DROP CONSTRAINT FK_2AB85B1E7975B7E7
+            ALTER TABLE bikes DROP CONSTRAINT FK_2AB85B1E7975B7E7
         SQL);
         $this->addSql(<<<'SQL'
             DROP INDEX IDX_2AB85B1E44F5D008
@@ -77,10 +77,10 @@ final class Version20250723203819 extends AbstractMigration
             DROP INDEX IDX_2AB85B1E7975B7E7
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE bicycles DROP brand_id
+            ALTER TABLE bikes DROP brand_id
         SQL);
         $this->addSql(<<<'SQL'
-            ALTER TABLE bicycles DROP model_id
+            ALTER TABLE bikes DROP model_id
         SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE brands DROP CONSTRAINT FK_7EA2443444F5D008

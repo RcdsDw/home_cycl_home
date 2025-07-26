@@ -2,22 +2,22 @@
 
 namespace App\Repository;
 
-use App\Entity\Bicycles;
+use App\Entity\Bikes;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Bicycles>
+ * @extends ServiceEntityRepository<Bikes>
  */
-class BicyclesRepository extends ServiceEntityRepository
+class BikesRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Bicycles::class);
+        parent::__construct($registry, Bikes::class);
     }
 
     //    /**
-    //     * @return Bicycles[] Returns an array of Bicycles objects
+    //     * @return Bikes[] Returns an array of Bikes objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -31,7 +31,7 @@ class BicyclesRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Bicycles
+    //    public function findOneBySomeField($value): ?Bikes
     //    {
     //        return $this->createQueryBuilder('b')
     //            ->andWhere('b.exampleField = :val')

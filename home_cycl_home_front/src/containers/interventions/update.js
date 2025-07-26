@@ -1,23 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Select, Button, Col, Row, DatePicker, message, Card } from 'antd';
-import { getInterventionById, updateIntervention } from '../../actions/interventions';
-import SelectTech from '../../utils/SelectTech';
-import dayjs from 'dayjs';
 import { useNavigate, useParams } from 'react-router-dom';
-import bikeOptions from '../../data/bikeOptions.json';
-import serviceOptions from '../../data/serviceOptions.json';
+
+import { Form, Input, Button, Col, Row, message, Card } from 'antd';
+import SelectTech from '../../utils/SelectTech';
+import { parseID } from '../../utils/ParseID';
+
+import { getInterventionById, updateIntervention } from '../../actions/interventions';
 import { getProducts } from '../../actions/products';
+import SelectMyBikes from '../../utils/SelectMyBikes';
+import SelectTypeIntervention from '../../utils/SelectTypeIntervention';
+import SelectProducts from '../../utils/SelectProducts';
 
 export default function EditIntervention() {
-  const [form] = Form.useForm();
+  const [loading, setLoading] = useState(false);
+
   const [price, setPrice] = useState(0);
+  const [intervention, setIntervention] = useState();
+  console.log("🚀 ~ EditIntervention ~ intervention:", intervention)
   const [selectedTechUser, setSelectedTechUser] = useState();
-  const [endDate, setEndDate] = useState(null);
-  const [products, setProducts] = useState([]);
+  const [selectedBike, setSelectedBike] = useState();
+  const [selectedTypeIntervention, setSelectedTypeIntervention] = useState();
   const [selectedProducts, setSelectedProducts] = useState([]);
 
-  const user = JSON.parse(localStorage.getItem('user'));
+  const [products, setProducts] = useState([]);
+  const [endDate, setEndDate] = useState(null);
 
+  const [form] = Form.useForm();
   const { id } = useParams();
   const nav = useNavigate();
 
@@ -27,44 +35,72 @@ export default function EditIntervention() {
   }, []);
 
   useEffect(() => {
-    calculateTotalPrice();
-  }, [selectedProducts]);
+    setFieldsValue();
+  }, [intervention]);
+
+  // useEffect(() => {
+  //   calculateTotalPrice();
+  // }, [selectedProducts]);
 
   const fetchProducts = async () => {
+    setLoading(true)
+
     try {
       const res = await getProducts();
-      setProducts(res.data);
+      setProducts(res.member);
     } catch (err) {
       message.error('Erreur lors de la récupération des produits.');
+    } finally {
+      setLoading(false)
     }
   };
 
   const fetchIntervention = async () => {
+    setLoading(true)
+
     try {
-      const res = await getInterventionById(id);
-      const intervention = res.data;
-
-      form.setFieldsValue({
-        ...intervention,
-        started_at: intervention.startedAt ? dayjs(intervention.startedAt) : null,
-      });
-
-      setSelectedTechUser(intervention.techId);
-      setSelectedProducts(intervention.products?.map((product) => product.id) || []);
-      setEndDate(intervention.endedAt ? dayjs(intervention.endedAt) : null);
-      setPrice(intervention.price.toFixed(2));
+      const res = await getInterventionById(id)
+      setIntervention(res)
     } catch (err) {
       message.error('Erreur lors de la récupération de l\'intervention.');
+    } finally {
+      setLoading(false)
     }
   };
 
+  const setFieldsValue = () => {
+    if (!intervention) {
+      return
+    }
+
+    form.setFieldsValue({
+      bike: intervention?.clientBike?.type || '',
+      service: intervention?.typeIntervention?.name || '',
+    });
+
+    if (intervention.technician) {
+      setSelectedTechUser(intervention.technician);
+    }
+
+    if (intervention.typeIntervention) {
+      setSelectedTypeIntervention(intervention.typeIntervention);
+    }
+
+    if (intervention.clientBike) {
+      setSelectedBike(intervention.clientBike);
+    }
+
+    if (intervention.interventionProducts && Array.isArray(intervention.interventionProducts)) {
+      setSelectedProducts(intervention.interventionProducts.map((product) => product.product).filter(Boolean));
+    }
+
+    // // Gérer le prix de manière sécurisée
+    // if (intervention.price !== undefined && intervention.price !== null) {
+    //   setPrice(intervention.price.toFixed(2));
+    // }
+  }
+
   const calculateTotalPrice = () => {
-    const bike = form.getFieldValue('bike');
-    const service = form.getFieldValue('service');
-
-    const bikePrice = bikeOptions.find((option) => option.value === bike)?.price || 0;
-    const servicePrice = serviceOptions.find((option) => option.value === service)?.price || 0;
-
     const selectedProductsData = selectedProducts.map((productId) =>
       products.find((product) => product.id === productId)
     );
@@ -74,41 +110,19 @@ export default function EditIntervention() {
       0
     );
 
-    const totalPrice = bikePrice + servicePrice + productsPrice;
+    const totalPrice = productsPrice;
     setPrice(totalPrice.toFixed(2));
-  };
-
-  const handleProductChange = (selected) => {
-    setSelectedProducts(selected);
-  };
-
-  const handleChange = () => {
-    const service = form.getFieldValue('service');
-    const startDate = form.getFieldValue('started_at');
-    if (startDate) {
-      const startDayjs = dayjs(startDate);
-      let endDateCalculated;
-
-      if (service === 'reparation') {
-        endDateCalculated = startDayjs.add(1, 'hour').add(30, 'minute');
-      } else if (service === 'maintenance') {
-        endDateCalculated = startDayjs.add(1, 'hour');
-      }
-
-      setEndDate(endDateCalculated);
-    }
   };
 
   const onFinish = async (values) => {
     const interventionData = {
       ...values,
       price,
-      tech_id: selectedTechUser,
-      client_id: user.id,
+      tech_id: parseID(selectedTechUser),
       ended_at: endDate ? endDate.toISOString() : null,
-      products: selectedProducts.map((productId) => ({
-        id: productId,
-        quantity: 1,
+      products: selectedProducts.map(({ id, quantity }) => ({
+        id,
+        quantity,
       })),
     };
 
@@ -117,20 +131,9 @@ export default function EditIntervention() {
       message.success('Intervention mise à jour avec succès !');
       nav(`/interventions/show/${id}`);
     } catch (err) {
-      message.error('Erreur lors de la mise à jour de l\'intervention.');
+      message.error("Erreur lors de la mise à jour de l'intervention.");
     }
   };
-
-  const disabledDate = (current) => current && current.day() === 0;
-
-  const disabledTime = () => ({
-    disabledHours: () => {
-      let hours = [];
-      for (let i = 0; i < 9; i++) hours.push(i);
-      for (let i = 18; i < 24; i++) hours.push(i);
-      return hours;
-    },
-  });
 
   return (
     <Card style={styles.card}>
@@ -143,12 +146,10 @@ export default function EditIntervention() {
               rules={[{ required: true, message: 'Veuillez choisir un type de vélo' }]}
               style={styles.formItem}
             >
-              <Select
-                onChange={calculateTotalPrice}
-                options={bikeOptions.map((option) => ({
-                  label: option.label,
-                  value: option.value,
-                }))}
+              <SelectMyBikes
+                selectedBike={selectedBike}
+                setSelectedBike={setSelectedBike}
+                clientId={intervention && parseID(intervention?.clientBike?.owner)}
               />
             </Form.Item>
           </Col>
@@ -160,17 +161,15 @@ export default function EditIntervention() {
               rules={[{ required: true, message: 'Veuillez choisir un type de service' }]}
               style={styles.formItem}
             >
-              <Select
-                onChange={calculateTotalPrice}
-                options={serviceOptions.map((option) => ({
-                  label: option.label,
-                  value: option.value,
-                }))}
+              <SelectTypeIntervention
+                loading={loading}
+                selectedTypeIntervention={selectedTypeIntervention}
+                setSelectedTypeIntervention={setSelectedTypeIntervention}
               />
             </Form.Item>
           </Col>
 
-          <Col span={24}>
+          {/* <Col span={24}>
             <Form.Item
               label="Date de début"
               name="started_at"
@@ -185,18 +184,19 @@ export default function EditIntervention() {
                 disabledTime={disabledTime}
               />
             </Form.Item>
-          </Col>
+          </Col> */}
 
-          <Col span={24}>
+          {/* <Col span={24}>
             <Form.Item label="Date de fin" style={styles.formItem}>
               <Input value={endDate ? endDate.format('YYYY-MM-DD HH:mm') : ''} disabled />
             </Form.Item>
-          </Col>
+          </Col> */}
 
           <Col span={24}>
             <label style={styles.formItem}>Technicien</label>
             <div style={{ marginLeft: -5 }}>
               <SelectTech
+                loading={loading}
                 selectedTechUser={selectedTechUser}
                 setSelectedTechUser={setSelectedTechUser}
               />
@@ -205,15 +205,10 @@ export default function EditIntervention() {
 
           <Col span={24}>
             <Form.Item label="Produits" style={styles.formItem}>
-              <Select
-                mode="multiple"
-                placeholder="Sélectionnez des produits"
-                value={selectedProducts}
-                onChange={handleProductChange}
-                options={products.map((product) => ({
-                  label: `${product.name} (${product.price.toFixed(2)} €)`,
-                  value: product.id,
-                }))}
+              <SelectProducts
+                loading={loading}
+                selectedProducts={selectedProducts}
+                setSelectedProducts={setSelectedProducts}
               />
             </Form.Item>
           </Col>

@@ -2,7 +2,7 @@
 
 namespace App\DataFixtures;
 
-use App\Entity\Bicycles;
+use App\Entity\Bikes;
 use App\Entity\Brands;
 use App\Entity\User;
 use App\Entity\Zone;
@@ -91,7 +91,7 @@ class Fixtures extends Fixture
         for ($i = 1; $i <= 10; $i++) {
             $user = $this->createUser("user$i@example.com", 'password', 'ROLE_USER', "User$i", "Test$i$i$i", "060000000$i");
             // Ajout d’un vélo
-            $bike = new Bicycles();
+            $bike = new Bikes();
             $bike->setName("Vélo $i");
             $bike->setSize('M');
             $bike->setType('VTC');
@@ -113,7 +113,7 @@ class Fixtures extends Fixture
         for ($i = 1; $i <= 3; $i++) {
             $admin = $this->createUser("admin$i@example.com", 'adminpass', 'ROLE_ADMIN', "Admin$i", "Boss$i$i$i", "061111111$i");
             // Ajout d’un vélo
-            $bike = new Bicycles();
+            $bike = new Bikes();
             $bike->setName("Vélo $i");
             $bike->setSize('M');
             $bike->setType('VTC');
@@ -134,7 +134,7 @@ class Fixtures extends Fixture
         for ($i = 1; $i <= 5; $i++) {
             $tech = $this->createUser("tech$i@example.com", 'techpass', 'ROLE_TECH', "Tech$i", "Support$i$i$i", "062222222$i");
             // Ajout d’un vélo
-            $bike = new Bicycles();
+            $bike = new Bikes();
             $bike->setName("Vélo $i");
             $bike->setSize('M');
             $bike->setType('VTC');
@@ -197,7 +197,7 @@ class Fixtures extends Fixture
             $intervention->setComment("Intervention #$i description");
 
             // Random client + technician from lists
-            $intervention->setClientBicycle($bikes[array_rand($bikes)]);
+            $intervention->setClientBike($bikes[array_rand($bikes)]);
             $intervention->setTechnician($technicians[array_rand($technicians)]);
             $intervention->setTypeIntervention($typeInterventions[array_rand($typeInterventions)]);
 

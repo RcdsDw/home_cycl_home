@@ -33,4 +33,15 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->persist($user);
         $this->getEntityManager()->flush();
     }
+
+    public function findOneWithBikes(string $id): ?User
+    {
+        return $this->createQueryBuilder('u')
+            ->leftJoin('u.bikes', 'b')
+            ->addSelect('b')
+            ->where('u.id = :id')
+            ->setParameter('id', $id)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }

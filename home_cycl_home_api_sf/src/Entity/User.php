@@ -17,6 +17,7 @@ use ApiPlatform\OpenApi\Model\Operation;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Provider\CurrentUserProvider;
+use App\Provider\UserWithBikesProvider;
 use App\Controller\RegisterController;
 use App\Traits\Timestampable;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -35,6 +36,12 @@ use Symfony\Component\Serializer\Attribute\Groups;
             uriTemplate: '/me',
             provider: CurrentUserProvider::class,
             openapi: new Operation(summary: 'Return the current user.'),
+        ),
+        new Get(
+            uriTemplate: '/users/{id}/bikes',
+            provider: UserWithBikesProvider::class,
+            normalizationContext: ['groups' => ['user:bikes']],
+            openapi: new Operation(summary: 'Get a user with their bikes by user ID'),
         ),
         new Put(),
         new Delete(),
@@ -76,11 +83,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users', 'intervention:bicycle'])]
+    #[Groups(['user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users', 'intervention:bike'])]
     private ?string $firstname;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users', 'intervention:bicycle'])]
+    #[Groups(['user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users', 'intervention:bike'])]
     private ?string $lastname;
 
     #[ORM\Column(length: 20)]
@@ -88,7 +95,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $number;
 
     #[ORM\Column(length: 255, type: 'json')]
-    #[Groups(['user:read', 'user:write', 'intervention:users', 'intervention:bicycle'])]
+    #[Groups(['user:read', 'user:write', 'intervention:users', 'intervention:bike'])]
     private ?array $address;
 
     #[ORM\OneToOne(inversedBy: 'technician', cascade: ['persist'])]
@@ -101,9 +108,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read'])]
     private ?Zone $clientZone = null;
 
-    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Bicycles::class)]
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Bikes::class)]
     #[Groups(['user:read'])]
-    private Collection $bicycles;
+    private Collection $bikes;
 
     #[ORM\OneToMany(mappedBy: 'technician', targetEntity: Intervention::class)]
     #[Groups(['user:read'])]
@@ -111,7 +118,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->bicycles = new ArrayCollection();
+        $this->bikes = new ArrayCollection();
         $this->technicianInterventions = new ArrayCollection();
     }
 
@@ -231,27 +238,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     /**
-     * @return Collection<int, Bicycles>
+     * @return Collection<int, Bikes>
      */
-    public function getBicycles(): Collection
+    #[Groups(['user:bikes'])]
+    public function getBikes(): Collection
     {
-        return $this->bicycles;
+        return $this->bikes;
     }
 
-    public function addBicycle(Bicycles $bicycle): static
+    public function addBike(Bikes $bike): static
     {
-        if (!$this->bicycles->contains($bicycle)) {
-            $this->bicycles[] = $bicycle;
-            $bicycle->setOwner($this);
+        if (!$this->bikes->contains($bike)) {
+            $this->bikes[] = $bike;
+            $bike->setOwner($this);
         }
         return $this;
     }
 
-    public function removeBicycle(Bicycles $bicycle): static
+    public function removeBike(Bikes $bike): static
     {
-        if ($this->bicycles->removeElement($bicycle)) {
-            if ($bicycle->getOwner() === $this) {
-                $bicycle->setOwner(null);
+        if ($this->bikes->removeElement($bike)) {
+            if ($bike->getOwner() === $this) {
+                $bike->setOwner(null);
             }
         }
         return $this;

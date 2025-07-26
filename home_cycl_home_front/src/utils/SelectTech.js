@@ -22,13 +22,15 @@ export default function SelectTech({ selectedTechUser, setSelectedTechUser }) {
     };
 
     const handleTechUserChange = (value) => {
-        setSelectedTechUser(value);
+        const newTechSelected = techUsers.find((target) => parseID(target) === value)
+        setSelectedTechUser(newTechSelected);
     };
 
     return (
         <Select
-            value={selectedTechUser}
+            value={parseID(selectedTechUser)}
             onChange={handleTechUserChange}
+            allowClear
             style={{ width: '100%', margin: "5px" }}
             placeholder="Sélectionnez un utilisateur"
         >

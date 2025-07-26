@@ -23,3 +23,8 @@ export async function getUserById(id) {
 export async function getTechUsers() {
     return await getReq(`/users?roles=ROLE_TECH`)
 }
+
+export async function getUsersBikes(id) {
+    console.log("🚀 ~ getUsersBikes ~ id:", id)
+    return await getReq(`/users/${id}/bikes`)
+}

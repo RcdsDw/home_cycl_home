@@ -13,7 +13,7 @@ export default function ProductCard({ product }) {
                     <p><b>Prix :</b> {product.product_price.toFixed(2)} €</p>
                     <p><b>Description :</b> {product.product.description}</p>
                     <p><Tag color="geekblue">Catégorie : {product.product.category}</Tag></p>
-                    <Button size="small" type="link" onClick={() => nav(`/bicycles/${parseID(product.product)}`)}>
+                    <Button size="small" type="link" onClick={() => nav(`/bikes/${parseID(product.product)}`)}>
                         Voir le produit
                     </Button>
                 </div>

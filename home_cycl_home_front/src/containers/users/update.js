@@ -6,8 +6,8 @@ import { useEffect, useState } from "react";
 import AddressSearch from "../../utils/AdressSearch";
 
 export default function EditUser() {
-    const [form] = Form.useForm();
     const [loading, setLoading] = useState(true);
+    const [form] = Form.useForm();
     const { id } = useParams();
     const nav = useNavigate();
 
@@ -41,7 +41,7 @@ export default function EditUser() {
     };
 
     return (
-        <div style={{ maxWidth: 600, margin: "50px auto" }}>
+        <div style={{ maxWidth: 600, margin: "auto" }}>
             <h1>Modifier l'utilisateur</h1>
             <Form
                 form={form}

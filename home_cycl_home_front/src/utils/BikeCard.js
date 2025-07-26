@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { Button, Popover, Tag } from "antd";
 import { parseID } from "./ParseID";
 
-export default function BicycleCard({ bike }) {
+export default function BikeCard({ bike }) {
     const nav = useNavigate()
 
     return (
@@ -14,7 +14,7 @@ export default function BicycleCard({ bike }) {
                     <p><b>Type :</b> {bike.type}</p>
                     <p><b>Marque :</b> {bike.brand?.name}</p>
                     <p><b>Modèle :</b> {bike.model?.name}</p>
-                    <Button size="small" type="link" onClick={() => nav(`/bicycles/${parseID(bike)}`)}>
+                    <Button size="small" type="link" onClick={() => nav(`/bikes/${parseID(bike)}`)}>
                         Voir le vélo
                     </Button>
                 </div>

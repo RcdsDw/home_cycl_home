@@ -4,13 +4,12 @@ import { Button, Empty, message, Modal, Spin, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
 import { deleteIntervention, getInterventions } from "../../actions/interventions";
 import dayjs from "dayjs";
-import BicycleCard from "../../utils/BicycleCard";
+import BikeCard from "../../utils/BikeCard";
 import { parseID } from "../../utils/ParseID";
 
 export default function Interventions() {
   const [loading, setLoading] = useState(true);
-  const [datas, setDatas] = useState([]);
-  console.log("🚀 ~ Interventions ~ datas:", datas)
+  const [interventions, setInterventions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
 
@@ -23,7 +22,7 @@ export default function Interventions() {
   const fetchInterventions = async () => {
     try {
       const res = await getInterventions();
-      setDatas(res.member);
+      setInterventions(res.member);
     } catch (error) {
       console.error("Erreur lors de la récupération des interventions :", error);
     } finally {
@@ -50,7 +49,7 @@ export default function Interventions() {
 
   const handleDelete = (id) => {
     deleteIntervention(id);
-    setDatas((prevDatas) => prevDatas.filter((intervention) => intervention.id !== id));
+    setInterventions((prevDatas) => prevDatas.filter((intervention) => intervention.id !== id));
   };
 
   const columns = [
@@ -68,9 +67,9 @@ export default function Interventions() {
     },
     {
       title: 'Vélo',
-      dataIndex: 'clientBicycle',
-      key: 'clientBicycle',
-      render: (text) => <BicycleCard bike={text} />,
+      dataIndex: 'clientBike',
+      key: 'clientBike',
+      render: (text) => <BikeCard bike={text} />,
     },
     {
       title: 'Service',
@@ -102,16 +101,10 @@ export default function Interventions() {
     },
     {
       title: 'Client',
-      dataIndex: 'clientBicycle',
+      dataIndex: 'clientBike',
       key: 'owner',
       render: (text) => <div>{`${text.owner.firstname} ${text.owner.lastname}` || "Non renseigné"}</div>,
     },
-    // {
-    //   title: 'Nombre de produits',
-    //   dataIndex: 'productsCount',
-    //   key: 'products_count',
-    //   render: (text) => <div>{text} produit(s)</div>,
-    // },
     {
       key: 'show',
       dataIndex: 'show',
@@ -141,7 +134,7 @@ export default function Interventions() {
       <Button type="primary" style={styles.button} onClick={() => nav('/interventions')}>
         Ajouter
       </Button>
-      <Table columns={columns} dataSource={datas} locale={{
+      <Table columns={columns} dataSource={interventions} locale={{
         emptyText: <Empty description="Aucune intervention trouvée" />,
       }} />
       <Modal

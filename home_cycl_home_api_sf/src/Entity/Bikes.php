@@ -8,7 +8,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
-use App\Repository\BicyclesRepository;
+use App\Repository\BikesRepository;
 use Ramsey\Uuid\UuidInterface;
 use App\Traits\Timestampable;
 use Doctrine\Common\Collections\Collection;
@@ -23,12 +23,15 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Put(),
         new Delete(),
     ],
-    normalizationContext: ['groups' => ['bicycles:read']],
-    denormalizationContext: ['groups' => ['bicycles:write']]
+    normalizationContext: ['groups' => ['bikes:read']],
+    denormalizationContext: ['groups' => ['bikes:write']]
 )]
-#[ORM\Entity(repositoryClass: BicyclesRepository::class)]
+#[ApiFilter(SearchFilter::class, properties: [
+    'ower.id' => 'exact'
+])]
+#[ORM\Entity(repositoryClass: BikesRepository::class)]
 #[ORM\HasLifecycleCallbacks]
-class Bicycles
+class Bikes
 {
     use Timestampable;
 
@@ -39,34 +42,34 @@ class Bicycles
     private ?UuidInterface $id;
 
     #[ORM\Column(length: 120)]
-    #[Groups(['bicycles:read', 'bicycles:write', 'intervention:bicycle'])]
+    #[Groups(['bikes:read', 'bikes:write', 'intervention:bike', 'user:bikes'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 3)]
-    #[Groups(['bicycles:read', 'bicycles:write', 'intervention:bicycle'])]
+    #[Groups(['bikes:read', 'bikes:write', 'intervention:bike', 'user:bikes'])]
     private ?string $size = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['bicycles:read', 'bicycles:write', 'intervention:bicycle'])]
+    #[Groups(['bikes:read', 'bikes:write', 'intervention:bike', 'user:bikes'])]
     private ?string $type = null;
 
-    #[ORM\ManyToOne(inversedBy: 'bicycles')]
+    #[ORM\ManyToOne(inversedBy: 'bikes')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['bicycles:read', 'bicycles:write', 'intervention:bicycle'])]
+    #[Groups(['bikes:read', 'bikes:write', 'intervention:bike', 'user:bikes'])]
     private ?User $owner = null;
 
-    #[ORM\OneToMany(mappedBy: 'clientBicycle', targetEntity: Intervention::class)]
-    #[Groups(['bicycles:read'])]
-    private Collection $bicycleInterventions;
+    #[ORM\OneToMany(mappedBy: 'clientBike', targetEntity: Intervention::class)]
+    #[Groups(['bikes:read'])]
+    private Collection $bikeInterventions;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['bicycles:read', 'bicycles:write', 'intervention:bicycle'])]
+    #[Groups(['bikes:read', 'bikes:write', 'intervention:bike'])]
     private ?Brands $brand = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['bicycles:read', 'bicycles:write', 'intervention:bicycle'])]
+    #[Groups(['bikes:read', 'bikes:write', 'intervention:bike', 'user:bikes'])]
     private ?Models $model = null;
 
     public function getId(): ?UuidInterface
