@@ -8,19 +8,21 @@ import dayjs from "dayjs";
 import L from "leaflet";
 import BikeCard from "../../utils/BikeCard";
 import ProductCard from "../../utils/ProductCard";
+import ModalProducts from "../../components/interventions/modalProducts";
 
 export default function ShowIntervention() {
     const [loading, setLoading] = useState(true);
     const [intervention, setIntervention] = useState(null);
     const [client, setClient] = useState(null)
     const [products, setProducts] = useState(null)
+    const [isModalProductsOpen, setIsModalProductsOpen] = useState(false);
 
     const { id } = useParams();
     const nav = useNavigate();
 
     useEffect(() => {
         fetchIntervention();
-    }, []);
+    }, [products]);
 
     const fetchIntervention = async () => {
         try {
@@ -44,6 +46,19 @@ export default function ShowIntervention() {
 
         return totalPrice
     }
+
+    const showModal = () => {
+        setIsModalProductsOpen(true);
+    };
+
+    const handleOk = () => {
+        setIsModalProductsOpen(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalProductsOpen(false);
+    };
+
     const markerIcon = new L.Icon({
         iconUrl: "https://unpkg.com/leaflet@1.7.1/dist/images/marker-icon.png",
         iconSize: [25, 41],
@@ -120,7 +135,14 @@ export default function ShowIntervention() {
 
                     {products.length > 0 && (
                         <Card
-                            title="Produits Commandés"
+                            title={
+                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                    <span>Produits Commandés</span>
+                                    <Button type="primary" onClick={showModal}>
+                                        Modifier les produits associés
+                                    </Button>
+                                </div>
+                            }
                             style={{ ...styles.card, marginTop: 20 }}
                             bordered
                         >
@@ -144,6 +166,14 @@ export default function ShowIntervention() {
                         </Card>
                     )}
                 </Col>
+
+                <ModalProducts
+                    open={isModalProductsOpen}
+                    onOk={handleOk}
+                    onCancel={handleCancel}
+                    currentProducts={products}
+                    interventionID={intervention['@id']}
+                />
 
                 <Col span={12}>
                     {geoCoords ? (

@@ -5,40 +5,40 @@ import { parseID } from './ParseID';
 
 const { Option } = Select;
 
-export default function SelectMyBikes({ selectedBike, setSelectedBike, clientId }) {
-    const [myBikes, setMyBikes] = useState([]);
-    console.log("🚀 ~ SelectMyBikes ~ myBikes:", myBikes)
+export default function SelectBikes({ selectedBike, setSelectedBike, clientId }) {
+    const [bikes, setBikes] = useState([]);
 
-    const fetchMyBikes = useCallback(async () => {
+    const fetchBikes = useCallback(async () => {
         try {
             const res = await getUsersBikes(clientId);
-            console.log("🚀 ~ fetchMyBikes ~ res:", res)
-            setMyBikes(res.bikes);
+            setBikes(res.bikes);
         } catch (error) {
             console.error("Erreur lors de la récupération des techniciens", error);
         }
     }, [clientId]);
 
     useEffect(() => {
-        fetchMyBikes();
-    }, [fetchMyBikes]);
+        if (clientId) {
+            fetchBikes();
+        }
+    }, [fetchBikes]);
 
-    const handleMyBikesChange = (value) => {
-        const newTypeSelected = myBikes.find((target) => parseID(target) === value)
-        setSelectedBike(newTypeSelected);
+    const handleBikesChange = (value) => {
+        const newBikeSelected = bikes.find((target) => parseID(target) === value)
+        setSelectedBike(newBikeSelected);
     };
 
     return (
         <Select
             value={parseID(selectedBike)}
-            onChange={handleMyBikesChange}
+            onChange={handleBikesChange}
             allowClear
             style={{ width: '100%', margin: "5px" }}
             placeholder="Sélectionnez un de vos vélos"
         >
             <Option disabled value={null}>Sélectionnez un de vos vélos</Option>
 
-            {myBikes && myBikes.map((bike) => (
+            {bikes && bikes.map((bike) => (
                 <Option key={parseID(bike)} value={parseID(bike)}>
                     {bike.name} {bike.type}
                 </Option>

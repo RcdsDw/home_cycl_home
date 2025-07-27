@@ -27,6 +27,7 @@ use App\Traits\Timestampable;
 )]
 #[ORM\Entity(repositoryClass: InterventionProductRepository::class)]
 #[ORM\Table(name: 'intervention_product')]
+#[ORM\UniqueConstraint(name: 'intervention_product_constraint', columns: ['intervention_id', 'product_id'])]
 #[ORM\HasLifecycleCallbacks]
 class InterventionProduct
 {
@@ -46,14 +47,14 @@ class InterventionProduct
     #[Groups(['intervention_product:read', 'intervention_product:write', 'intervention:read', 'intervention:write'])]
     private float $product_price;
 
-    #[ORM\ManyToOne(inversedBy: 'interventionProducts')]
+    #[ORM\ManyToOne(inversedBy: 'interventionProducts', cascade: ['persist'])]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['intervention_product:read', 'intervention_product:write'])]
     private ?Intervention $intervention = null;
 
     #[ORM\ManyToOne(inversedBy: 'interventionProducts')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['intervention_product:read', 'intervention_product:write', 'intervention:read'])]
+    #[Groups(['intervention_product:read', 'intervention_product:write', 'intervention:read', 'intervention:write'])]
     private ?Product $product = null;
 
     public function getId(): ?UuidInterface

@@ -6,24 +6,19 @@ import SelectTech from '../../utils/SelectTech';
 import { parseID } from '../../utils/ParseID';
 
 import { getInterventionById, updateIntervention } from '../../actions/interventions';
-import { getProducts } from '../../actions/products';
 import SelectMyBikes from '../../utils/SelectMyBikes';
 import SelectTypeIntervention from '../../utils/SelectTypeIntervention';
-import SelectProducts from '../../utils/SelectProducts';
+import { createInterventionProduct } from '../../actions/interventionProduct';
 
 export default function EditIntervention() {
   const [loading, setLoading] = useState(false);
 
   const [price, setPrice] = useState(0);
   const [intervention, setIntervention] = useState();
-  console.log("🚀 ~ EditIntervention ~ intervention:", intervention)
   const [selectedTechUser, setSelectedTechUser] = useState();
   const [selectedBike, setSelectedBike] = useState();
   const [selectedTypeIntervention, setSelectedTypeIntervention] = useState();
-  const [selectedProducts, setSelectedProducts] = useState([]);
 
-  const [products, setProducts] = useState([]);
-  const [endDate, setEndDate] = useState(null);
 
   const [form] = Form.useForm();
   const { id } = useParams();
@@ -31,29 +26,15 @@ export default function EditIntervention() {
 
   useEffect(() => {
     fetchIntervention();
-    fetchProducts();
   }, []);
 
   useEffect(() => {
     setFieldsValue();
   }, [intervention]);
 
-  // useEffect(() => {
-  //   calculateTotalPrice();
-  // }, [selectedProducts]);
-
-  const fetchProducts = async () => {
-    setLoading(true)
-
-    try {
-      const res = await getProducts();
-      setProducts(res.member);
-    } catch (err) {
-      message.error('Erreur lors de la récupération des produits.');
-    } finally {
-      setLoading(false)
-    }
-  };
+  useEffect(() => {
+    calculateTotalPrice();
+  }, [selectedTypeIntervention]);
 
   const fetchIntervention = async () => {
     setLoading(true)
@@ -89,41 +70,22 @@ export default function EditIntervention() {
     if (intervention.clientBike) {
       setSelectedBike(intervention.clientBike);
     }
-
-    if (intervention.interventionProducts && Array.isArray(intervention.interventionProducts)) {
-      setSelectedProducts(intervention.interventionProducts.map((product) => product.product).filter(Boolean));
-    }
-
-    // // Gérer le prix de manière sécurisée
-    // if (intervention.price !== undefined && intervention.price !== null) {
-    //   setPrice(intervention.price.toFixed(2));
-    // }
   }
 
   const calculateTotalPrice = () => {
-    const selectedProductsData = selectedProducts.map((productId) =>
-      products.find((product) => product.id === productId)
-    );
-
-    const productsPrice = selectedProductsData.reduce(
-      (total, product) => total + (product?.price || 0),
-      0
-    );
-
-    const totalPrice = productsPrice;
-    setPrice(totalPrice.toFixed(2));
+    setPrice(selectedTypeIntervention?.price);
   };
 
-  const onFinish = async (values) => {
+  const onFinish = async () => {
+    setLoading(true)
+
     const interventionData = {
-      ...values,
-      price,
-      tech_id: parseID(selectedTechUser),
-      ended_at: endDate ? endDate.toISOString() : null,
-      products: selectedProducts.map(({ id, quantity }) => ({
-        id,
-        quantity,
-      })),
+      start_date: intervention.start_date,
+      end_date: intervention.end_date,
+      comment: intervention.comment,
+      clientBike: selectedBike['@id'],
+      technician: selectedTechUser['@id'],
+      typeIntervention: selectedTypeIntervention['@id'],
     };
 
     try {
@@ -132,6 +94,8 @@ export default function EditIntervention() {
       nav(`/interventions/show/${id}`);
     } catch (err) {
       message.error("Erreur lors de la mise à jour de l'intervention.");
+    } finally {
+      setLoading(false)
     }
   };
 
@@ -169,29 +133,6 @@ export default function EditIntervention() {
             </Form.Item>
           </Col>
 
-          {/* <Col span={24}>
-            <Form.Item
-              label="Date de début"
-              name="started_at"
-              rules={[{ required: true, message: 'Veuillez choisir une date de début' }]}
-              style={styles.formItem}
-            >
-              <DatePicker
-                showTime
-                onChange={handleChange}
-                format="YYYY-MM-DD HH:mm"
-                disabledDate={disabledDate}
-                disabledTime={disabledTime}
-              />
-            </Form.Item>
-          </Col> */}
-
-          {/* <Col span={24}>
-            <Form.Item label="Date de fin" style={styles.formItem}>
-              <Input value={endDate ? endDate.format('YYYY-MM-DD HH:mm') : ''} disabled />
-            </Form.Item>
-          </Col> */}
-
           <Col span={24}>
             <label style={styles.formItem}>Technicien</label>
             <div style={{ marginLeft: -5 }}>
@@ -204,23 +145,13 @@ export default function EditIntervention() {
           </Col>
 
           <Col span={24}>
-            <Form.Item label="Produits" style={styles.formItem}>
-              <SelectProducts
-                loading={loading}
-                selectedProducts={selectedProducts}
-                setSelectedProducts={setSelectedProducts}
-              />
-            </Form.Item>
-          </Col>
-
-          <Col span={24}>
             <Form.Item label="Prix total" style={styles.formItem}>
               <Input value={`${price} €`} disabled />
             </Form.Item>
           </Col>
 
           <Form.Item style={styles.formItem}>
-            <Button type="primary" htmlType="submit" style={styles.button}>
+            <Button type="primary" htmlType="submit" style={styles.button} loading>
               Mettre à jour l'intervention
             </Button>
           </Form.Item>

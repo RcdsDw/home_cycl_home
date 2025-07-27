@@ -3,26 +3,32 @@
 namespace App\Traits;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 trait Timestampable
 {
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(name: 'created_at', type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
 
-    #[ORM\Column(type: 'datetime')]
+    #[ORM\Column(name: 'updated_at', type: 'datetime')]
     private ?\DateTimeInterface $updatedAt = null;
 
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
         $now = new \DateTime();
-        $this->setCreatedAt($now);
+        if ($this->createdAt === null) {
+            $this->setCreatedAt($now);
+        }
         $this->setUpdatedAt($now);
     }
 
     #[ORM\PreUpdate]
     public function onPreUpdate(): void
     {
+        if ($this->createdAt === null) {
+            $this->setCreatedAt(new \DateTime());
+        }
         $this->setUpdatedAt(new \DateTime());
     }
 
@@ -34,7 +40,6 @@ trait Timestampable
     public function setCreatedAt(\DateTimeInterface $createdAt): self
     {
         $this->createdAt = $createdAt;
-
         return $this;
     }
 
@@ -46,7 +51,6 @@ trait Timestampable
     public function setUpdatedAt(\DateTimeInterface $updatedAt): self
     {
         $this->updatedAt = $updatedAt;
-
         return $this;
     }
 }

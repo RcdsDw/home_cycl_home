@@ -57,6 +57,15 @@ export function patchReq(endpoint, payload, token = true) {
     return api("PATCH", endpoint, payload, token);
 }
 /**
+ * @param {string} method - "PUT"
+ * @param {string} endpoint - "/route"
+ * @param {object|null} payload - datas to send (default = null)
+ * @param {boolean} token - default = true
+ */
+export function putReq(endpoint, payload, token = true) {
+    return api("PUT", endpoint, payload, token);
+}
+/**
  * @param {string} method - "DELETE"
  * @param {string} endpoint - "/route"
  * @param {boolean} token - default = true

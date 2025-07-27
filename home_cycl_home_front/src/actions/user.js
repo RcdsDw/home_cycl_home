@@ -25,6 +25,5 @@ export async function getTechUsers() {
 }
 
 export async function getUsersBikes(id) {
-    console.log("🚀 ~ getUsersBikes ~ id:", id)
     return await getReq(`/users/${id}/bikes`)
 }

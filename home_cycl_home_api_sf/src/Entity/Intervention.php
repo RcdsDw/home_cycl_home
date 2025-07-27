@@ -7,6 +7,7 @@ use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Get;
 use App\Repository\InterventionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -27,6 +28,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             normalizationContext: ['groups' => ['intervention:read', 'intervention:users', 'intervention:bike']]
         ),
         new Put(),
+        new Patch(),
         new Delete(),
     ],
     normalizationContext: ['groups' => ['intervention:read']],
@@ -72,11 +74,8 @@ class Intervention
     #[Groups(['intervention:read', 'intervention:list', 'intervention:write'])]
     private ?TypeIntervention $typeIntervention = null;
 
-    /**
-     * @var Collection<int, InterventionProduct>
-     */
-    #[ORM\OneToMany(mappedBy: 'intervention', targetEntity: InterventionProduct::class, cascade: ['persist', 'remove'], orphanRemoval: true)]
-    #[Groups(['intervention:read', 'intervention:write'])]
+    #[ORM\OneToMany(mappedBy: 'intervention', targetEntity: InterventionProduct::class, cascade: ['remove'])]
+    #[Groups(['intervention:read'])]
     private Collection $interventionProducts;
 
     public function __construct()
@@ -172,9 +171,6 @@ class Intervention
         return $interval->format('%h heures %i minutes');
     }
 
-    /**
-     * @return Collection<int, InterventionProduct>
-     */
     public function getInterventionProducts(): Collection
     {
         return $this->interventionProducts;
