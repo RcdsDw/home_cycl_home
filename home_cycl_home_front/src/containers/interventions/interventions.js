@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { deleteIntervention, getInterventions } from "../../actions/interventions";
 import dayjs from "dayjs";
 import BikeCard from "../../utils/BikeCard";
+import UserCard from "../../utils/UserCard";
 import { parseID } from "../../utils/ParseID";
 
 export default function Interventions() {
@@ -97,13 +98,13 @@ export default function Interventions() {
       title: 'Technicien',
       dataIndex: 'technician',
       key: 'technician',
-      render: (text) => <div>{`${text.firstname} ${text.lastname}` || "Non renseigné"}</div>,
+      render: (text) => <UserCard user={text} />,
     },
     {
       title: 'Client',
       dataIndex: 'clientBike',
       key: 'owner',
-      render: (text) => <div>{`${text.owner.firstname} ${text.owner.lastname}` || "Non renseigné"}</div>,
+      render: (text) => <UserCard user={text.owner} />,
     },
     {
       key: 'show',
@@ -131,7 +132,7 @@ export default function Interventions() {
 
   return (
     <>
-      <Button type="primary" style={styles.button} onClick={() => nav('/interventions')}>
+      <Button type="primary" style={styles.button} onClick={() => nav('/interventions/new')}>
         Ajouter
       </Button>
       <Table columns={columns} dataSource={interventions} locale={{

@@ -2,13 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { Form, Input, Button, Col, Row, message, Card } from 'antd';
-import SelectTech from '../../utils/SelectTech';
 import { parseID } from '../../utils/ParseID';
 
 import { getInterventionById, updateIntervention } from '../../actions/interventions';
-import SelectMyBikes from '../../utils/SelectMyBikes';
+import SelectTech from '../../utils/SelectTech';
+import SelectBikes from '../../utils/SelectBikes';
 import SelectTypeIntervention from '../../utils/SelectTypeIntervention';
-import { createInterventionProduct } from '../../actions/interventionProduct';
 
 export default function EditIntervention() {
   const [loading, setLoading] = useState(false);
@@ -110,7 +109,7 @@ export default function EditIntervention() {
               rules={[{ required: true, message: 'Veuillez choisir un type de vélo' }]}
               style={styles.formItem}
             >
-              <SelectMyBikes
+              <SelectBikes
                 selectedBike={selectedBike}
                 setSelectedBike={setSelectedBike}
                 clientId={intervention && parseID(intervention?.clientBike?.owner)}
@@ -126,7 +125,6 @@ export default function EditIntervention() {
               style={styles.formItem}
             >
               <SelectTypeIntervention
-                loading={loading}
                 selectedTypeIntervention={selectedTypeIntervention}
                 setSelectedTypeIntervention={setSelectedTypeIntervention}
               />
@@ -137,7 +135,6 @@ export default function EditIntervention() {
             <label style={styles.formItem}>Technicien</label>
             <div style={{ marginLeft: -5 }}>
               <SelectTech
-                loading={loading}
                 selectedTechUser={selectedTechUser}
                 setSelectedTechUser={setSelectedTechUser}
               />
@@ -151,7 +148,7 @@ export default function EditIntervention() {
           </Col>
 
           <Form.Item style={styles.formItem}>
-            <Button type="primary" htmlType="submit" style={styles.button} loading>
+            <Button type="primary" htmlType="submit" style={styles.button} loading={loading}>
               Mettre à jour l'intervention
             </Button>
           </Form.Item>

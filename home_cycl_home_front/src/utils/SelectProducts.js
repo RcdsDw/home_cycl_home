@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { InputNumber, Select } from 'antd';
 import { getProducts } from '../actions/products';
 import { parseID } from './ParseID';
-import { updateInterventionProduct } from '../actions/interventionProduct';
+import { createInterventionProduct, deleteInterventionProduct, updateInterventionProduct } from '../actions/interventionProduct';
 
 const { Option } = Select;
 
@@ -26,7 +26,17 @@ export default function SelectProducts({
         }
     };
 
-    const handleProductChange = (selectedIds) => {
+    const handleProductChange = async (selectedIds) => {
+        const currentProductIds = getSelectedProductIds();
+
+        const addedProductIds = selectedIds.filter(id => !currentProductIds.includes(id));
+
+        const removedProductIds = currentProductIds.filter(id => !selectedIds.includes(id));
+
+        for (const productId of removedProductIds) {
+            await handleProductRemove(productId);
+        }
+
         const newSelectedProducts = selectedIds.map((productId) => {
             const existingItem = selectedProducts?.find(item =>
                 parseID(item.product) === productId
@@ -46,27 +56,99 @@ export default function SelectProducts({
         });
 
         setSelectedProducts(newSelectedProducts);
+
+        for (const productId of addedProductIds) {
+            await handleProductCreateWithData(productId, newSelectedProducts);
+        }
+    };
+
+    const handleProductCreateWithData = async (productId, currentSelectedProducts) => {
+        const productData = products.find(p => parseID(p) === productId);
+
+        const productToCreate = currentSelectedProducts.find(item =>
+            parseID(item.product) === productId
+        );
+
+        if (!productData || !productToCreate) {
+            console.error(`Produit avec l'ID ${productId} non trouvé`);
+            return;
+        }
+
+        const newInterventionProduct = {
+            intervention: interventionID,
+            product: productData['@id'],
+            quantity: productToCreate.quantity,
+            product_price: productData?.price || 0
+        };
+
+        try {
+            const createdItem = await createInterventionProduct(newInterventionProduct);
+
+            const finalProducts = currentSelectedProducts.map(item => {
+                if (parseID(item.product) === productId) {
+                    return {
+                        ...createdItem,
+                        product: productData
+                    };
+                }
+                return item;
+            });
+
+            setSelectedProducts(finalProducts);
+            console.log(`Produit d'intervention créé avec succès: ${productId}`);
+        } catch (error) {
+            console.error(`Erreur lors de la création du produit d'intervention ${productId}:`, error);
+
+            const rollbackProducts = currentSelectedProducts.filter(item =>
+                parseID(item.product) !== productId
+            );
+            setSelectedProducts(rollbackProducts);
+        }
+    };
+
+    const handleProductRemove = async (productId) => {
+        const productToRemove = selectedProducts.find((item) => parseID(item.product) === productId);
+
+        if (!productToRemove) {
+            console.error(`Produit avec l'ID ${productId} non trouvé`);
+            return;
+        }
+
+        if (productToRemove.id || productToRemove['@id']) {
+            try {
+                await deleteInterventionProduct(parseID(productToRemove));
+            } catch (error) {
+                console.error(`Erreur lors de la suppression du produit d'intervention ${productId}:`, error);
+                return;
+            }
+        }
+
+        const updatedProducts = selectedProducts.filter((item) => parseID(item.product) !== productId);
+        setSelectedProducts(updatedProducts);
     };
 
     const handleQuantityChange = async (productId, newQuantity) => {
-        const productToUpdate = selectedProducts.find((item) => parseID(item.product) === productId)
+        const productToUpdate = selectedProducts.find((item) => parseID(item.product) === productId);
 
         if (!productToUpdate) {
             console.error(`Produit avec l'ID ${productId} non trouvé`);
             return;
         }
 
-        let itemToUpdate = {
-            intervention: interventionID,
-            product: productToUpdate.product['@id'],
-            quantity: newQuantity,
-            product_price: productToUpdate?.product_price
-        };
+        if (productToUpdate.id || productToUpdate['@id']) {
+            let itemToUpdate = {
+                intervention: interventionID,
+                product: productToUpdate.product['@id'],
+                quantity: newQuantity,
+                product_price: productToUpdate?.product_price
+            };
 
-        try {
-            await updateInterventionProduct(parseID(productToUpdate), itemToUpdate)
-        } catch (err) {
-            console.error(err)
+            try {
+                await updateInterventionProduct(parseID(productToUpdate), itemToUpdate);
+            } catch (err) {
+                console.error('Erreur lors de la mise à jour de la quantité:', err);
+                return;
+            }
         }
 
         const updatedProducts = selectedProducts.map((item) => {
@@ -74,7 +156,6 @@ export default function SelectProducts({
                 return {
                     ...item,
                     quantity: newQuantity || 1,
-
                 };
             }
             return item;

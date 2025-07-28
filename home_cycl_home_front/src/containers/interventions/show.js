@@ -133,38 +133,40 @@ export default function ShowIntervention() {
                         </Descriptions>
                     </Card>
 
-                    {products.length > 0 && (
-                        <Card
-                            title={
-                                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                                    <span>Produits Commandés</span>
-                                    <Button type="primary" onClick={showModal}>
-                                        Modifier les produits associés
-                                    </Button>
-                                </div>
-                            }
-                            style={{ ...styles.card, marginTop: 20 }}
-                            bordered
-                        >
-                            <List
-                                dataSource={products}
-                                renderItem={(product) => (
-                                    <List.Item>
-                                        <ProductCard product={product} />
-                                        <div>
-                                            Total: {(product.product.price * product.quantity).toFixed(
-                                                2
-                                            )} €
-                                        </div>
-                                    </List.Item>
-                                )}
-                            />
-                            <Divider />
-                            <h3 style={{ textAlign: "right" }}>
-                                Prix total des produits: {totalPrice().toFixed(2)} €
-                            </h3>
-                        </Card>
-                    )}
+                    <Card
+                        title={
+                            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                                <span>Produits Commandés</span>
+                                <Button type="primary" onClick={showModal}>
+                                    Modifier les produits associés
+                                </Button>
+                            </div>
+                        }
+                        style={{ ...styles.card, marginTop: 20 }}
+                        bordered
+                    >
+                        {products.length > 0 && (
+                            <>
+                                <List
+                                    dataSource={products}
+                                    renderItem={(product) => (
+                                        <List.Item>
+                                            <ProductCard product={product} />
+                                            <div>
+                                                Total: {(product.product.price * product.quantity).toFixed(
+                                                    2
+                                                )} €
+                                            </div>
+                                        </List.Item>
+                                    )}
+                                />
+                                <Divider />
+                                <h3 style={{ textAlign: "right" }}>
+                                    Prix total des produits: {totalPrice().toFixed(2)} €
+                                </h3>
+                            </>
+                        )}
+                    </Card>
                 </Col>
 
                 <ModalProducts

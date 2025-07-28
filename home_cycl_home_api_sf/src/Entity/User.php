@@ -35,6 +35,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Get(
             uriTemplate: '/me',
             provider: CurrentUserProvider::class,
+            normalizationContext: ['groups' => ['user:read']],
             openapi: new Operation(summary: 'Return the current user.'),
         ),
         new Get(
@@ -53,6 +54,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ORM\Table(name: "users")]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[ORM\HasLifecycleCallbacks]
+#[Groups(['user:read'])]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     use Timestampable;
