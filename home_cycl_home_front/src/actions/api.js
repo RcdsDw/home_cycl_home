@@ -17,16 +17,25 @@ async function api(method, endpoint, payload = null, token = true) {
 
     try {
         const response = await fetch(`${API_URL}${endpoint}`, options);
-        const data = await response.json();
+        let data = null;
+        if (response.status !== 204) {
+            try {
+                data = await response.json();
+            } catch (parseError) {
+                data = null;
+            }
+        }
 
         if (!response.ok) {
-            throw new Error(data.message || `Error with the ${method} request`);
+            const error = new Error(data?.message || 'Erreur serveur');
+            error.status = response.status;
+            error.details = data;
+            throw error;
         }
 
         return data;
     } catch (err) {
-        console.error(err);
-        return null;
+        throw err;
     }
 }
 

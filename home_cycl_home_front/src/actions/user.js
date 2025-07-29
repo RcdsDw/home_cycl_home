@@ -1,7 +1,7 @@
 import { deleteReq, getReq, patchReq, postReq } from "./api";
 
 export async function createUser(values) {
-    return await postReq("/users/new", values)
+    return await postReq("/users", values)
 }
 
 export async function updateUser(values, id) {

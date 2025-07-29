@@ -3,24 +3,48 @@ import { useNavigate } from "react-router-dom";
 import { Button, Form, Input, Card, message, Select } from "antd";
 import { createUser } from "../../actions/user";
 import AddressSearch from "../../utils/AdressSearch";
+import { parseID } from "../../utils/ParseID";
+import { useState } from "react";
 
 export default function NewUser() {
+  const [loading, setLoading] = useState()
+
   const [form] = Form.useForm();
   const nav = useNavigate()
 
-  const onFinishRegister = (values) => {
-    createUser(values)
-      .then(() => {
+  const refactoAddress = (address) => {
+    return {
+      street: address.data?.name,
+      city: address.data?.city,
+      code: address.data?.citycode,
+      coords: {
+        lat: address.geo?.coordinates[1],
+        lng: address.geo?.coordinates[0],
+      },
+    };
+  };
+
+  const onFinishRegister = async (values) => {
+    setLoading(true)
+
+    if (values?.address) {
+      values.address = refactoAddress(values.address);
+    }
+
+    try {
+      await createUser(values).then((res) => {
         message.success(`Nouvel utilisateur créé`);
-        nav('/users');
+        nav(`/users/show/${parseID(res)}`);
       })
-      .catch((err) => {
-        if (err.status === 406) {
-          message.error(err.data.message);
-        } else {
-          message.error("Erreur lors de la création.");
-        }
-      });
+    } catch (err) {
+      if (err.status === 409) {
+        message.error("Cette adresse email est déjà utilisée.");
+      } else {
+        message.error("Erreur lors de la création.");
+      }
+    } finally {
+      setLoading(false)
+    }
   };
 
   const onFinishFailed = (info) => {
@@ -56,21 +80,21 @@ export default function NewUser() {
 
         <Form.Item
           label="Rôle"
-          name="role"
+          name="roles"
           rules={[{ required: true, message: 'Entrez le rôle.' }]}
         >
           <Select
             options={[
               {
-                value: "admin",
+                value: "ROLE_ADMIN",
                 label: "Admin"
               },
               {
-                value: "tech",
+                value: "ROLE_TECH",
                 label: "Technicien"
               },
               {
-                value: "user",
+                value: "ROLE_USER",
                 label: "Utilisateur"
               },
             ]}
@@ -117,7 +141,7 @@ export default function NewUser() {
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading}>
             Valider
           </Button>
         </Form.Item>

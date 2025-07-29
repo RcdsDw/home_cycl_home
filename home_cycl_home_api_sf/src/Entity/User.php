@@ -26,6 +26,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ApiResource(
     operations: [
+        new Post(),
         new Post(
             uriTemplate: '/register',
             controller: RegisterController::class,
@@ -110,11 +111,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user:read'])]
     private ?Zone $clientZone = null;
 
-    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Bikes::class)]
+    #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Bikes::class, cascade: ['persist', 'remove'])]
     #[Groups(['user:read'])]
     private Collection $bikes;
 
-    #[ORM\OneToMany(mappedBy: 'technician', targetEntity: Intervention::class)]
+    #[ORM\OneToMany(mappedBy: 'technician', targetEntity: Intervention::class, orphanRemoval: false)]
     #[Groups(['user:read'])]
     private Collection $technicianInterventions;
 

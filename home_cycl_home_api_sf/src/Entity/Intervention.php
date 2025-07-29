@@ -60,7 +60,7 @@ class Intervention
     private ?string $comment = null;
 
     #[ORM\ManyToOne(targetEntity: Bikes::class, inversedBy: 'bikeInterventions')]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(onDelete: 'SET NULL', nullable: true)]
     #[Groups(['intervention:read', 'intervention:list', 'intervention:bike', 'intervention:write'])]
     private ?Bikes $clientBike = null;
 
