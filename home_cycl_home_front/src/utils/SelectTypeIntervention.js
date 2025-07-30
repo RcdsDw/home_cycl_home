@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Select } from 'antd';
-import { getTypeInterventions } from '../actions/typeIntervention';
+import { getTypeInterventions } from '../actions/typesIntervention';
 import { parseID } from './ParseID';
 
 const { Option } = Select;

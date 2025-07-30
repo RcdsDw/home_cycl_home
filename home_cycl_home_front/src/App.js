@@ -2,16 +2,19 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
 import Auth from './containers/auth/auth.js';
 import Dashboard from './containers/dashboard/dashboard.js';
-import Users from './containers/users/users.js';
+import Users from './containers/users/list.js';
 import MainLayout from "./MainLayout"
 import NewUser from './containers/users/new.js';
 import ShowUser from './containers/users/show.js';
 import Planning from './containers/planning/planning.js';
 import EditUser from './containers/users/update.js';
 import NewIntervention from './containers/interventions/new.js';
-import Interventions from './containers/interventions/interventions.js';
+import Interventions from './containers/interventions/list.js';
 import ShowIntervention from './containers/interventions/show.js';
 import EditIntervention from './containers/interventions/update.js';
+import TypeInterventions from './containers/typeInterventions/list.js';
+import NewTypeInterventions from './containers/typeInterventions/new.js';
+import EditTypeInterventions from './containers/typeInterventions/update.js';
 
 export default function App() {
   return (
@@ -30,6 +33,9 @@ export default function App() {
           <Route path="/interventions/new" element={<NewIntervention />} />
           <Route path="/interventions/show/:id" element={<ShowIntervention />} />
           <Route path="/interventions/edit/:id" element={<EditIntervention />} />
+          <Route path="/type_intervention" element={<TypeInterventions />} />
+          <Route path="/type_intervention/new" element={<NewTypeInterventions />} />
+          <Route path="/type_intervention/edit/:id" element={<EditTypeInterventions />} />
         </Route>
       </Routes>
     </Router>

@@ -18,5 +18,6 @@ export async function authLogin(values) {
 }
 
 export async function authLogout() {
-  await getReq("/logout", false)
+  localStorage.removeItem('token');
+  localStorage.removeItem('user');
 }

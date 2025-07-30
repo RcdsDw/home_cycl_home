@@ -14,7 +14,6 @@ import TagRoles from "../../utils/TagRoles";
 export default function ShowUser() {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState(null);
-    console.log("🚀 ~ ShowUser ~ user:", user)
     const { id } = useParams();
     const nav = useNavigate();
 

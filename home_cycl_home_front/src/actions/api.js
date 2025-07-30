@@ -27,6 +27,14 @@ async function api(method, endpoint, payload = null, token = true) {
         }
 
         if (!response.ok) {
+            if (response.status === 401) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                localStorage.setItem('unauthenticated', '1');
+                window.location.href = '/';
+                return;
+            }
+
             const error = new Error(data?.message || 'Erreur serveur');
             error.status = response.status;
             error.details = data;

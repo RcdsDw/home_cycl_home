@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Form, Input, Button, message } from "antd";
 import { authLogin } from "../../actions/auth";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +7,13 @@ export default function LoginForm() {
     const [loading, setLoading] = useState();
     const [form] = Form.useForm();
     const nav = useNavigate();
+
+    useEffect(() => {
+        if (localStorage.getItem('unauthenticated')) {
+            message.error("Vous n'êtes pas authentifié, veuillez vous reconnecter.");
+            localStorage.removeItem('unauthenticated');
+        }
+    }, []);
 
     const onFinish = async (values) => {
         setLoading(true)

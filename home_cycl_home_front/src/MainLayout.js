@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate } from 'react-router-dom';
 import Logo from './assets/logo.png'
 import { Layout, Menu, message } from 'antd';
-import { BarChartOutlined, FundOutlined, UserDeleteOutlined, UnorderedListOutlined, QqOutlined, UserOutlined, FormOutlined } from '@ant-design/icons';
+import { BarChartOutlined, FundOutlined, UserDeleteOutlined, UnorderedListOutlined, QqOutlined, UserOutlined, FormOutlined, TagOutlined } from '@ant-design/icons';
 import { authLogout } from './actions/auth';
 import { Content } from 'antd/es/layout/layout';
 
@@ -34,8 +34,8 @@ export default function Dashboard() {
     };
   }, []);
 
-  const handleLogout = () => {
-    authLogout()
+  const handleLogout = async () => {
+    await authLogout()
     message.success("Déconnexion réussie")
     nav('/')
   }
@@ -59,6 +59,9 @@ export default function Dashboard() {
         break;
       case 'newInter':
         nav('/interventions/new')
+        break;
+      case 'typesInter':
+        nav('/type_intervention')
         break;
       default:
         break;
@@ -87,6 +90,7 @@ export default function Dashboard() {
         children: [
           { label: 'Utilisateurs', key: 'users', icon: <UserOutlined />, },
           { label: 'Interventions', key: 'inters', icon: <FormOutlined />, },
+          { label: "Types d'intervention", key: 'typesInter', icon: <TagOutlined />, },
         ]
       },
     ];

@@ -7,10 +7,12 @@ import dayjs from "dayjs";
 import BikeCard from "../../utils/BikeCard";
 import UserCard from "../../utils/UserCard";
 import { parseID } from "../../utils/ParseID";
+import { DurationDisplay } from "../../utils/ParseDuration";
 
 export default function Interventions() {
   const [loading, setLoading] = useState(true);
   const [interventions, setInterventions] = useState([]);
+  console.log("🚀 ~ Interventions ~ interventions:", interventions)
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
 
@@ -86,7 +88,7 @@ export default function Interventions() {
       title: 'Durée',
       dataIndex: 'typeIntervention',
       key: 'duration',
-      render: (text) => <div>{text?.duration / 60} min</div>,
+      render: (text) => <DurationDisplay seconds={text.duration} />,
     },
     {
       title: 'Prix',

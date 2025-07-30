@@ -9,6 +9,7 @@ import L from "leaflet";
 import BikeCard from "../../utils/BikeCard";
 import ProductCard from "../../utils/ProductCard";
 import ModalProducts from "../../components/interventions/modalProducts";
+import { DurationDisplay } from "../../utils/ParseDuration";
 
 export default function ShowIntervention() {
     const [loading, setLoading] = useState(true);
@@ -109,9 +110,7 @@ export default function ShowIntervention() {
                                 </Tag>
                             </Descriptions.Item>
                             <Descriptions.Item label="Durée">
-                                <Tag color={"green"}>
-                                    {intervention.typeIntervention.duration / 60 + " min" || "Non renseigné"}
-                                </Tag>
+                                <DurationDisplay seconds={intervention.typeIntervention.duration} />
                             </Descriptions.Item>
                             <Descriptions.Item label="Prix Total Intervention">
                                 {intervention.typeIntervention.price ? `${intervention.typeIntervention.price} €` : "Non renseigné"}

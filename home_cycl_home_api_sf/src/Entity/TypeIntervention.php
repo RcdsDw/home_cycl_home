@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
+use ApiPlatform\Metadata\Put;
 use App\Repository\TypeInterventionRepository;
 use Ramsey\Uuid\UuidInterface;
 use App\Traits\Timestampable;
@@ -18,6 +19,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(
     operations: [
         new Post(),
+        new Put(),
         new GetCollection(),
         new Delete(),
     ],
@@ -36,15 +38,15 @@ class TypeIntervention
     #[ORM\CustomIdGenerator(class: 'Ramsey\Uuid\Doctrine\UuidGenerator')]
     private ?UuidInterface $id;
 
-    #[Groups(['type_intervention:read', 'intervention:read', 'intervention:list'])]
+    #[Groups(['type_intervention:read', 'type_intervention:write', 'intervention:read', 'intervention:list'])]
     #[ORM\Column(length: 120)]
     private ?string $name = null;
 
-    #[Groups(['type_intervention:read', 'intervention:read', 'intervention:list'])]
+    #[Groups(['type_intervention:read', 'type_intervention:write', 'intervention:read', 'intervention:list'])]
     #[ORM\Column]
     private ?float $price = null;
 
-    #[Groups(['type_intervention:read', 'intervention:read', 'intervention:list'])]
+    #[Groups(['type_intervention:read', 'type_intervention:write', 'intervention:read', 'intervention:list'])]
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $duration = null;
 
