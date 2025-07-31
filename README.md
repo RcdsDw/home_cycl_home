@@ -16,6 +16,7 @@ Projet full stack orchestré avec Docker Compose :
 
 ## Structure du projet
 
+```bash
 .
 ├── home_cycl_home_api_sf/          # Code source de l'API Symfony
 │   ├── nginx/
@@ -24,6 +25,7 @@ Projet full stack orchestré avec Docker Compose :
 ├── docker-compose.yml              # Configuration Docker Compose
 ├── Makefile                        # Commandes simplifiées
 └── README.md
+```
 
 ## Services
 
