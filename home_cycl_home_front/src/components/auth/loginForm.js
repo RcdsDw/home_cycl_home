@@ -8,12 +8,12 @@ export default function LoginForm() {
     const [form] = Form.useForm();
     const nav = useNavigate();
 
-    useEffect(() => {
-        if (localStorage.getItem('unauthenticated')) {
-            message.error("Vous n'êtes pas authentifié, veuillez vous reconnecter.");
-            localStorage.removeItem('unauthenticated');
-        }
-    }, []);
+    // useEffect(() => {
+    //     if (localStorage.getItem('unauthenticated')) {
+    //         message.error("Vous n'êtes pas authentifié, veuillez vous reconnecter.");
+    //         localStorage.removeItem('unauthenticated');
+    //     }
+    // }, []);
 
     const onFinish = async (values) => {
         setLoading(true)

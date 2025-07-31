@@ -1,37 +1,41 @@
 
 # Projet Home Cycl Home
 
-Ce projet utilise Docker Compose pour orchestrer plusieurs services :
+Projet full stack orchestré avec Docker Compose :
 
-- **backend** : API Node.js avec Adonis.
-- **frontend** : Interface utilisateur développée en React.
+- **backend** : API Symfony (API Platform).
+- **frontend** : Application React.
 - **db** : Base de données PostgreSQL.
-- **pgadmin** : Interface graphique pour gérer la base de données PostgreSQL.
+- **nginx** : Serveur web et reverse proxy.
 
 ## Prérequis
 
 - [Docker](https://www.docker.com/) installé sur votre machine.
 - [Docker Compose](https://docs.docker.com/compose/) installé (souvent inclus avec Docker Desktop).
+- Fichier .env configuré avec les variables d'environnement.
 
 ## Structure du projet
 
-- `home_cycl_home_api/` : Contient le code source de l'API backend.
-- `home_cycl_home_front/` : Contient le code source de l'application frontend.
-- `docker-compose.yml` : Fichier de configuration pour Docker Compose.
+.
+├── home_cycl_home_api_sf/          # Code source de l'API Symfony
+│   ├── nginx/
+│   │   └── Dockerfile              # Configuration Nginx
+│   └── Dockerfile                  # Configuration du conteneur backend
+├── docker-compose.yml              # Configuration Docker Compose
+├── Makefile                        # Commandes simplifiées
+└── README.md
 
 ## Services
 
 ### Backend
 
-- Dossier : `home_cycl_home_api`
-- Exposé sur le port : `3333`
-- Démarre avec la commande : `npm run dev`
+- Dossier : `home_cycl_home_api_sf`
+- Framework : Symfony avec API Platform
+- Langage : PHP
+- Volume : Code source monté pour le hot-reload
+- Dépendances : Volume dédié pour vendor/
 - Variables d'environnement :
-  - `DB_HOST`: Adresse de l'hôte pour PostgreSQL (db).
-  - `DB_PORT`: Port PostgreSQL (5432).
-  - `DB_USER`: Utilisateur PostgreSQL (postgres).
-  - `DB_PASSWORD`: Mot de passe PostgreSQL (password).
-  - `DB_NAME`: Nom de la base de données (home_cycl_home).
+  - `DATABASE_URL` : URL de connexion à PostgreSQL
 
 ### Frontend
 
@@ -39,111 +43,199 @@ Ce projet utilise Docker Compose pour orchestrer plusieurs services :
 - Exposé sur le port : `4000`
 - Démarre avec la commande : `npm start`
 
-### Base de données (PostgreSQL)
+### Base de données (PostgreSQL  + PostGIS)
 
-- Image : `postgres:14`
-- Exposé sur le port : `5544`
-- Volume pour persister les données : `pgdata:/var/lib/postgresql/data`
+- Image : `postgis/postgis:14-3.3`
+- Port exposé : 5544 → 5432
+- Extension : PostGIS pour les fonctionnalités géospatiales
+- Volume : pgdata pour persister les données
 - Variables d'environnement :
-  - `POSTGRES_DB`: Nom de la base de données (home_cycl_home).
-  - `POSTGRES_USER`: Utilisateur PostgreSQL (postgres).
-  - `POSTGRES_PASSWORD`: Mot de passe PostgreSQL (password).
+  - `POSTGRES_DB`: Nom de la base de données.
+  - `POSTGRES_USER`: Utilisateur PostgreSQL.
+  - `POSTGRES_PASSWORD`: Mot de passe PostgreSQL.
 
-### pgAdmin
+### Nginx
 
-- Image : `dpage/pgadmin4`
-- Exposé sur le port : `5050`
-- Volume pour persister les données : `pgadmin-data:/var/lib/pgadmin`
-- Variables d'environnement :
-  - `PGADMIN_DEFAULT_EMAIL`: Email de connexion à pgAdmin ([admin@admin.com](mailto:admin@admin.com)).
-  - `PGADMIN_DEFAULT_PASSWORD`: Mot de passe pgAdmin (admin).
+- Port exposé : 82 → 80
+- Rôle : Serveur web et reverse proxy vers Symfony
+- Configuration : Dockerfile personnalisé dans nginx/
+- Volume partagé : public_data pour les fichiers statiques
 
+## Configuration
+
+1. Créez un fichier .env à la racine du projet avec les variables suivantes :
+
+### Base de données
+`POSTGRES_DB`=home_cycl_home
+`POSTGRES_USER`=postgres
+`POSTGRES_PASSWORD`=your_password_here
+
+### URL de connexion Symfony
+DATABASE_URL=postgresql://postgres:your_password_here@db:5432/home_cycl_home
 
 ## Installation et exécution
 
 1. Cloner le dépôt :
 
-   ```bash
-   git clone <url-du-depot>
-   cd <nom-du-repertoire>
-   ```
+```bash
+  git clone <url-du-depot>
+  cd home-cycl-home
+```
 
-2. Démarrer les services avec Docker Compose :
+2. Configuration :
 
-   ```bash
-   docker-compose up --build
-   ```
+  Créez et configurez votre fichier .env avec vos paramètres.
+
+3. Démarrage en développement :
+
+### Avec le Makefile (recommandé)
+make dev-build
+
+### Ou directement avec Docker Compose
+docker-compose up --build
 
 3. Accéder aux services :
 
-   - Backend : [http://localhost:3333](http://localhost:3333)
-   - Frontend : [http://localhost:3000](http://localhost:3000)
-   - pgAdmin : [http://localhost:5050](http://localhost:5050)
+   - Application : [http://localhost:82](http://localhost:82)
+   - API Symfony : Accessible via Nginx sur le port 82
+   - Base de données : [http://localhost:5544](http://localhost:5544)
+   - Documentation API Platform : [http://localhost:82/api/docs](http://localhost:82/api/docs)
 
-4. Se connecter à pgAdmin :
+## Commandes utiles (Makefile)
 
-   - Email : `admin@admin.com`
-   - Mot de passe : `admin`
-   - Ajouter une connexion à la base de données avec les paramètres suivants :
-     - Host : `db`
-     - Port : `5432`
-     - Username : `postgres`
-     - Password : `password`
+### Gestion des conteneurs
 
-## Volumes
+```bash
+  # Démarrer en développement avec build
+  make dev-build
 
-Les volumes Docker permettent de persister les données entre les redémarrages :
+  # Démarrer en développement
+  make dev
 
-- `pgdata` : Données PostgreSQL.
-- `pgadmin-data` : Données pgAdmin.
+  # Démarrer en production
+  make prod
 
-## Migrations
+  # Arrêter les services
+  make down
 
-- **Lancer les migrations** :
+  # Reconstruire les images
+  make build
 
-Pour entrer dans le container "backend" :
-```
-  docker compose exec backend bash
-```
-puis
+  # Voir les logs en temps réel
+  make logs
 
-```
-  npm run migrateup
+  # Redémarrer complètement
+  make restart
 ```
 
-- **Lancer les seeders**
+### Gestion de l'application Symfony
 
+```bash
+  # Vider le cache Symfony
+  make cache-clear
+
+  # Créer une nouvelle migration
+  make migration
+
+  # Exécuter les migrations
+  make migrate
+
+  # Charger les fixtures (données de test)
+  make fixtures
 ```
-  node ace db:seed
+
+### Base de données
+
+```bash
+  # Se connecter directement à PostgreSQL
+  make db
 ```
 
-## Commandes utiles
+## Développement
 
-- **Démarrer les services** :
+### Structure des volumes
 
-  ```bash
-  docker compose up
-  ```
+- `symfony_vendor` : Dépendances PHP pour éviter les conflits de plateformes
+- `public_data` : Fichiers statiques partagés entre Symfony et Nginx
+- `pgdata` : Données PostgreSQL persistantes
 
-- **Arrêter les services** :
+### Hot-reload
 
-  ```bash
-  docker compose down
-  ```
+Le code source est monté dans le conteneur backend, permettant :
 
-- **Reconstruire les images Docker** :
+Modification en temps réel du code PHP
+Rechargement automatique des changements
+Développement sans reconstruction des conteneurs
 
-  ```bash
-  docker compose up --build
-  ```
+### Réseau
 
-- **Vérifier les logs des services** :
+Tous les services communiquent via le réseau Docker `app-network`.
 
-  ```bash
-  docker compose logs -f
-  ```
+## Base de données PostGIS
 
-## Notes
+PostGIS ajoute des fonctionnalités géospatiales à PostgreSQL :
 
-- Assurez-vous que les ports utilisés (3000, 3333, 5050, 5444) ne sont pas déjà pris sur votre machine.
-- Si vous souhaitez modifier les ports ou autres paramètres, éditez le fichier `docker-compose.yml`.
+- Types de données géométriques
+- Fonctions de calcul de distances
+- Index spatiaux
+- Support des systèmes de coordonnées
+
+### Connexion externe
+
+Pour vous connecter avec un client externe (DBeaver, pgAdmin, etc.) :
+
+- Host : `localhost`
+- Port : `5544`
+- Database : Valeur de `POSTGRES_DB`
+- Username : Valeur de `POSTGRES_USER`
+- Password : Valeur de `POSTGRES_PASSWORD`
+
+## Déploiement en production
+
+```bash
+  # Démarrer en mode production (détaché)
+  make prod
+```
+
+Le mode production utilise une configuration optimisée avec :
+
+- Variables d'environnement spécifiques
+- Optimisations de performance
+- Configuration de sécurité renforcée
+
+## Dépannage
+
+### Problèmes courants
+
+1. Port déjà utilisé : Vérifiez que les ports 82 et 5544 sont libres
+2. Permissions : Assurez-vous que Docker a les permissions sur les dossiers
+3. Variables d'environnement : Vérifiez votre fichier .env
+
+### Logs de débogage
+
+```bash
+  # Voir tous les logs
+  make logs
+
+  # Logs d'un service spécifique
+  docker-compose logs -f backend
+  docker-compose logs -f nginx
+  docker-compose logs -f db
+```
+
+### Nettoyer l'environnement
+
+```bash
+  # Supprimer les conteneurs et volumes
+  docker-compose down -v
+
+  # Nettoyer les images inutilisées
+  docker system prune
+```
+
+## Notes techniques
+
+- L'extension PostGIS est automatiquement activée dans PostgreSQL
+- Nginx est configuré pour servir les assets Symfony et faire du reverse proxy
+- Le hot-reload fonctionne grâce au volume monté du code source
+- Les dépendances Composer sont isolées dans un volume dédié
