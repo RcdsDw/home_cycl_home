@@ -38,44 +38,75 @@ class Fixtures extends Fixture
         $manager->flush();
 
         // --- Création des marques ---
+        $brandNames = [
+            'Trek' => ['Domane', 'Marlin', 'Emonda', 'Slash'],
+            'Specialized' => ['Allez', 'Rockhopper', 'Tarmac', 'Stumpjumper'],
+            'Cannondale' => ['Synapse', 'Trail', 'Topstone', 'Scalpel'],
+            'Giant' => ['Defy', 'Talon', 'TCR', 'Anthem'],
+            'Scott' => ['Addict', 'Aspect', 'Genius', 'Spark']
+        ];
+
         $brands = [];
-        for ($i = 1; $i <= 5; $i++) {
+        $models = [];
+
+        foreach ($brandNames as $brandName => $modelNames) {
             $brand = new Brands();
-            $brand->setName("Marque $i");
+            $brand->setName($brandName);
             $brand->setCreatedAt(new \DateTime());
             $brand->setUpdatedAt(new \DateTime());
             $manager->persist($brand);
             $brands[] = $brand;
-        }
 
-        // --- Création des modèles ---
-        $models = [];
-        foreach ($brands as $index => $brand) {
-            for ($j = 1; $j <= 2; $j++) {
+            foreach ($modelNames as $modelName) {
                 $model = new Models();
-                $model->setName("Modèle " . ($index * 2 + $j));
+                $model->setName($modelName);
                 $model->setBrand($brand);
                 $model->setCreatedAt(new \DateTime());
                 $model->setUpdatedAt(new \DateTime());
                 $manager->persist($model);
-                $models[$brand->getName()][] = $model;
+                $models[$brandName][] = $model;
             }
         }
 
-        // Create 5 zones
-        $zones = [];
-        for ($i = 1; $i <= 5; $i++) {
+        $zones = [
+            'Centre-ville Tarbes' => [
+                ['lat' => 43.2335, 'lng' => 0.0700],
+                ['lat' => 43.2340, 'lng' => 0.0800],
+                ['lat' => 43.2280, 'lng' => 0.0820],
+                ['lat' => 43.2250, 'lng' => 0.0700],
+            ],
+            'Séméac' => [
+                ['lat' => 43.2200, 'lng' => 0.1000],
+                ['lat' => 43.2220, 'lng' => 0.1100],
+                ['lat' => 43.2150, 'lng' => 0.1150],
+                ['lat' => 43.2100, 'lng' => 0.1030],
+            ],
+            'Ibos' => [
+                ['lat' => 43.2400, 'lng' => 0.0200],
+                ['lat' => 43.2430, 'lng' => 0.0280],
+                ['lat' => 43.2380, 'lng' => 0.0320],
+                ['lat' => 43.2300, 'lng' => 0.0220],
+            ],
+            'Laloubère' => [
+                ['lat' => 43.2150, 'lng' => 0.0650],
+                ['lat' => 43.2180, 'lng' => 0.0750],
+                ['lat' => 43.2090, 'lng' => 0.0780],
+                ['lat' => 43.2050, 'lng' => 0.0650],
+            ],
+            'Aureilhan' => [
+                ['lat' => 43.2300, 'lng' => 0.0950],
+                ['lat' => 43.2325, 'lng' => 0.1050],
+                ['lat' => 43.2240, 'lng' => 0.1080],
+                ['lat' => 43.2200, 'lng' => 0.0950],
+            ],
+        ];
+
+        foreach ($zones as $name => $coords) {
             $zone = new Zone();
-            $zone->setName("Zone $i");
-            $zone->setCoords([
-                ['lat' => 43.46 + $i / 10 * 0.01, 'lng' => 4.69 + $i / 10 * 0.01],
-                ['lat' => 43.36 + $i / 10 * 0.01, 'lng' => 4.59 + $i / 10 * 0.01],
-                ['lat' => 43.26 + $i / 10 * 0.01, 'lng' => 4.49 + $i / 10 * 0.01],
-                ['lat' => 43.16 + $i / 10 * 0.01, 'lng' => 4.39 + $i / 10 * 0.01],
-            ]);
-            $now = new \DateTime();
-            $zone->setCreatedAt($now);
-            $zone->setUpdatedAt($now);
+            $zone->setName($name);
+            $zone->setCoords($coords);
+            $zone->setCreatedAt(new \DateTime());
+            $zone->setUpdatedAt(new \DateTime());
 
             $manager->persist($zone);
             $zones[] = $zone;
@@ -87,9 +118,23 @@ class Fixtures extends Fixture
         $technicians = [];
         $bikes = [];
 
+        $userNames = [
+            ['Lucas', 'Martin'],
+            ['Emma', 'Dubois'],
+            ['Nathan', 'Leroy'],
+            ['Léa', 'Moreau'],
+            ['Hugo', 'Lefevre'],
+            ['Chloé', 'Garcia'],
+            ['Enzo', 'Bernard'],
+            ['Manon', 'Roux'],
+            ['Tom', 'Simon'],
+            ['Inès', 'Durand']
+        ];
+
         // 2 USERS
         for ($i = 1; $i <= 10; $i++) {
-            $user = $this->createUser("user$i@example.com", 'password', 'ROLE_USER', "User$i", "Test$i$i$i", "060000000$i");
+            [$firstname, $lastname] = $userNames[$i - 1];
+            $user = $this->createUser("user$i@example.com", 'password', 'ROLE_USER', $firstname, $lastname, "060000000$i");
             // Ajout d’un vélo
             $bike = new Bikes();
             $bike->setName("Vélo $i");
@@ -109,9 +154,16 @@ class Fixtures extends Fixture
             $clients[] = $user;
         }
 
+        $adminNames = [
+            ['Apollon', 'Grec'],
+            ['Odin', 'Viking'],
+            ['Jupiter', 'Rome'],
+        ];
+
         // 2 ADMINS
         for ($i = 1; $i <= 3; $i++) {
-            $admin = $this->createUser("admin$i@example.com", 'adminpass', 'ROLE_ADMIN', "Admin$i", "Boss$i$i$i", "061111111$i");
+            [$firstname, $lastname] = $adminNames[$i - 1];
+            $admin = $this->createUser("admin$i@example.com", 'password', 'ROLE_ADMIN', $firstname, $lastname, "060000000$i");
             // Ajout d’un vélo
             $bike = new Bikes();
             $bike->setName("Vélo $i");
@@ -130,9 +182,18 @@ class Fixtures extends Fixture
             $manager->persist($admin);
         }
 
+        $techNames = [
+            ['Emma', 'Tompuce'],
+            ['Alain', 'Dex'],
+            ['Thelma', 'Geur'],
+            ['Anne', 'Ulaire'],
+            ['Aurie', 'Culaire'],
+        ];
+
         // 6 TECHS
         for ($i = 1; $i <= 5; $i++) {
-            $tech = $this->createUser("tech$i@example.com", 'techpass', 'ROLE_TECH', "Tech$i", "Support$i$i$i", "062222222$i");
+            [$firstname, $lastname] = $techNames[$i - 1];
+            $tech = $this->createUser("tech$i@example.com", 'password', 'ROLE_TECH', $firstname, $lastname, "060000000$i");
             // Ajout d’un vélo
             $bike = new Bikes();
             $bike->setName("Vélo $i");
@@ -156,39 +217,37 @@ class Fixtures extends Fixture
         // Flush first to have IDs
         $manager->flush();
 
-        // Create 2 type_intervention
-        $typeIntervention1 = new TypeIntervention();
-
         // Random dates (start today + 0-10 days, end start + 1-3 days)
         $start = new \DateTime();
         $end = (clone $start)->modify("+" . rand(1, 3) . " days");
 
-        $typeIntervention1->setName("Réparation");
-        $typeIntervention1->setPrice(90);
-        $typeIntervention1->setDuration(7200);
-        $manager->persist($typeIntervention1);
+        // --- Création de types d’interventions ---
+        $typeInterventions = [];
 
-        $typeIntervention2 = new TypeIntervention();
+        $typeNames = [
+            ['Réparation', 90, 7200],
+            ['Entretien', 40, 3600],
+            ['Réglage freins', 25, 1800],
+            ['Changement chaîne', 35, 2700],
+            ['Changement pneu', 30, 2400],
+            ['Révision complète', 120, 10800]
+        ];
 
-        // Random dates (start today + 0-10 days, end start + 1-3 days)
-        $start = new \DateTime();
-        $end = (clone $start)->modify("+" . rand(1, 3) . " days");
+        foreach ($typeNames as [$name, $price, $duration]) {
+            $type = new TypeIntervention();
+            $type->setName($name);
+            $type->setPrice($price);
+            $type->setDuration($duration);
+            $manager->persist($type);
+            $typeInterventions[] = $type;
+        }
+        $manager->flush(); // Flush ici pour choper les IDs si besoin
 
-        $typeIntervention2->setName("Entretien");
-        $typeIntervention2->setPrice(40);
-        $typeIntervention2->setDuration(3600);
-        $manager->persist($typeIntervention2);
-
-        $manager->flush();
-
-        $typeInterventions = [$typeIntervention1, $typeIntervention2];
-
-
-        // Create 20 interventions
+        // --- Création de 20 interventions ---
         for ($i = 1; $i <= 20; $i++) {
             $intervention = new Intervention();
 
-            // Random dates (start today + 0-10 days, end start + 1-3 days)
+            // Dates aléatoires : aujourd'hui + 0-10j, durée 1 à 3j
             $start = (new \DateTime())->modify("+" . rand(0, 10) . " days");
             $end = (clone $start)->modify("+" . rand(1, 3) . " days");
 
@@ -196,7 +255,7 @@ class Fixtures extends Fixture
             $intervention->setEndDate($end);
             $intervention->setComment("Intervention #$i description");
 
-            // Random client + technician from lists
+            // Assignations aléatoires
             $intervention->setClientBike($bikes[array_rand($bikes)]);
             $intervention->setTechnician($technicians[array_rand($technicians)]);
             $intervention->setTypeIntervention($typeInterventions[array_rand($typeInterventions)]);
@@ -207,8 +266,8 @@ class Fixtures extends Fixture
 
             $manager->persist($intervention);
 
-            // 🆕 Ajout de 1 à 3 produits via l'entité pivot InterventionProduct
-            $randomProductIndexes = (array)array_rand($products, rand(1, 3));
+            // Produits liés (1 à 3 au hasard)
+            $randomProductIndexes = (array) array_rand($products, rand(1, 3));
             foreach ($randomProductIndexes as $index) {
                 $product = $products[$index];
 
@@ -216,7 +275,7 @@ class Fixtures extends Fixture
                 $interventionProduct->setIntervention($intervention);
                 $interventionProduct->setProduct($product);
                 $interventionProduct->setQuantity(rand(1, 5));
-                $interventionProduct->setProductPrice($product->getPrice()); // copie du prix actuel
+                $interventionProduct->setProductPrice($product->getPrice()); // prix fixé à la date
 
                 $manager->persist($interventionProduct);
             }

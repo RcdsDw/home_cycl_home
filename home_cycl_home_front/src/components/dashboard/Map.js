@@ -20,8 +20,8 @@ export default function MapView({ zones, onZoneCreated }) {
     return (
         <MapContainer
             style={{ width: '100%', height: '500px' }}
-            center={[43.750, 4.650]}
-            zoom={12}
+            center={[43.2325, 0.0781]}
+            zoom={13}
             scrollWheelZoom={false}
             ref={mapRef}
         >
@@ -30,7 +30,7 @@ export default function MapView({ zones, onZoneCreated }) {
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
 
-            <Marker title="Magasin" position={[43.750, 4.650]} icon={storeIcon} />
+            <Marker title="Magasin" position={[43.2325, 0.0781]} icon={storeIcon} />
 
             <FeatureGroup>
                 <EditControl

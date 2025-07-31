@@ -44,6 +44,7 @@ class Brands
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'brand', targetEntity: Models::class)]
+    #[Groups(['bikes:read', 'brands:read'])]
     private Collection $models;
 
     public function __construct()

@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Select } from 'antd';
+import { Input, Select } from 'antd';
 import { getUsers } from '../actions/user';
 import { parseID } from './ParseID';
 
 const { Option } = Select;
 
-export default function SelectUser({ selectedUser, setSelectedUser }) {
+export default function SelectUser({ selectedUser, setSelectedUser, onShowUser }) {
     const [users, setUsers] = useState([]);
 
     useEffect(() => {
@@ -27,20 +27,24 @@ export default function SelectUser({ selectedUser, setSelectedUser }) {
     };
 
     return (
-        <Select
-            value={parseID(selectedUser)}
-            onChange={handleUserChange}
-            allowClear
-            style={{ width: '100%', margin: "5px" }}
-            placeholder="Sélectionnez un utilisateur"
-        >
-            <Option disabled value={null}>Sélectionnez un utilisateur</Option>
-
-            {users && users.map((user) => (
-                <Option key={parseID(user)} value={parseID(user)}>
-                    {user.firstname} {user.lastname}
-                </Option>
-            ))}
-        </Select>
+        <>
+            {!onShowUser ? (
+                <Select
+                    value={parseID(selectedUser)}
+                    onChange={handleUserChange}
+                    allowClear
+                    style={{ width: '100%', margin: "5px" }}
+                    placeholder="Sélectionnez un utilisateur"
+                >
+                    {users && users.map((user) => (
+                        <Option key={parseID(user)} value={parseID(user)}>
+                            {user.firstname} {user.lastname}
+                        </Option>
+                    ))}
+                </Select>
+            ) : (
+                <Input disabled value={`${selectedUser?.firstname} ${selectedUser?.lastname}` || ''} />
+            )}
+        </>
     );
 }

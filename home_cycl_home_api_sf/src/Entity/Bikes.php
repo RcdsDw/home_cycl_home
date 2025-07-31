@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\GetCollection;
@@ -27,7 +29,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     denormalizationContext: ['groups' => ['bikes:write']]
 )]
 #[ApiFilter(SearchFilter::class, properties: [
-    'ower.id' => 'exact'
+    'owner.id' => 'exact'
 ])]
 #[ORM\Entity(repositoryClass: BikesRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -71,6 +73,11 @@ class Bikes
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['bikes:read', 'bikes:write', 'intervention:bike', 'user:bikes'])]
     private ?Models $model = null;
+
+    public function __construct()
+    {
+        $this->bikeInterventions = new \Doctrine\Common\Collections\ArrayCollection();
+    }
 
     public function getId(): ?UuidInterface
     {

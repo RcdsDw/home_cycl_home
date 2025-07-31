@@ -9,9 +9,7 @@ import dayjs from "dayjs";
 
 import { getUserById } from "../../actions/user";
 import TagRoles from "../../utils/TagRoles";
-import TableInterventions from "../../components/interventions/table";
 import TableBikes from "../../components/bikes/table";
-import Title from "antd/es/skeleton/Title";
 import { parseID } from "../../utils/ParseID";
 
 export default function ShowUser() {

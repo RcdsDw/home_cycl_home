@@ -1,8 +1,16 @@
 export function parseID(obj) {
-    if (!obj || typeof obj !== 'object' || !obj['@id']) {
-        console.warn('parseID: Objet invalide ou propriété @id manquante', obj);
-        return null;
+    if (!obj) return null;
+
+    if (typeof obj === 'string') {
+        const parts = obj.split('/');
+        return parts.length > 0 ? parts.pop() : null;
     }
 
-    return obj['@id'].split('/').pop();
+    if (typeof obj === 'object' && obj['@id']) {
+        const parts = obj['@id'].split('/');
+        return parts.length > 0 ? parts.pop() : null;
+    }
+
+    console.warn('parseID: Format non reconnu', obj);
+    return null;
 }

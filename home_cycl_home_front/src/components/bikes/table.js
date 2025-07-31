@@ -23,7 +23,6 @@ export default function TableBikes() {
   const fetchBikes = async () => {
     try {
       const res = await getBikes();
-      console.log("🚀 ~ fetchBikes ~ res:", res)
       setBikes(res.member);
     } catch (error) {
       console.error("Erreur lors de la récupération des vélos :", error);
@@ -51,7 +50,7 @@ export default function TableBikes() {
 
   const handleDelete = (id) => {
     deleteBike(id);
-    setBikes((prevDatas) => prevDatas.filter((bike) => bike.id !== id));
+    setBikes((prevDatas) => prevDatas.filter((bike) => parseID(bike) !== id));
   };
 
   const columns = [

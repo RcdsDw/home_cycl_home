@@ -47,7 +47,7 @@ export default function Users() {
 
   const handleDelete = (id) => {
     deleteUser(id)
-    setDatas((prevDatas) => prevDatas.filter(user => user.id !== id))
+    setDatas((prevDatas) => prevDatas.filter(user => parseID(user) !== id))
   }
 
   const columns = [

@@ -122,7 +122,7 @@ export default function NewIntervention() {
 
           <Col span={24}>
             <Form.Item label="Prix total" style={styles.formItem}>
-              <Input value={`${price} €`} disabled />
+              <Input value={price ? `${price} €` : "Non disponible"} disabled />
             </Form.Item>
           </Col>
 
@@ -147,6 +147,7 @@ const styles = {
     marginBottom: 20,
   },
   button: {
+    marginLeft: 10,
     width: '100%',
   },
 };

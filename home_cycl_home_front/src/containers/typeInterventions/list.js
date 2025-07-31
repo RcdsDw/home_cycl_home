@@ -48,7 +48,7 @@ export default function TypeInterventions() {
 
   const handleDelete = (id) => {
     deleteTypeIntervention(id);
-    setTypeInterventions((prevDatas) => prevDatas.filter((typeIntervention) => typeIntervention.id !== id));
+    setTypeInterventions((prevDatas) => prevDatas.filter((typeIntervention) => parseID(typeIntervention) !== id));
   };
 
   const columns = [

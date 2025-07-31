@@ -2,19 +2,17 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { Form, Input, Button, Col, Row, message, Card, Select } from 'antd';
-import { parseID } from '../../utils/ParseID';
 
 import { createBike } from '../../actions/bikes';
 import { getUserById } from '../../actions/user';
 import SelectUser from '../../utils/SelectUser';
-import SelectBrand from '../../utils/SelectBrands';
-import SelectModel from '../../utils/SelectModels';
+import SelectBrandModel from '../../utils/SelectBrandModel';
 
 const { Option } = Select;
 
 export default function NewBike() {
   const [loading, setLoading] = useState(false);
-  
+
   const [selectedOwner, setSelectedOwner] = useState();
   const [selectedBrand, setSelectedBrand] = useState();
   const [selectedModel, setSelectedModel] = useState();
@@ -22,7 +20,6 @@ export default function NewBike() {
   const [form] = Form.useForm();
   const nav = useNavigate();
   const { ownerId } = useParams();
-  console.log("🚀 ~ NewBike ~ ownerId:", ownerId)
 
   useEffect(() => {
     if (ownerId) {
@@ -39,26 +36,8 @@ export default function NewBike() {
     }
   };
 
-  const bikeTypes = [
-    'VTT',
-    'Route',
-    'Urbain',
-    'Électrique',
-    'BMX',
-    'Gravel',
-    'Cyclocross',
-    'Fixie',
-    'Pliant'
-  ];
-
-  const bikeSizes = [
-    'XS',
-    'S', 
-    'M',
-    'L',
-    'XL',
-    'XXL'
-  ];
+  const bikeTypes = ['VTT', 'Route', 'Urbain', 'Électrique', 'BMX', 'Gravel', 'Cyclocross', 'Fixie', 'Pliant'];
+  const bikeSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
 
   const onFinish = async (values) => {
     setLoading(true);
@@ -91,15 +70,18 @@ export default function NewBike() {
     };
 
     try {
-      const res = await createBike(bikeData);
+      await createBike(bikeData);
 
       form.resetFields();
       setSelectedOwner(null);
       setSelectedBrand(null);
       setSelectedModel(null);
-      
+
       message.success('Vélo créé avec succès !');
-      nav(`/bikes/show/${parseID(res)}`);
+      if (ownerId) {
+        nav(`/users/show/${ownerId}`);
+      }
+      nav(`/users`);
     } catch (err) {
       console.error('Erreur lors de la création du vélo:', err);
       message.error('Erreur lors de la création du vélo.');
@@ -108,14 +90,10 @@ export default function NewBike() {
     }
   };
 
-  const onBrandChange = () => {
-    setSelectedModel(null);
-  };
-
   return (
     <Card style={styles.card}>
       <h2 style={styles.title}>Nouveau Vélo</h2>
-      
+
       <Form form={form} onFinish={onFinish} layout="vertical">
         <Row gutter={16}>
           <Col span={24}>
@@ -128,7 +106,7 @@ export default function NewBike() {
                 { max: 120, message: 'Le nom ne peut pas dépasser 120 caractères' }
               ]}
             >
-              <Input 
+              <Input
                 placeholder="Ex: Mon vélo de route"
                 maxLength={120}
               />
@@ -176,51 +154,34 @@ export default function NewBike() {
               required
             >
               <SelectUser
+                onShowUser={true}
                 selectedUser={selectedOwner}
                 setSelectedUser={setSelectedOwner}
-                placeholder="Sélectionner le propriétaire"
-                disabled={!!ownerId} // Désactiver la sélection si un owner est pré-sélectionné
               />
             </Form.Item>
           </Col>
 
-          <Col span={12}>
+          <Col span={24}>
             <Form.Item
               label="Marque"
               style={styles.formItem}
               required
             >
-              <SelectBrand
+              <SelectBrandModel
                 selectedBrand={selectedBrand}
                 setSelectedBrand={setSelectedBrand}
-                onChange={onBrandChange}
-                placeholder="Sélectionner une marque"
-              />
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item
-              label="Modèle"
-              style={styles.formItem}
-              required
-            >
-              <SelectModel
                 selectedModel={selectedModel}
                 setSelectedModel={setSelectedModel}
-                brandId={selectedBrand ? parseID(selectedBrand) : null}
-                disabled={!selectedBrand}
-                placeholder={selectedBrand ? "Sélectionner un modèle" : "Sélectionner d'abord une marque"}
               />
             </Form.Item>
           </Col>
 
           <Col span={24}>
             <Form.Item style={styles.submitContainer}>
-              <Button 
-                type="primary" 
-                htmlType="submit" 
-                style={styles.button} 
+              <Button
+                type="primary"
+                htmlType="submit"
+                style={styles.button}
                 loading={loading}
               >
                 Créer le vélo

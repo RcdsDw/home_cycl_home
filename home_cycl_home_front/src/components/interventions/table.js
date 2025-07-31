@@ -51,7 +51,7 @@ export default function TableInterventions() {
 
   const handleDelete = (id) => {
     deleteIntervention(id);
-    setInterventions((prevDatas) => prevDatas.filter((intervention) => intervention.id !== id));
+    setInterventions((prevDatas) => prevDatas.filter((intervention) => parseID(intervention) !== id));
   };
 
   const columns = [
