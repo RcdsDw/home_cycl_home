@@ -1,8 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { Button, Card, Descriptions, Empty, Spin, Row, Col } from "antd";
+import { Button, Card, Descriptions, Empty, Spin, Row, Col, Typography } from "antd";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -10,6 +9,10 @@ import dayjs from "dayjs";
 
 import { getUserById } from "../../actions/user";
 import TagRoles from "../../utils/TagRoles";
+import TableInterventions from "../../components/interventions/table";
+import TableBikes from "../../components/bikes/table";
+import Title from "antd/es/skeleton/Title";
+import { parseID } from "../../utils/ParseID";
 
 export default function ShowUser() {
     const [loading, setLoading] = useState(true);
@@ -115,6 +118,17 @@ export default function ShowUser() {
                     </MapContainer>
                 </Col>
             </Row>
+            <Card>
+                <Row style={styles.row}>
+                    <Typography.Title level={4} style={{ margin: 0 }}>
+                        Les vélos de {user.firstname} {user.lastname}
+                    </Typography.Title>
+                    <Button type="primary" onClick={() => nav(`/bikes/new/${parseID(user)}`)} style={{ marginBottom: 20 }}>
+                        Ajouter un vélo
+                    </Button>
+                </Row>
+                <TableBikes />
+            </Card>
         </>
     );
 }
@@ -128,11 +142,13 @@ const styles = {
         display: 'block',
         margin: '100px auto'
     },
+    row: {
+        display: "flex",
+        justifyContent: "space-between",
+        marginBottom: 25,
+    },
     empty: {
         marginTop: 100
-    },
-    row: {
-        marginTop: 50
     },
     card: {
         maxWidth: 700,

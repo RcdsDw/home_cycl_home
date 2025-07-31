@@ -14,8 +14,8 @@ export default function BikeCard({ bike }) {
                     <p><b>Type :</b> {bike.type}</p>
                     <p><b>Marque :</b> {bike.brand?.name}</p>
                     <p><b>Modèle :</b> {bike.model?.name}</p>
-                    <Button size="small" type="link" onClick={() => nav(`/bikes/${parseID(bike)}`)}>
-                        Voir le vélo
+                    <Button size="small" type="link" onClick={() => nav(`/users/show/${parseID(bike.owner)}`)}>
+                        Voir le détenteur
                     </Button>
                 </div>
             }

@@ -115,7 +115,7 @@ export default function Users() {
 
   return (
     <>
-      <Button type="primary" style={styles.button} onClick={() => nav('/users/new')}>Ajouter</Button>
+      <Button type="primary" style={styles.button} onClick={() => nav('/users/new')}>Ajouter un utilisateur</Button>
       <Table columns={columns} dataSource={datas} locale={{
         emptyText: <Empty description="Aucun utilisateur trouvé" />,
       }} />

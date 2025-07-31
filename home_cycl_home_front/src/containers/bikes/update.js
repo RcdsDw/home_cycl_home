@@ -1,60 +1,100 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import dayjs from 'dayjs';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { Form, Input, Button, Col, Row, message, Card } from 'antd';
 import { parseID } from '../../utils/ParseID';
 
-import { createIntervention } from '../../actions/interventions';
+import { getInterventionById, updateIntervention } from '../../actions/interventions';
 import SelectTech from '../../utils/SelectTech';
 import SelectBikes from '../../utils/SelectBikes';
 import SelectTypeIntervention from '../../utils/SelectTypeIntervention';
-import SelectUser from '../../utils/SelectUser';
 
-export default function NewIntervention() {
+export default function EditIntervention() {
   const [loading, setLoading] = useState(false);
 
   const [price, setPrice] = useState(0);
+  const [intervention, setIntervention] = useState();
   const [selectedTechUser, setSelectedTechUser] = useState();
   const [selectedBike, setSelectedBike] = useState();
   const [selectedTypeIntervention, setSelectedTypeIntervention] = useState();
-  const [selectedClient, setSelectedClient] = useState();
+
 
   const [form] = Form.useForm();
+  const { id } = useParams();
   const nav = useNavigate();
+
+  useEffect(() => {
+    fetchIntervention();
+  }, []);
+
+  useEffect(() => {
+    setFieldsValue();
+  }, [intervention]);
 
   useEffect(() => {
     calculateTotalPrice();
   }, [selectedTypeIntervention]);
 
+  const fetchIntervention = async () => {
+    setLoading(true)
+
+    try {
+      const res = await getInterventionById(id)
+      setIntervention(res)
+    } catch (err) {
+      message.error('Erreur lors de la récupération de l\'intervention.');
+    } finally {
+      setLoading(false)
+    }
+  };
+
+  const setFieldsValue = () => {
+    if (!intervention) {
+      return
+    }
+
+    form.setFieldsValue({
+      bike: intervention?.clientBike?.type || '',
+      service: intervention?.typeIntervention?.name || '',
+    });
+
+    if (intervention.technician) {
+      setSelectedTechUser(intervention.technician);
+    }
+
+    if (intervention.typeIntervention) {
+      setSelectedTypeIntervention(intervention.typeIntervention);
+    }
+
+    if (intervention.clientBike) {
+      setSelectedBike(intervention.clientBike);
+    }
+  }
+
   const calculateTotalPrice = () => {
     setPrice(selectedTypeIntervention?.price);
   };
 
-  const onFinish = async (values) => {
+  const onFinish = async () => {
     setLoading(true)
 
     const interventionData = {
-      start_date: values.start_date || dayjs(),
-      end_date: values.end_date || dayjs(),
-      comment: values.comment || "",
+      start_date: intervention.start_date,
+      end_date: intervention.end_date,
+      comment: intervention.comment,
       clientBike: selectedBike['@id'],
       technician: selectedTechUser['@id'],
       typeIntervention: selectedTypeIntervention['@id'],
     };
 
     try {
-      const res = await createIntervention(interventionData);
-
-      form.resetFields();
-      message.success('Intervention créée avec succès !');
-
-      nav(`/interventions/show/${parseID(res)}`);
+      await updateIntervention(id, interventionData);
+      message.success('Intervention mise à jour avec succès !');
+      nav(`/interventions/show/${id}`);
     } catch (err) {
-      console.error('Erreur lors de la création de l\'intervention:', err);
-      message.error('Erreur lors de la création de l\'intervention.');
+      message.error("Erreur lors de la mise à jour de l'intervention.");
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   };
 
@@ -66,35 +106,22 @@ export default function NewIntervention() {
             <Form.Item
               label="Type de vélo"
               name="bike"
+              rules={[{ required: true, message: 'Veuillez choisir un type de vélo' }]}
               style={styles.formItem}
             >
-              <SelectUser
-                selectedUser={selectedClient}
-                setSelectedUser={setSelectedClient}
+              <SelectBikes
+                selectedBike={selectedBike}
+                setSelectedBike={setSelectedBike}
+                clientId={intervention && parseID(intervention?.clientBike?.owner)}
               />
             </Form.Item>
           </Col>
-
-          {selectedClient && (
-            <Col span={24}>
-              <Form.Item
-                label="Type de vélo"
-                name="bike"
-                style={styles.formItem}
-              >
-                <SelectBikes
-                  selectedBike={selectedBike}
-                  setSelectedBike={setSelectedBike}
-                  clientId={parseID(selectedClient)}
-                />
-              </Form.Item>
-            </Col>
-          )}
 
           <Col span={24}>
             <Form.Item
               label="Service"
               name="service"
+              rules={[{ required: true, message: 'Veuillez choisir un type de service' }]}
               style={styles.formItem}
             >
               <SelectTypeIntervention
@@ -115,12 +142,6 @@ export default function NewIntervention() {
           </Col>
 
           <Col span={24}>
-            <Form.Item label="Commentaires" name="comments" style={styles.formItem}>
-              <Input type='text' />
-            </Form.Item>
-          </Col>
-
-          <Col span={24}>
             <Form.Item label="Prix total" style={styles.formItem}>
               <Input value={`${price} €`} disabled />
             </Form.Item>
@@ -128,7 +149,7 @@ export default function NewIntervention() {
 
           <Form.Item style={styles.formItem}>
             <Button type="primary" htmlType="submit" style={styles.button} loading={loading}>
-              Soumettre l'intervention
+              Mettre à jour l'intervention
             </Button>
           </Form.Item>
         </Row>

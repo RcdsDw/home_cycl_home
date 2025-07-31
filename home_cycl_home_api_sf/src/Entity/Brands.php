@@ -40,11 +40,10 @@ class Brands
     private ?UuidInterface $id;
 
     #[ORM\Column(length: 120)]
-    #[Groups(['brands:read', 'brands:write', 'models:read', 'intervention:bike', 'user:bikes'])]
+    #[Groups(['brands:read', 'brands:write', 'models:read', 'intervention:bike', 'bikes:read', 'user:bikes'])]
     private ?string $name = null;
 
     #[ORM\OneToMany(mappedBy: 'brand', targetEntity: Models::class)]
-    #[Groups(['brands:read'])]
     private Collection $models;
 
     public function __construct()

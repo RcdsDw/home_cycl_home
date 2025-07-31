@@ -15,6 +15,7 @@ import EditIntervention from './containers/interventions/update.js';
 import TypeInterventions from './containers/typeInterventions/list.js';
 import NewTypeInterventions from './containers/typeInterventions/new.js';
 import EditTypeInterventions from './containers/typeInterventions/update.js';
+import NewBike from './containers/bikes/new.js';
 
 export default function App() {
   return (
@@ -36,6 +37,8 @@ export default function App() {
           <Route path="/type_intervention" element={<TypeInterventions />} />
           <Route path="/type_intervention/new" element={<NewTypeInterventions />} />
           <Route path="/type_intervention/edit/:id" element={<EditTypeInterventions />} />
+          <Route path="/bikes/new/:ownerId" element={<NewBike />} />
+          {/* <Route path="/type_intervention/edit/:id" element={<EditTypeInterventions />} /> */}
         </Route>
       </Routes>
     </Router>
