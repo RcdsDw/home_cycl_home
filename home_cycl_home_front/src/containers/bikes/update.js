@@ -16,8 +16,6 @@ export default function UpdateBike() {
   const [selectedBrand, setSelectedBrand] = useState();
   const [selectedModel, setSelectedModel] = useState();
 
-  console.log(`/users/show/${parseID(selectedOwner)}}`)
-
   const [form] = Form.useForm();
   const nav = useNavigate();
   const { bikeId } = useParams();
@@ -32,7 +30,6 @@ export default function UpdateBike() {
   const fetchBike = async () => {
     try {
       const bike = await getBikeById(bikeId);
-      console.log("🚀 ~ fetchBike ~ bike:", bike)
       form.setFieldsValue({
         name: bike.name,
         type: bike.type,

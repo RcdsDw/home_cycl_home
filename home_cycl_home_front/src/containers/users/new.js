@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 
 import { Button, Form, Input, Card, message, Select } from "antd";
 import { createUser } from "../../actions/user";
-import AddressSearch from "../../utils/AdressSearch";
+import AddressSearch from "../../utils/AddressSearch";
 import { parseID } from "../../utils/ParseID";
 import { useState } from "react";
 
@@ -13,6 +13,7 @@ export default function NewUser() {
   const nav = useNavigate()
 
   const refactoAddress = (address) => {
+    console.log("🚀 ~ refactoAddress ~ address:", address)
     return {
       street: address.data?.name,
       city: address.data?.city,
@@ -25,26 +26,27 @@ export default function NewUser() {
   };
 
   const onFinishRegister = async (values) => {
+    console.log("🚀 ~ onFinishRegister ~ values:", values)
     setLoading(true)
 
     if (values?.address) {
       values.address = refactoAddress(values.address);
     }
 
-    try {
-      await createUser(values).then((res) => {
-        message.success(`Nouvel utilisateur créé`);
-        nav(`/users/show/${parseID(res)}`);
-      })
-    } catch (err) {
-      if (err.status === 409) {
-        message.error("Cette adresse email est déjà utilisée.");
-      } else {
-        message.error("Erreur lors de la création.");
-      }
-    } finally {
-      setLoading(false)
-    }
+    // try {
+    //   await createUser(values).then((res) => {
+    //     message.success(`Nouvel utilisateur créé`);
+    //     nav(`/users/show/${parseID(res)}`);
+    //   })
+    // } catch (err) {
+    //   if (err.status === 409) {
+    //     message.error("Cette adresse email est déjà utilisée.");
+    //   } else {
+    //     message.error("Erreur lors de la création.");
+    //   }
+    // } finally {
+    //   setLoading(false)
+    // }
   };
 
   const onFinishFailed = (info) => {

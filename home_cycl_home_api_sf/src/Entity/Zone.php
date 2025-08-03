@@ -8,6 +8,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Get;
+use App\Controller\ZoneCheckController;
 use App\Repository\ZoneRepository;
 use Ramsey\Uuid\UuidInterface;
 use Doctrine\ORM\Mapping as ORM;
@@ -15,10 +16,19 @@ use App\Traits\Timestampable;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Serializer\Attribute\Groups;
+use LongitudeOne\Spatial\PHP\Types\Geometry\Polygon;
+use LongitudeOne\Spatial\PHP\Types\Geometry\Point;
+use LongitudeOne\Spatial\PHP\Types\Geometry\LineString;
 
 #[ApiResource(
     operations: [
         new Post(),
+        new Post(
+            uriTemplate: '/zones/check',
+            controller: ZoneCheckController::class,
+            deserialize: false,
+            name: 'check_point_in_zone'
+        ),
         new GetCollection(
             normalizationContext: ['groups' => ['zone:list']]
         ),
@@ -41,19 +51,17 @@ class Zone
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'Ramsey\Uuid\Doctrine\UuidGenerator')]
-    #[Groups(['zone:read', 'zone:list', 'user:read'])]
     private ?UuidInterface $id;
 
     #[ORM\Column(length: 150)]
     #[Groups(['zone:read', 'zone:list', 'zone:write', 'user:read'])]
     private ?string $name = null;
 
-    #[ORM\Column]
-    #[Groups(['zone:read', 'zone:list', 'zone:write', 'user:read'])]
-    private array $coords = [];
+    #[ORM\Column(type: 'geometry', nullable: true)]
+    private ?Polygon $coords = null;
 
     #[ORM\OneToOne(mappedBy: 'technicianZone', cascade: ['persist'])]
-    #[Groups(['zone:list', 'zone:write'])]
+    #[Groups(['zone:read', 'zone:list', 'zone:write'])]
     private ?User $technician = null;
 
     #[ORM\OneToMany(mappedBy: 'clientZone', targetEntity: User::class)]
@@ -81,14 +89,73 @@ class Zone
         return $this;
     }
 
-    public function getCoords(): array
+    public function getCoords(): ?Polygon
     {
         return $this->coords;
     }
 
-    public function setCoords(array $coords): static
+    public function setCoords(?Polygon $coords): static
     {
         $this->coords = $coords;
+        return $this;
+    }
+
+    #[Groups(['zone:read', 'zone:list', 'zone:write', 'user:read'])]
+    public function getCoordsArray(): ?array
+    {
+        if (!$this->coords) {
+            return null;
+        }
+
+        $coordinates = [];
+        $rings = $this->coords->getRings();
+
+        if (!empty($rings)) {
+            $exteriorRing = $rings[0];
+            foreach ($exteriorRing->getPoints() as $point) {
+                $coordinates[] = [
+                    'lat' => $point->getY(),
+                    'lng' => $point->getX()
+                ];
+            }
+        }
+
+        return $coordinates;
+    }
+
+    #[Groups(['zone:write'])]
+    public function setCoordsArray(?array $coordsArray): static
+    {
+        if (empty($coordsArray)) {
+            $this->coords = null;
+            return $this;
+        }
+
+        return $this->setCoordsFromArray($coordsArray);
+    }
+
+    public function setCoordsFromArray(array $coordinates): static
+    {
+        if (empty($coordinates)) {
+            $this->coords = null;
+            return $this;
+        }
+
+        $points = [];
+        foreach ($coordinates as $coord) {
+            $points[] = new Point($coord['lng'], $coord['lat']);
+        }
+
+        if (!empty($points) && $points[0] != end($points)) {
+            $points[] = $points[0];
+        }
+
+        $lineString = new LineString($points);
+        $polygon = new Polygon([$lineString]);
+        $polygon->setSrid(4326);
+
+        $this->coords = $polygon;
+
         return $this;
     }
 
@@ -112,9 +179,6 @@ class Zone
         return $this;
     }
 
-    /**
-     * @return Collection<int, User>
-     */
     public function getClients(): Collection
     {
         return $this->clients;

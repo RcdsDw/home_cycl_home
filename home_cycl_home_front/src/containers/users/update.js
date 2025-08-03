@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Button, Form, Input, Select, message } from "antd";
 import { getUserById, updateUser } from "../../actions/user";
 import { useEffect, useState } from "react";
-import AddressSearch from "../../utils/AdressSearch";
+import AddressSearch from "../../utils/AddressSearch";
 
 export default function EditUser() {
     const [loading, setLoading] = useState(true);

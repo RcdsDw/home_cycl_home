@@ -6,9 +6,13 @@ services:
         autoconfigure: true
 
     App\:
-        resource: '../src/'
-        exclude: '../src/Controller'
+        resource: "../src/"
+        exclude: "../src/Controller"
 
     App\Controller\:
-        resource: '../src/Controller'
-        tags: ['controller.service_arguments']
+        resource: "../src/Controller"
+        tags: ["controller.service_arguments"]
+
+        # Normaliseur pour les polygones
+    App\Serializer\PolygonNormalizer:
+        tags: ["serializer.normalizer"]

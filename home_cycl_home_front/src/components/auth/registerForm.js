@@ -1,7 +1,7 @@
 import React from "react";
 import { Form, Input, Button, message } from "antd";
 import { authRegister } from "../../actions/auth";
-import AddressSearch from "../../utils/AdressSearch";
+import AddressSearch from "../../utils/AddressSearch";
 import { useNavigate } from "react-router-dom";
 
 export default function RegisterForm() {
@@ -9,6 +9,7 @@ export default function RegisterForm() {
     const nav = useNavigate();
 
     const refactoAddress = (address) => {
+        console.log("🚀 ~ refactoAddress ~ address:", address)
         return {
             street: address.data?.name,
             city: address.data?.city,
@@ -21,18 +22,19 @@ export default function RegisterForm() {
     };
 
     const onFinish = (values) => {
+        console.log("🚀 ~ onFinish ~ values:", values)
         if (values?.address) {
             values.address = refactoAddress(values.address);
         }
 
-        authRegister(values)
-            .then(() => {
-                message.success(`Enregistré`);
-                nav("/");
-            })
-            .catch(() => {
-                message.error("Erreur ?");
-            });
+        // authRegister(values)
+        //     .then(() => {
+        //         message.success(`Enregistré`);
+        //         nav("/");
+        //     })
+        //     .catch(() => {
+        //         message.error("Erreur lors de l'enrefistrement");
+        //     });
     };
 
     return (

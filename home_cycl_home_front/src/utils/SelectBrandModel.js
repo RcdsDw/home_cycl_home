@@ -11,10 +11,8 @@ export default function SelectBrandModel({
     selectedModel,
     setSelectedModel,
 }) {
-    console.log("🚀 ~ SelectBrandModel ~ selectedBrand:", selectedBrand)
     const [brands, setBrands] = useState([]);
     const [models, setModels] = useState([]);
-    console.log("🚀 ~ SelectBrandModel ~ models:", models)
 
     useEffect(() => {
         if (selectedBrand) {

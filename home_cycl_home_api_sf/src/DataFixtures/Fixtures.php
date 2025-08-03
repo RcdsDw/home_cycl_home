@@ -68,7 +68,8 @@ class Fixtures extends Fixture
             }
         }
 
-        $zones = [
+        // --- Création des zones avec Polygon ---
+        $zonesData = [
             'Centre-ville Tarbes' => [
                 ['lat' => 43.2335, 'lng' => 0.0700],
                 ['lat' => 43.2340, 'lng' => 0.0800],
@@ -101,10 +102,11 @@ class Fixtures extends Fixture
             ],
         ];
 
-        foreach ($zones as $name => $coords) {
+        $zones = [];
+        foreach ($zonesData as $name => $coords) {
             $zone = new Zone();
             $zone->setName($name);
-            $zone->setCoords($coords);
+            $zone->setCoordsFromArray($coords);
             $zone->setCreatedAt(new \DateTime());
             $zone->setUpdatedAt(new \DateTime());
 
@@ -209,7 +211,9 @@ class Fixtures extends Fixture
             $bike->setModel($model);
             $manager->persist($bike);
             $bikes[] = $bike;
-            $tech->setTechnicianZone($zones[$i - 1]);
+            if (isset($zones[$i - 1])) {
+                $tech->setTechnicianZone($zones[$i - 1]);
+            }
             $manager->persist($tech);
             $technicians[] = $tech;
         }

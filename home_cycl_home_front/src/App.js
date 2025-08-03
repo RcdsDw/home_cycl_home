@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 
-import Auth from './containers/auth/auth.js';
+import Login from './containers/auth/login.js';
+import Register from './containers/auth/register.js';
 import Dashboard from './containers/dashboard/dashboard.js';
 import Users from './containers/users/list.js';
 import MainLayout from "./MainLayout"
@@ -17,12 +18,15 @@ import NewTypeInterventions from './containers/typeInterventions/new.js';
 import EditTypeInterventions from './containers/typeInterventions/update.js';
 import NewBike from './containers/bikes/new.js';
 import UpdateBike from './containers/bikes/update.js';
+import Welcome from './components/auth/welcome.js';
 
 export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Auth />} />
+        <Route path="/" element={<Welcome />} />
+        <Route path="/auth/login" element={<Login />} />
+        <Route path="/auth/register" element={<Register />} />
 
         <Route element={<MainLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />

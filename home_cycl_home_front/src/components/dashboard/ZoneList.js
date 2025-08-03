@@ -2,13 +2,14 @@ import React from 'react';
 import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { Input } from 'antd';
 import SelectTech from '../../utils/SelectTech';
+import { parseID } from '../../utils/ParseID';
 
 export default function ZoneList({
     zones,
     editingZone,
     newZoneName,
     newTechUser,
-    onEdit,
+    // onEdit,
     onDelete,
     onSave,
     onCancel,
@@ -20,26 +21,28 @@ export default function ZoneList({
             <h3>Zones créées</h3>
             <ul>
                 {zones && zones.map((zone) => (
-                    <li key={zone.id} style={styles.zoneItem}>
-                        {editingZone !== zone.id && (
+                    <li key={parseID(zone)} style={styles.zoneItem}>
+                        {editingZone !== parseID(zone) && (
                             <>
                                 <div style={styles.flexColumn}>
                                     <span style={styles.zoneName}>{zone.name}</span>
                                     <small style={styles.description}>
-                                        Pris en charge par : {`${zone.technician?.firstname} ${zone.technician?.lastname}` || 'Inconnu'}
+                                        Pris en charge par : {zone.technician ? `${zone.technician?.firstname} ${zone.technician?.lastname}` : 'Inconnu'}
                                     </small>
                                 </div>
-                                <EditOutlined
-                                    style={styles.editIcon}
-                                    onClick={() => onEdit(zone)}
-                                />
-                                <DeleteOutlined
-                                    style={styles.deleteIcon}
-                                    onClick={() => onDelete(zone.id)}
-                                />
+                                <div>
+                                    {/* <EditOutlined
+                                        style={styles.editIcon}
+                                        onClick={() => onEdit(zone)}
+                                    /> */}
+                                    <DeleteOutlined
+                                        style={styles.deleteIcon}
+                                        onClick={() => onDelete(parseID(zone))}
+                                    />
+                                </div>
                             </>
                         )}
-                        {editingZone === zone.id && (
+                        {editingZone === parseID(zone) && (
                             <div style={styles.editForm}>
                                 <div style={styles.flexColumn}>
                                     <Input

@@ -12,8 +12,7 @@ export default function Dashboard() {
   const [zoneName, setZoneName] = useState('');
   const [currentCoordinates, setCurrentCoordinates] = useState([]);
   const [selectedTechUser, setSelectedTechUser] = useState('');
-
-  const [editingZone, setEditingZone] = useState(null);
+  // const [editingZone, setEditingZone] = useState(null);
   const [newZoneName, setNewZoneName] = useState('');
   const [newTechUser, setNewTechUser] = useState('');
 
@@ -53,15 +52,23 @@ export default function Dashboard() {
       return message.error("Veuillez sélectionner un technicien.");
     }
 
-    const formattedCoordinates = currentCoordinates.map(coord => ({
+    const coords = [...currentCoordinates];
+    const first = coords[0];
+    const last = coords[coords.length - 1];
+
+    if (first.lat !== last.lat || first.lng !== last.lng) {
+      coords.push(first);
+    }
+
+    const formattedCoords = coords.map(coord => ({
       lat: parseFloat(coord.lat),
-      lng: parseFloat(coord.lng),
+      lng: parseFloat(coord.lng)
     }));
 
     const zoneData = {
-      name: `Zone ${zoneName}`,
-      coords: formattedCoordinates,
-      technician: `/api/users/${selectedTechUser}`,
+      name: zoneName,
+      coordsArray: formattedCoords,
+      technician: selectedTechUser['@id'],
     };
 
     try {
@@ -77,40 +84,41 @@ export default function Dashboard() {
     }
   };
 
-  const handleEditZone = (zone) => {
-    setEditingZone(zone.id);
-    setNewZoneName(zone.name);
-    setNewTechUser(zone.userId);
-  };
+  // const handleEditZone = (zone) => {
+  //   console.log("🚀 ~ handleEditZone ~ zone:", zone)
+  //   setEditingZone(zone.id);
+  //   setNewZoneName(zone.name);
+  //   setNewTechUser(zone.userId);
+  // };
 
-  const handleCancelEdit = () => {
-    setEditingZone(null);
-  };
+  // const handleCancelEdit = () => {
+  //   setEditingZone(null);
+  // };
 
-  const handleSaveZone = async () => {
-    if (!newZoneName.trim()) {
-      return message.error("Veuillez saisir un nom pour la zone.");
-    }
+  // const handleSaveZone = async () => {
+  //   if (!newZoneName.trim()) {
+  //     return message.error("Veuillez saisir un nom pour la zone.");
+  //   }
 
-    if (!newTechUser) {
-      return message.error("Veuillez sélectionner un technicien.");
-    }
+  //   if (!newTechUser) {
+  //     return message.error("Veuillez sélectionner un technicien.");
+  //   }
 
-    const updatedZone = {
-      name: newZoneName,
-      user_id: newTechUser,
-    };
+  //   const updatedZone = {
+  //     name: newZoneName,
+  //     technician: newTechUser['@id'],
+  //   };
 
-    try {
-      await updateZone(editingZone, updatedZone);
-      fetchZones();
-      setEditingZone(null);
-      message.success('Zone modifiée avec succès !');
-    } catch (error) {
-      console.error("Erreur lors de la modification de la zone", error);
-      message.error("Impossible de modifier la zone.");
-    }
-  };
+  //   try {
+  //     await updateZone(editingZone, updatedZone);
+  //     fetchZones();
+  //     setEditingZone(null);
+  //     message.success('Zone modifiée avec succès !');
+  //   } catch (error) {
+  //     console.error("Erreur lors de la modification de la zone", error);
+  //     message.error("Impossible de modifier la zone.");
+  //   }
+  // };
 
   const handleDeleteZone = async (zoneId) => {
     Modal.confirm({
@@ -118,7 +126,7 @@ export default function Dashboard() {
       onOk: async () => {
         try {
           await deleteZone(zoneId);
-          setZones((prev) => prev.filter(zone => zone.id !== zoneId));
+          await fetchZones();
           message.success('Zone supprimée avec succès !');
         } catch (error) {
           console.error("Erreur lors de la suppression de la zone", error);
@@ -138,13 +146,13 @@ export default function Dashboard() {
 
         <ZoneList
           zones={zones}
-          editingZone={editingZone}
+          // editingZone={editingZone}
           newZoneName={newZoneName}
           newTechUser={newTechUser}
-          onEdit={handleEditZone}
+          // onEdit={handleEditZone}
           onDelete={handleDeleteZone}
-          onSave={handleSaveZone}
-          onCancel={handleCancelEdit}
+          // onSave={handleSaveZone}
+          // onCancel={handleCancelEdit}
           setNewZoneName={setNewZoneName}
           setNewTechUser={setNewTechUser}
         />

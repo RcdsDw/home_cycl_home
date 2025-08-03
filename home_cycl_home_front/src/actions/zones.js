@@ -4,6 +4,10 @@ export async function createZone(values) {
     return await postReq("/zones", values)
 }
 
+export async function testAddress(values) {
+    return await postReq("/zones/check", values)
+}
+
 export async function updateZone(values, id) {
     return await patchReq(`/zones/${id}`, values)
 }

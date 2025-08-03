@@ -46,14 +46,14 @@ export default function MapView({ zones, onZoneCreated }) {
             </FeatureGroup>
 
             {zones && zones.length > 0 && zones.map((zone, index) => {
-                if (!Array.isArray(zone.coords) || zone.coords.length === 0) return null;
+                if (!Array.isArray(zone.coordsArray) || zone.coordsArray.length === 0) return null;
 
                 const randomColor = getRandomColor();
-                const positions = zone.coords.map(coord => [coord.lat, coord.lng]);
+                const positions = zone.coordsArray.map(coord => [coord.lat, coord.lng]);
 
                 return (
                     <Polygon key={index} positions={positions} color={randomColor}>
-                        <Popup>{zone.name}</Popup>
+                        <Popup>{zone.name} / {zone.technician?.firstname} {zone.technician?.lastname}</Popup>
                     </Polygon>
                 );
             })}

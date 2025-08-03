@@ -43,7 +43,7 @@ export default function SelectUser({ selectedUser, setSelectedUser, onShowUser }
                     ))}
                 </Select>
             ) : (
-                <Input disabled value={`${selectedUser?.firstname} ${selectedUser?.lastname}` || ''} />
+                <Input disabled value={selectedUser ? `${selectedUser?.firstname} ${selectedUser?.lastname}` : 'En chargement...'} />
             )}
         </>
     );
