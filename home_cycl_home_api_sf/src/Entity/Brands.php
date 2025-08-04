@@ -43,7 +43,7 @@ class Brands
     #[Groups(['brands:read', 'brands:write', 'models:read', 'intervention:bike', 'bikes:read', 'user:bikes'])]
     private ?string $name = null;
 
-    #[ORM\OneToMany(mappedBy: 'brand', targetEntity: Models::class)]
+    #[ORM\OneToMany(mappedBy: 'brand', targetEntity: Models::class, cascade: ['remove'])]
     #[Groups(['bikes:read', 'brands:read'])]
     private Collection $models;
 

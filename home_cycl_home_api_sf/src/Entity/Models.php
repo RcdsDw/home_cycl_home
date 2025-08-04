@@ -43,7 +43,7 @@ class Models
 
     #[ORM\ManyToOne(inversedBy: 'models')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['models:read'])]
+    #[Groups(['models:read', 'models:write'])]
     private ?Brands $brand = null;
 
     public function getId(): ?UuidInterface

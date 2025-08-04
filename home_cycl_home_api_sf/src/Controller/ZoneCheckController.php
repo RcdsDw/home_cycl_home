@@ -19,7 +19,6 @@ class ZoneCheckController
         $lat = $data['latitude'];
         $lng = $data['longitude'];
 
-        // Récupère la connexion doctrine
         $conn = $zoneRepository->getEntityManager()->getConnection();
 
         $sql = "SELECT z.id, z.name, u.firstname as technician_firstname, u.lastname as technician_lastname
@@ -34,10 +33,8 @@ class ZoneCheckController
 
         $zoneIds = array_column($result->fetchAllAssociative(), 'id');
 
-        // Récupère les objets Zone complets depuis Doctrine
         $zones = $zoneRepository->findBy(['id' => $zoneIds]);
 
-        // Sérialise proprement avec les bons groupes
         $json = $serializer->serialize([
             'insideZones' => $zones,
             'inside' => count($zones) > 0,

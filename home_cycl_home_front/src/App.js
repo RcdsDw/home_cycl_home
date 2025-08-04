@@ -19,6 +19,7 @@ import EditTypeInterventions from './containers/typeInterventions/update.js';
 import NewBike from './containers/bikes/new.js';
 import UpdateBike from './containers/bikes/update.js';
 import Welcome from './components/auth/welcome.js';
+import BrandsModels from './containers/brands/list.js';
 
 export default function App() {
   return (
@@ -44,6 +45,7 @@ export default function App() {
           <Route path="/type_intervention/edit/:id" element={<EditTypeInterventions />} />
           <Route path="/bikes/new/:ownerId" element={<NewBike />} />
           <Route path="/bikes/edit/:bikeId" element={<UpdateBike />} />
+          <Route path="/brands" element={<BrandsModels />} />
         </Route>
       </Routes>
     </Router>
