@@ -133,13 +133,34 @@ class Fixtures extends Fixture
             ['Inès', 'Durand']
         ];
 
+        $bikesNames = [
+            "Test",
+            "Attila",
+            "Colon",
+            "Ayyaaa",
+            "Coiuubeh",
+            "Quette",
+            "Dofus",
+            "Banana",
+            "Rooooh",
+            "Fuck",
+            "Les",
+            "Noms",
+            "Vélo",
+            "Sayé",
+            "Franci",
+            "Portos",
+            "Primo",
+            "Dernier",
+        ];
+
         // 2 USERS
         for ($i = 1; $i <= 10; $i++) {
             [$firstname, $lastname] = $userNames[$i - 1];
             $user = $this->createUser("user$i@example.com", 'password', 'ROLE_USER', $firstname, $lastname, "060000000$i");
             // Ajout d’un vélo
             $bike = new Bikes();
-            $bike->setName("Vélo $i");
+            $bike->setName("Vélo " . $bikesNames[$i - 1]);
             $bike->setSize('M');
             $bike->setType('VTC');
             $bike->setOwner($user);
@@ -168,7 +189,7 @@ class Fixtures extends Fixture
             $admin = $this->createUser("admin$i@example.com", 'password', 'ROLE_ADMIN', $firstname, $lastname, "060000000$i");
             // Ajout d’un vélo
             $bike = new Bikes();
-            $bike->setName("Vélo $i");
+            $bike->setName("Vélo " . $bikesNames[$i + 9]);
             $bike->setSize('M');
             $bike->setType('VTC');
             $bike->setOwner($user);
@@ -198,7 +219,7 @@ class Fixtures extends Fixture
             $tech = $this->createUser("tech$i@example.com", 'password', 'ROLE_TECH', $firstname, $lastname, "060000000$i");
             // Ajout d’un vélo
             $bike = new Bikes();
-            $bike->setName("Vélo $i");
+            $bike->setName("Vélo " . $bikesNames[$i + 12]);
             $bike->setSize('M');
             $bike->setType('VTC');
             $bike->setOwner($user);
@@ -231,10 +252,10 @@ class Fixtures extends Fixture
         $typeNames = [
             ['Réparation', 90, 7200],
             ['Entretien', 40, 3600],
-            ['Réglage freins', 25, 1800],
-            ['Changement chaîne', 35, 2700],
-            ['Changement pneu', 30, 2400],
-            ['Révision complète', 120, 10800]
+            ['Réglage freins', 25, 3600],
+            ['Changement chaîne', 35, 3600],
+            ['Changement pneu', 30, 3600],
+            ['Révision complète', 120, 7200]
         ];
 
         foreach ($typeNames as [$name, $price, $duration]) {

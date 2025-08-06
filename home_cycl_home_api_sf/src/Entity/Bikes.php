@@ -44,15 +44,15 @@ class Bikes
     private ?UuidInterface $id;
 
     #[ORM\Column(length: 120)]
-    #[Groups(['bikes:read', 'bikes:write', 'intervention:bike', 'user:bikes'])]
+    #[Groups(['user:me', 'bikes:read', 'bikes:write', 'intervention:bike', 'user:bikes'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 3)]
-    #[Groups(['bikes:read', 'bikes:write', 'intervention:bike', 'user:bikes'])]
+    #[Groups(['user:me', 'bikes:read', 'bikes:write', 'intervention:bike', 'user:bikes'])]
     private ?string $size = null;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['bikes:read', 'bikes:write', 'intervention:bike', 'user:bikes'])]
+    #[Groups(['user:me', 'bikes:read', 'bikes:write', 'intervention:bike', 'user:bikes'])]
     private ?string $type = null;
 
     #[ORM\ManyToOne(inversedBy: 'bikes')]
@@ -60,7 +60,7 @@ class Bikes
     #[Groups(['bikes:read', 'bikes:write', 'intervention:bike', 'user:bikes'])]
     private ?User $owner = null;
 
-    #[ORM\OneToMany(mappedBy: 'clientBike', targetEntity: Intervention::class)]
+    #[ORM\OneToMany(mappedBy: 'clientBike', targetEntity: Intervention::class, cascade: ['remove'])]
     #[Groups(['bikes:read'])]
     private Collection $bikeInterventions;
 

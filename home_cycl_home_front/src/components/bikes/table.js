@@ -8,7 +8,7 @@ import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
 import { deleteBike, getBikes } from "../../actions/bikes";
 import { parseID } from "../../utils/ParseID";
 
-export default function TableBikes() {
+export default function TableBikes({ id }) {
   const [loading, setLoading] = useState(true);
   const [bikes, setBikes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -23,7 +23,8 @@ export default function TableBikes() {
   const fetchBikes = async () => {
     try {
       const res = await getBikes();
-      setBikes(res.member);
+      const filtered = res.member.filter((bike) => parseID(bike.owner) === id);
+      setBikes(filtered);
     } catch (error) {
       console.error("Erreur lors de la récupération des vélos :", error);
     } finally {

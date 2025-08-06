@@ -4,6 +4,9 @@ import { parseID } from "./ParseID";
 
 export default function BikeCard({ bike }) {
     const nav = useNavigate()
+    if (!bike) {
+        return
+    }
 
     return (
         <Popover

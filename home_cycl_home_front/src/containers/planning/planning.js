@@ -4,38 +4,43 @@ import interactionPlugin from '@fullcalendar/interaction';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import frLocale from '@fullcalendar/core/locales/fr';
 import { useEffect, useState } from 'react';
-import getRandomColor from '../../utils/RandomColor';
-import { getInterventions } from '../../actions/interventions';
+import { getInterventionsWithParams } from '../../actions/interventions';
 import { message, Spin } from 'antd';
-import { getUsers } from '../../actions/user';
+import SelectTech from '../../utils/SelectTech'
+import { getCurrentUser } from '../../utils/GetCurrentInfo';
+import { parseID } from '../../utils/ParseID';
 
 export default function Planning() {
     const [loading, setLoading] = useState(true);
+    const [selectedTechUser, setSelectedTechUser] = useState()
     const [events, setEvents] = useState([]);
 
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [selectedTechUser]);
 
     const fetchData = async () => {
         try {
             setLoading(true);
-            const interventionsRes = await getInterventions();
-            const interventions = interventionsRes.data;
-            
-            const usersRes = await getUsers();
-            const users = usersRes.data;
 
-            const eventsData = interventions.map((intervention) => {
-                const client = users.find(user => user.id === intervention.clientId);
+            const currentUser = getCurrentUser()
+            const queryParams = `?technician.id=${selectedTechUser ? parseID(selectedTechUser) : currentUser.id}`;
+            const res = await getInterventionsWithParams(queryParams);
+            console.log("🚀 ~ fetchData ~ res:", res)
+            // const interventions = interventionsRes.data;
+
+            // const usersRes = await getUsers();
+            // const users = usersRes.data;
+
+            const eventsData = res?.member?.map((intervention) => {
                 return {
-                    id: intervention.id,
-                    title: client 
-                        ? ` ${client.firstname} ${client.lastname} - ${intervention.price} €`
-                        : ` Client inconnu - ${intervention.price} €`,
-                    start: intervention.startedAt,
-                    end: intervention.endedAt,
-                    color: getRandomColor(),
+                    id: parseID(intervention),
+                    title: intervention.clientBike?.owner
+                        ? ` ${intervention.clientBike?.owner?.firstname} ${intervention.clientBike?.owner?.lastname} - ${intervention.typeIntervention?.price} €`
+                        : ` Client inconnu - ${intervention.typeIntervention?.price} €`,
+                    start: intervention.start_date,
+                    end: intervention.end_date,
+                    color: "grey",
                 };
             });
 
@@ -52,47 +57,37 @@ export default function Planning() {
     }
 
     return (
-        <FullCalendar
-            plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
-            initialView="timeGridWeek"
-            weekends={false}
-            events={events}
-            eventContent={renderEventContent}
-            locale={frLocale}
-            selectable={true}
-            allDaySlot={false}
-            slotMinTime={"09:00:00"}
-            slotMaxTime={"17:00:00"}
-            height={"100%"}
-            // editable={true}
-            // droppable={true}
-            // eventDrop={handleEventDrop}
-            // eventResize={handleEventResize}
-        />
+        <>
+            <SelectTech selectedTechUser={selectedTechUser} setSelectedTechUser={setSelectedTechUser} />
+            <FullCalendar
+                plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
+                initialView="timeGridWeek"
+                weekends={false}
+                events={events}
+                eventContent={renderEventContent}
+                locale={frLocale}
+                selectable={true}
+                allDaySlot={false}
+                slotMinTime={"08:00:00"}
+                slotMaxTime={"18:00:00"}
+                height={"100%"}
+            />
+        </>
     )
 }
 
 function renderEventContent(eventInfo) {
     return (
-      <>
-        <b>{eventInfo.timeText}</b>
-        <i>{eventInfo.event.title}</i>
-      </>
+        <>
+            <b>{eventInfo.timeText}</b>
+            <i>{eventInfo.event.title}</i>
+        </>
     );
 }
 
-// function handleEventDrop(info) {
-//     console.log('L\'événement a été déplacé vers :', info.event.start);
-
-// }
-
-// function handleEventResize(info) {
-//     console.log('L\'événement a été redimensionné vers :', info.event.start);
-// }
-
 const styles = {
     spinner: {
-      display: 'block',
-      margin: '100px auto'
+        display: 'block',
+        margin: '100px auto'
     },
 }

@@ -5,7 +5,7 @@ import { parseID } from './ParseID';
 
 const { Option } = Select;
 
-export default function SelectTech({ selectedTechUser, setSelectedTechUser }) {
+export default function SelectTech({ selectedTechUser, setSelectedTechUser, ...props }) {
     const [techUsers, setTechUsers] = useState([]);
 
     useEffect(() => {
@@ -28,6 +28,7 @@ export default function SelectTech({ selectedTechUser, setSelectedTechUser }) {
 
     return (
         <Select
+            disabled={props?.isDisabled}
             value={parseID(selectedTechUser)}
             onChange={handleTechUserChange}
             allowClear

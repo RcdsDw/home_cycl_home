@@ -106,14 +106,14 @@ export default function ShowIntervention() {
                             </Descriptions.Item>
                             <Descriptions.Item label="Service">
                                 <Tag color={"orange"}>
-                                    {intervention.typeIntervention.name || "Non renseigné"}
+                                    {intervention.typeIntervention?.name || "Non renseigné"}
                                 </Tag>
                             </Descriptions.Item>
                             <Descriptions.Item label="Durée">
-                                <DurationDisplay seconds={intervention.typeIntervention.duration} />
+                                <DurationDisplay seconds={intervention.typeIntervention?.duration} />
                             </Descriptions.Item>
                             <Descriptions.Item label="Prix Total Intervention">
-                                {intervention.typeIntervention.price ? `${intervention.typeIntervention.price} €` : "Non renseigné"}
+                                {intervention.typeIntervention?.price ? `${intervention.typeIntervention?.price} €` : "Non renseigné"}
                             </Descriptions.Item>
                             <Descriptions.Item label="Vélo">
                                 <BikeCard bike={intervention?.clientBike} />
@@ -144,7 +144,7 @@ export default function ShowIntervention() {
                         style={{ ...styles.card, marginTop: 20 }}
                         bordered
                     >
-                        {products.length > 0 && (
+                        {products && products.length > 0 && (
                             <>
                                 <List
                                     dataSource={products}
@@ -189,7 +189,7 @@ export default function ShowIntervention() {
                                 />
                                 <Marker position={geoCoords} icon={markerIcon}>
                                     <Popup>
-                                        {client.firstname} {client.lastname}
+                                        {client?.firstname} {client?.lastname}
                                     </Popup>
                                 </Marker>
                             </MapContainer>

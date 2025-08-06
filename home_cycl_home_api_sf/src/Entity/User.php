@@ -36,7 +36,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
         new Get(
             uriTemplate: '/me',
             provider: CurrentUserProvider::class,
-            normalizationContext: ['groups' => ['user:read']],
+            normalizationContext: ['groups' => ['user:me']],
             openapi: new Operation(summary: 'Return the current user.'),
         ),
         new Get(
@@ -64,55 +64,50 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: 'uuid', unique: true)]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(class: 'Ramsey\Uuid\Doctrine\UuidGenerator')]
+    #[Groups(['user:me'])]
     private ?UuidInterface $id;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users'])]
+    #[Groups(['user:me', 'user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users'])]
     private ?string $email;
 
-    /**
-     * @var list<string> The user roles
-     */
     #[ORM\Column]
-    #[Groups(['user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users'])]
+    #[Groups(['user:me', 'user:read', 'user:write', 'zone:list', 'zone:clients', 'intervention:users'])]
     #[ApiFilter(SearchFilter::class, strategy: 'partial')]
     private ?string $roles;
 
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
     #[Groups(['user:write'])]
     private ?string $password;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['user:read', 'user:write', 'zone:read', 'zone:list', 'zone:clients', 'intervention:users', 'intervention:bike'])]
+    #[Groups(['user:me', 'user:read', 'user:write', 'zone:read', 'zone:list', 'zone:clients', 'intervention:users', 'intervention:bike'])]
     private ?string $firstname;
 
     #[ORM\Column(length: 50)]
-    #[Groups(['user:read', 'user:write', 'zone:read', 'zone:list', 'zone:clients', 'intervention:users', 'intervention:bike'])]
+    #[Groups(['user:me', 'user:read', 'user:write', 'zone:read', 'zone:list', 'zone:clients', 'intervention:users', 'intervention:bike'])]
     private ?string $lastname;
 
     #[ORM\Column(length: 20)]
-    #[Groups(['user:read', 'user:write', 'intervention:users'])]
+    #[Groups(['user:me', 'user:read', 'user:write', 'intervention:users'])]
     private ?string $number;
 
     #[ORM\Column(length: 255, type: 'json')]
-    #[Groups(['user:read', 'user:write', 'intervention:users', 'intervention:bike'])]
+    #[Groups(['user:me', 'user:read', 'user:write', 'intervention:users', 'intervention:bike'])]
     private ?array $address;
 
     #[ORM\OneToOne(inversedBy: 'technician', cascade: ['persist'])]
     #[ORM\JoinColumn(name: 'technician_zone_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    #[Groups(['user:read'])]
+    #[Groups(['user:me', 'user:read'])]
     private ?Zone $technicianZone = null;
 
     #[ORM\ManyToOne(inversedBy: 'clients')]
     #[ORM\JoinColumn(name: 'client_zone_id', referencedColumnName: 'id', onDelete: 'SET NULL')]
-    #[Groups(['user:read'])]
+    #[Groups(['user:me', 'user:read'])]
     private ?Zone $clientZone = null;
 
     #[ORM\OneToMany(mappedBy: 'owner', targetEntity: Bikes::class, cascade: ['persist', 'remove'])]
-    #[Groups(['user:read'])]
+    #[Groups(['user:me', 'user:read'])]
     private Collection $bikes;
 
     #[ORM\OneToMany(mappedBy: 'technician', targetEntity: Intervention::class, orphanRemoval: false)]
@@ -240,9 +235,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Bikes>
-     */
     #[Groups(['user:bikes'])]
     public function getBikes(): Collection
     {
@@ -268,9 +260,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    /**
-     * @return Collection<int, Intervention>
-     */
     public function getTechnicianInterventions(): Collection
     {
         return $this->technicianInterventions;

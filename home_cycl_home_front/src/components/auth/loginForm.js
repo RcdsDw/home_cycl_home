@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Form, Input, Button, message } from "antd";
 import { authLogin } from "../../actions/auth";
 import { useNavigate } from "react-router-dom";

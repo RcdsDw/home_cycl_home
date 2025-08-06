@@ -35,6 +35,7 @@ async function api(method, endpoint, payload = null, token = true) {
             //     return;
             // }
 
+            console.log("🚀 ~ api ~ data:", data)
             const error = new Error(data?.message || 'Erreur serveur');
             error.status = response.status;
             error.details = data;

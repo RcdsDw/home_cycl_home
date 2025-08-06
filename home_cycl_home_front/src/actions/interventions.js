@@ -16,6 +16,14 @@ export async function getInterventions() {
     return await getReq("/interventions")
 }
 
+export async function getInterventionsWithParams(queryParams) {
+    return await getReq(`/interventions${queryParams}`)
+}
+
 export async function getInterventionById(id) {
     return await getReq(`/interventions/${id}`)
+}
+
+export async function getDisponibilites(values) {
+    return await postReq("/interventions/disponibilities", values);
 }

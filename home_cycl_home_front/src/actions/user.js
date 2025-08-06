@@ -25,5 +25,11 @@ export async function getTechUsers() {
 }
 
 export async function getUsersBikes(id) {
-    return await getReq(`/users/${id}/bikes`)
+    const res = await getReq(`/users/${id}/bikes`)
+    return res
+}
+
+export async function getUsersInterventions(id) {
+    const res = await getReq(`/users/${id}/interventions`)
+    return res
 }

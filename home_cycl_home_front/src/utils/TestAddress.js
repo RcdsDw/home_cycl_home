@@ -23,7 +23,6 @@ const TestAddress = () => {
 
         try {
             const res = await testAddress({ latitude: lat, longitude: lng })
-            console.log("🚀 ~ checkAddress ~ result:", res)
 
             if (res.inside) {
                 message.success(`

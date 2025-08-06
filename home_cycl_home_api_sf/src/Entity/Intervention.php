@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
+use ApiPlatform\Metadata\ApiFilter;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
@@ -9,6 +11,7 @@ use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Patch;
 use ApiPlatform\Metadata\Get;
+use App\Controller\DisponibilitesController;
 use App\Repository\InterventionRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -21,6 +24,10 @@ use Symfony\Component\Serializer\Attribute\Groups;
 #[ApiResource(
     operations: [
         new Post(),
+        new Post(
+            uriTemplate: '/interventions/disponibilities',
+            controller: DisponibilitesController::class,
+        ),
         new GetCollection(
             normalizationContext: ['groups' => ['intervention:list', 'intervention:users', 'intervention:bike']]
         ),
@@ -34,6 +41,9 @@ use Symfony\Component\Serializer\Attribute\Groups;
     normalizationContext: ['groups' => ['intervention:read']],
     denormalizationContext: ['groups' => ['intervention:write']]
 )]
+#[ApiFilter(SearchFilter::class, properties: [
+    'technician.id' => 'exact'
+])]
 #[ORM\Entity(repositoryClass: InterventionRepository::class)]
 #[ORM\Table(name: "interventions")]
 #[ORM\HasLifecycleCallbacks]

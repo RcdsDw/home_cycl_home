@@ -54,7 +54,7 @@ class Zone
     private ?UuidInterface $id;
 
     #[ORM\Column(length: 150)]
-    #[Groups(['zone:read', 'zone:list', 'zone:write', 'user:read'])]
+    #[Groups(['user:me', 'zone:read', 'zone:list', 'zone:write', 'user:read'])]
     private ?string $name = null;
 
     #[ORM\Column(type: 'geometry', nullable: true)]

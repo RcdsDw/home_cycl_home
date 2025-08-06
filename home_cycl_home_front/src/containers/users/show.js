@@ -125,7 +125,7 @@ export default function ShowUser() {
                         Ajouter un vélo
                     </Button>
                 </Row>
-                <TableBikes />
+                <TableBikes id={parseID(user)} />
             </Card>
         </>
     );
