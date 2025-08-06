@@ -36,49 +36,55 @@ export default function NewTypeInterventions() {
   };
 
   return (
-    <Card style={styles.card}>
-      <Form form={form} onFinish={onFinish} layout="vertical">
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              label="Nom"
-              name="name"
-              style={styles.formItem}
-              rules={[{ required: true, message: 'Le nom est requis' }]}
-            >
-              <Input type='text' />
-            </Form.Item>
-          </Col>
+    <>
+      <Button type="primary" onClick={() => nav("/type_intervention")}>
+        Retour à la liste
+      </Button>
+      <Card style={styles.card}>
+        <h2 style={styles.title}>Nouveau type d'intervention</h2>
+        <Form form={form} onFinish={onFinish} layout="vertical">
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item
+                label="Nom"
+                name="name"
 
-          <Col span={24}>
-            <Form.Item
-              label="Prix"
-              name="price"
-              style={styles.formItem}
-              rules={[{ required: true, message: 'Le prix est requis' }]}
-            >
-              <Input type='number' />
-            </Form.Item>
-          </Col>
+                rules={[{ required: true, message: 'Le nom est requis' }]}
+              >
+                <Input type='text' />
+              </Form.Item>
+            </Col>
 
-          <Col span={24}>
-            <Form.Item
-              label="Durée (en minutes)"
-              name="duration"
-              style={styles.formItem}
-              rules={[{ required: true, message: 'La durée est requise' }]}
-            >
-              <Input type='number' />
+            <Col span={24}>
+              <Form.Item
+                label="Prix"
+                name="price"
+
+                rules={[{ required: true, message: 'Le prix est requis' }]}
+              >
+                <Input type='number' />
+              </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <Form.Item
+                label="Durée (en minutes)"
+                name="duration"
+
+                rules={[{ required: true, message: 'La durée est requise' }]}
+              >
+                <Input type='number' />
+              </Form.Item>
+            </Col>
+            <Form.Item >
+              <Button type="primary" htmlType="submit" loading={loading}>
+                Valider
+              </Button>
             </Form.Item>
-          </Col>
-          <Form.Item style={styles.formItem}>
-            <Button type="primary" htmlType="submit" style={styles.button} loading={loading}>
-              Soumettre le type d'intervention
-            </Button>
-          </Form.Item>
-        </Row>
-      </Form>
-    </Card>
+          </Row>
+        </Form>
+      </Card>
+    </>
   );
 }
 
@@ -86,12 +92,12 @@ const styles = {
   card: {
     maxWidth: 800,
     margin: '0 auto',
-    padding: '20px',
+    padding: '30px',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
   },
-  formItem: {
-    marginBottom: 20,
-  },
-  button: {
-    width: '100%',
+  title: {
+    textAlign: 'center',
+    marginBottom: '30px',
+    color: '#000000ff',
   },
 };

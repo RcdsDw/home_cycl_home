@@ -70,78 +70,82 @@ export default function UpdateBike() {
   };
 
   return (
-    <Card style={styles.card}>
-      <h2 style={styles.title}>Modifier le Vélo</h2>
-      <Form form={form} onFinish={onFinish} layout="vertical">
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item label="Nom du vélo" name="name" style={styles.formItem}
-              rules={[
-                { required: true, message: 'Le nom du vélo est requis' },
-                { max: 120, message: 'Le nom ne peut pas dépasser 120 caractères' }
-              ]}>
-              <Input placeholder="Ex: Mon vélo de route" maxLength={120} />
-            </Form.Item>
-          </Col>
+    <>
+      <Button type="primary" onClick={() => nav(`/users/show/${parseID(selectedOwner)}`)}>
+        Retour
+      </Button>
+      <Card style={styles.card}>
+        <h2 style={styles.title}>Modifier le Vélo</h2>
+        <Form form={form} onFinish={onFinish} layout="vertical">
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item label="Nom du vélo" name="name"
+                rules={[
+                  { required: true, message: 'Le nom du vélo est requis' },
+                  { max: 120, message: 'Le nom ne peut pas dépasser 120 caractères' }
+                ]}>
+                <Input placeholder="Ex: Mon vélo de route" maxLength={120} />
+              </Form.Item>
+            </Col>
 
-          <Col span={12}>
-            <Form.Item label="Type de vélo" name="type" style={styles.formItem}
-              rules={[{ required: true, message: 'Le type de vélo est requis' }]}>
-              <Select placeholder="Sélectionner un type">
-                {bikeTypes.map(type => (
-                  <Option key={type} value={type}>{type}</Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
+            <Col span={12}>
+              <Form.Item label="Type de vélo" name="type"
+                rules={[{ required: true, message: 'Le type de vélo est requis' }]}>
+                <Select placeholder="Sélectionner un type">
+                  {bikeTypes.map(type => (
+                    <Option key={type} value={type}>{type}</Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
 
-          <Col span={12}>
-            <Form.Item label="Taille" name="size" style={styles.formItem}
-              rules={[{ required: true, message: 'La taille est requise' }]}>
-              <Select placeholder="Sélectionner une taille">
-                {bikeSizes.map(size => (
-                  <Option key={size} value={size}>{size}</Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
+            <Col span={12}>
+              <Form.Item label="Taille" name="size"
+                rules={[{ required: true, message: 'La taille est requise' }]}>
+                <Select placeholder="Sélectionner une taille">
+                  {bikeSizes.map(size => (
+                    <Option key={size} value={size}>{size}</Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
 
-          <Col span={24}>
-            <Form.Item label="Propriétaire" style={styles.formItem} required>
-              <SelectUser
-                onShowUser={true}
-                selectedUser={selectedOwner}
-                setSelectedUser={setSelectedOwner}
-              />
-            </Form.Item>
-          </Col>
+            <Col span={24}>
+              <Form.Item label="Propriétaire" required>
+                <SelectUser
+                  onShowUser={true}
+                  selectedUser={selectedOwner}
+                  setSelectedUser={setSelectedOwner}
+                />
+              </Form.Item>
+            </Col>
 
-          <Col span={24}>
-            <Form.Item label="Marque / Modèle" style={styles.formItem} required>
-              <SelectBrandModel
-                selectedBrand={selectedBrand}
-                setSelectedBrand={setSelectedBrand}
-                selectedModel={selectedModel}
-                setSelectedModel={setSelectedModel}
-              />
-            </Form.Item>
-          </Col>
+            <Col span={24}>
+              <Form.Item label="Marque / Modèle" required>
+                <SelectBrandModel
+                  selectedBrand={selectedBrand}
+                  setSelectedBrand={setSelectedBrand}
+                  selectedModel={selectedModel}
+                  setSelectedModel={setSelectedModel}
+                />
+              </Form.Item>
+            </Col>
 
-          <Col span={24}>
-            <Form.Item style={styles.submitContainer}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                style={styles.button}
-                loading={loading}
-              >
-                Mettre à jour le vélo
-              </Button>
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
-    </Card>
+            <Col span={24}>
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={loading}
+                >
+                  Mettre à jour le vélo
+                </Button>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Card>
+    </>
   );
 }
 

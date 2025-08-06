@@ -20,6 +20,8 @@ import NewBike from './containers/bikes/new.js';
 import UpdateBike from './containers/bikes/update.js';
 import Welcome from './components/auth/welcome.js';
 import BrandsModels from './containers/brands/list.js';
+import PrivateRoute from './utils/PrivateRoute.js';
+import NotFound from './utils/NotFound.js';
 
 export default function App() {
   return (
@@ -29,7 +31,11 @@ export default function App() {
         <Route path="/auth/login" element={<Login />} />
         <Route path="/auth/register" element={<Register />} />
 
-        <Route element={<MainLayout />}>
+        <Route element={
+          <PrivateRoute>
+            <MainLayout />
+          </PrivateRoute>
+        }>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/users" element={<Users />} />
           <Route path="/users/new" element={<NewUser />} />
@@ -47,6 +53,7 @@ export default function App() {
           <Route path="/bikes/edit/:bikeId" element={<UpdateBike />} />
           <Route path="/brands" element={<BrandsModels />} />
         </Route>
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );

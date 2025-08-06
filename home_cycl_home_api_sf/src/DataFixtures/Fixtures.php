@@ -21,6 +21,8 @@ class Fixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         // --- Création de produits ---
+        echo "🧪 Création des produits...\n";
+
         $products = [];
         $categories = ['Freins', 'Pneus', 'Chaîne', 'Selle', 'Pédales'];
 
@@ -38,6 +40,8 @@ class Fixtures extends Fixture
         $manager->flush();
 
         // --- Création des marques ---
+        echo "🏷️  Création des marques et modèles...\n";
+
         $brandNames = [
             'Trek' => ['Domane', 'Marlin', 'Emonda', 'Slash'],
             'Specialized' => ['Allez', 'Rockhopper', 'Tarmac', 'Stumpjumper'],
@@ -69,6 +73,8 @@ class Fixtures extends Fixture
         }
 
         // --- Création des zones avec Polygon ---
+        echo "🗺️  Création des zones...\n";
+
         $zonesData = [
             'Centre-ville Tarbes' => [
                 ['lat' => 43.2335, 'lng' => 0.0700],
@@ -155,6 +161,8 @@ class Fixtures extends Fixture
         ];
 
         // 2 USERS
+        echo "👤 Création des clients avec vélos...\n";
+
         for ($i = 1; $i <= 10; $i++) {
             [$firstname, $lastname] = $userNames[$i - 1];
             $user = $this->createUser("user$i@example.com", 'password', 'ROLE_USER', $firstname, $lastname, "060000000$i");
@@ -184,6 +192,8 @@ class Fixtures extends Fixture
         ];
 
         // 2 ADMINS
+        echo "🛡️  Création des admins avec vélos...\n";
+
         for ($i = 1; $i <= 3; $i++) {
             [$firstname, $lastname] = $adminNames[$i - 1];
             $admin = $this->createUser("admin$i@example.com", 'password', 'ROLE_ADMIN', $firstname, $lastname, "060000000$i");
@@ -192,7 +202,7 @@ class Fixtures extends Fixture
             $bike->setName("Vélo " . $bikesNames[$i + 9]);
             $bike->setSize('M');
             $bike->setType('VTC');
-            $bike->setOwner($user);
+            $bike->setOwner($admin);
 
             // Choix aléatoire d’une marque et d’un modèle de cette marque
             $brand = $brands[array_rand($brands)];
@@ -214,6 +224,8 @@ class Fixtures extends Fixture
         ];
 
         // 6 TECHS
+        echo "🔧 Création des techniciens avec vélos...\n";
+
         for ($i = 1; $i <= 5; $i++) {
             [$firstname, $lastname] = $techNames[$i - 1];
             $tech = $this->createUser("tech$i@example.com", 'password', 'ROLE_TECH', $firstname, $lastname, "060000000$i");
@@ -222,7 +234,7 @@ class Fixtures extends Fixture
             $bike->setName("Vélo " . $bikesNames[$i + 12]);
             $bike->setSize('M');
             $bike->setType('VTC');
-            $bike->setOwner($user);
+            $bike->setOwner($tech);
 
             // Choix aléatoire d’une marque et d’un modèle de cette marque
             $brand = $brands[array_rand($brands)];
@@ -247,6 +259,8 @@ class Fixtures extends Fixture
         $end = (clone $start)->modify("+" . rand(1, 3) . " days");
 
         // --- Création de types d’interventions ---
+        echo "📋 Création des types d’interventions...\n";
+
         $typeInterventions = [];
 
         $typeNames = [
@@ -266,32 +280,75 @@ class Fixtures extends Fixture
             $manager->persist($type);
             $typeInterventions[] = $type;
         }
-        $manager->flush(); // Flush ici pour choper les IDs si besoin
 
-        // --- Création de 20 interventions ---
-        for ($i = 1; $i <= 20; $i++) {
+        $manager->flush();
+
+        // --- Création de 40 interventions sans chevauchement par technicien ---
+        echo "📅 Création des interventions...\n";
+        $created = 0;
+
+        $interventionsPerTech = []; // stocke les créneaux déjà utilisés par tech
+
+        for ($i = 1; $i <= 40; $i++) {
             $intervention = new Intervention();
 
-            // Dates aléatoires : aujourd'hui + 0-10j, durée 1 à 3j
-            $start = (new \DateTime())->modify("+" . rand(0, 10) . " days");
-            $end = (clone $start)->modify("+" . rand(1, 3) . " days");
+            $type = $typeInterventions[array_rand($typeInterventions)];
+            $duration = $type->getDuration(); // en secondes
+
+            $tech = $technicians[array_rand($technicians)];
+
+            // Initialise la liste des créneaux si pas encore fait
+            $techId = (string) $tech->getId();
+
+            if (!isset($interventionsPerTech[$techId])) {
+                $interventionsPerTech[$techId] = [];
+            }
+
+            $tries = 0;
+            $start = null;
+            $end = null;
+
+            do {
+                $tries++;
+
+                // Génère une date de début aléatoire (entre aujourd'hui et +10j)
+                $start = (new \DateTime())->modify("+" . rand(0, 10) . " days")
+                    ->setTime(rand(8, 16), 0); // entre 8h et 16h
+
+                $end = (clone $start)->modify("+{$duration} seconds");
+
+                // Vérifie s'il y a un chevauchement
+                $overlaps = false;
+                foreach ($interventionsPerTech[$techId] as [$existingStart, $existingEnd]) {
+                    if ($start < $existingEnd && $end > $existingStart) {
+                        $overlaps = true;
+                        break;
+                    }
+                }
+            } while ($overlaps && $tries < 100); // pour éviter boucle infinie
+
+            if ($tries >= 100) {
+                echo "💥 Impossible de planifier l'intervention #$i pour le tech {$tech->getEmail()} après 100 essais.\n";
+                continue; // skip si on n’a pas trouvé de créneau dispo
+            }
+
+            // Enregistre le créneau
+            $interventionsPerTech[$techId][] = [$start, $end];
 
             $intervention->setStartDate($start);
             $intervention->setEndDate($end);
             $intervention->setComment("Intervention #$i description");
 
-            // Assignations aléatoires
             $intervention->setClientBike($bikes[array_rand($bikes)]);
-            $intervention->setTechnician($technicians[array_rand($technicians)]);
-            $intervention->setTypeIntervention($typeInterventions[array_rand($typeInterventions)]);
-
+            $intervention->setTechnician($tech);
+            $intervention->setTypeIntervention($type);
             $now = new \DateTime();
             $intervention->setCreatedAt($now);
             $intervention->setUpdatedAt($now);
 
             $manager->persist($intervention);
 
-            // Produits liés (1 à 3 au hasard)
+            // Produits liés (1 à 3)
             $randomProductIndexes = (array) array_rand($products, rand(1, 3));
             foreach ($randomProductIndexes as $index) {
                 $product = $products[$index];
@@ -300,13 +357,22 @@ class Fixtures extends Fixture
                 $interventionProduct->setIntervention($intervention);
                 $interventionProduct->setProduct($product);
                 $interventionProduct->setQuantity(rand(1, 5));
-                $interventionProduct->setProductPrice($product->getPrice()); // prix fixé à la date
+                $interventionProduct->setProductPrice($product->getPrice());
 
                 $manager->persist($interventionProduct);
             }
+            echo "✅ Intervention #$i planifiée pour {$tech->getEmail()} de {$start->format('Y-m-d H:i')} à {$end->format('H:i')}\n";
+            $created++;
         }
-
         $manager->flush();
+
+        echo "\n🎉 Fixtures terminées :\n";
+        echo "- $created interventions créées avec succès\n";
+        echo "- " . count($products) . " produits\n";
+        echo "- " . count($brands) . " marques / " . count($models, COUNT_RECURSIVE) . " modèles\n";
+        echo "- " . count($zones) . " zones\n";
+        echo "- " . count($clients) . " clients\n";
+        echo "- " . count($technicians) . " techniciens\n";
     }
 
     private function createUser(string $email, string $password, string $roles, string $firstname, string $lastname, string $number): User

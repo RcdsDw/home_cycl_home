@@ -125,95 +125,101 @@ export default function NewIntervention() {
   };
 
   return (
-    <Card style={styles.card}>
-      <Form form={form} onFinish={onFinish} layout="vertical">
-        <Row gutter={16}>
-          {selectedClient && (
+    <>
+      <Button type="primary" onClick={() => nav("/users")}>
+        Retour à la liste
+      </Button>
+      <Card style={styles.card}>
+        <h2 style={styles.title}>Nouvel utilisateur</h2>
+        <Form form={form} onFinish={onFinish} layout="vertical">
+          <Row gutter={16}>
+            {selectedClient && (
+              <Col span={24}>
+                <Form.Item
+                  label="Vélo"
+                  name="bike"
+
+                  required
+                >
+                  <SelectBikes
+                    selectedBike={selectedBike}
+                    setSelectedBike={setSelectedBike}
+                    clientId={selectedClient.id}
+                  />
+                </Form.Item>
+              </Col>
+            )}
+
             <Col span={24}>
               <Form.Item
-                label="Vélo"
-                name="bike"
-                style={styles.formItem}
+                label="Service"
+                name="service"
+
                 required
               >
-                <SelectBikes
-                  selectedBike={selectedBike}
-                  setSelectedBike={setSelectedBike}
-                  clientId={selectedClient.id}
+                <SelectTypeIntervention
+                  selectedTypeIntervention={selectedTypeIntervention}
+                  setSelectedTypeIntervention={setSelectedTypeIntervention}
                 />
               </Form.Item>
             </Col>
-          )}
 
-          <Col span={24}>
-            <Form.Item
-              label="Service"
-              name="service"
-              style={styles.formItem}
-              required
-            >
-              <SelectTypeIntervention
-                selectedTypeIntervention={selectedTypeIntervention}
-                setSelectedTypeIntervention={setSelectedTypeIntervention}
-              />
-            </Form.Item>
-          </Col>
+            <Col span={24}>
+              <Form.Item
+                label="Créneau disponible"
+                name="creneau"
 
-          <Col span={24}>
-            <Form.Item
-              label="Créneau disponible"
-              name="creneau"
-              style={styles.formItem}
-              required
-            >
-              <SelectDate form={form} selectedTypeIntervention={selectedTypeIntervention} />
-            </Form.Item>
-
-            <Form.Item name="start_date" hidden>
-              <Input />
-            </Form.Item>
-
-            <Form.Item name="end_date" hidden>
-              <Input />
-            </Form.Item>
-          </Col>
-
-          <Col span={24}>
-            <Form.Item
-              label="Technicien"
-              name="technician"
-              style={styles.formItem}
-              required
-            >
-              <SelectTech
-                isDisabled={isDisabled}
-                selectedTechUser={selectedTechUser}
                 required
-                setSelectedTechUser={setSelectedTechUser}
-              />
-            </Form.Item>
-          </Col>
+              >
+                <SelectDate form={form} selectedTypeIntervention={selectedTypeIntervention} />
+              </Form.Item>
 
-          <Col span={24}>
-            <Form.Item label="Commentaires" name="comments" style={styles.formItem}>
-              <Input type='text' />
-            </Form.Item>
-          </Col>
+              <Form.Item name="start_date" hidden>
+                <Input />
+              </Form.Item>
 
-          <Col span={24}>
-            <Form.Item label="Prix total" style={styles.formItem}>
-              <Input value={price ? `${price} €` : "Non disponible"} disabled />
-            </Form.Item>
-          </Col>
+              <Form.Item name="end_date" hidden>
+                <Input />
+              </Form.Item>
+            </Col>
 
-          <Form.Item style={styles.formItem}>
-            <Button type="primary" htmlType="submit" style={styles.button} loading={loading}>
-              Soumettre l'intervention
-            </Button>
-          </Form.Item>
-        </Row>
-      </Form>
-    </Card>
+            <Col span={24}>
+              <Form.Item
+                label="Technicien"
+                name="technician"
+
+                required
+              >
+                <SelectTech
+                  isDisabled={isDisabled}
+                  selectedTechUser={selectedTechUser}
+                  required
+                  setSelectedTechUser={setSelectedTechUser}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <Form.Item label="Commentaires" name="comments">
+                <Input type='text' />
+              </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <Form.Item label="Prix total">
+                <Input value={price ? `${price} €` : "Non disponible"} disabled />
+              </Form.Item>
+            </Col>
+
+            <Form.Item>
+              <Button type="primary" htmlType="submit" loading={loading}>
+                Valider
+              </Button>
+            </Form.Item>
+          </Row>
+        </Form>
+      </Card>
+    </>
   );
 }
 
@@ -221,13 +227,12 @@ const styles = {
   card: {
     maxWidth: 800,
     margin: '0 auto',
-    padding: '20px',
+    padding: '30px',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
   },
-  formItem: {
-    marginBottom: 20,
-  },
-  button: {
-    marginLeft: 10,
-    width: '100%',
+  title: {
+    textAlign: 'center',
+    marginBottom: '30px',
+    color: '#000000ff',
   },
 };

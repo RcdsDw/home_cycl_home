@@ -54,8 +54,8 @@ export default function EditIntervention() {
     }
 
     form.setFieldsValue({
-      bike: intervention?.clientBike?.type || '',
-      service: intervention?.typeIntervention?.name || '',
+      bike: intervention?.clientBike?.type,
+      service: intervention?.typeIntervention?.name,
     });
 
     if (intervention.technician) {
@@ -99,62 +99,68 @@ export default function EditIntervention() {
   };
 
   return (
-    <Card style={styles.card}>
-      <Form form={form} onFinish={onFinish} layout="vertical">
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              label="Type de vélo"
-              name="bike"
-              rules={[{ required: true, message: 'Veuillez choisir un type de vélo' }]}
-              style={styles.formItem}
-            >
-              <SelectBikes
-                selectedBike={selectedBike}
-                setSelectedBike={setSelectedBike}
-                clientId={intervention && parseID(intervention?.clientBike?.owner)}
-              />
+    <>
+      <Button type="primary" onClick={() => nav(`/interventions/show/${id}`)}>
+        Retour à la liste
+      </Button>
+      <Card style={styles.card}>
+        <h2 style={styles.title}>Nouvelle intervention</h2>
+        <Form form={form} onFinish={onFinish} layout="vertical">
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item
+                label="Type de vélo"
+                name="bike"
+                rules={[{ required: true, message: 'Veuillez choisir un type de vélo' }]}
+
+              >
+                <SelectBikes
+                  selectedBike={selectedBike}
+                  setSelectedBike={setSelectedBike}
+                  clientId={intervention && parseID(intervention?.clientBike?.owner)}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <Form.Item
+                label="Service"
+                name="service"
+                rules={[{ required: true, message: 'Veuillez choisir un type de service' }]}
+
+              >
+                <SelectTypeIntervention
+                  selectedTypeIntervention={selectedTypeIntervention}
+                  setSelectedTypeIntervention={setSelectedTypeIntervention}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <label >Technicien</label>
+              <div style={{ marginLeft: -5 }}>
+                <SelectTech
+                  selectedTechUser={selectedTechUser}
+                  setSelectedTechUser={setSelectedTechUser}
+                />
+              </div>
+            </Col>
+
+            <Col span={24}>
+              <Form.Item label="Prix total" >
+                <Input value={`${price} €`} disabled />
+              </Form.Item>
+            </Col>
+
+            <Form.Item >
+              <Button type="primary" htmlType="submit" loading={loading}>
+                Valider
+              </Button>
             </Form.Item>
-          </Col>
-
-          <Col span={24}>
-            <Form.Item
-              label="Service"
-              name="service"
-              rules={[{ required: true, message: 'Veuillez choisir un type de service' }]}
-              style={styles.formItem}
-            >
-              <SelectTypeIntervention
-                selectedTypeIntervention={selectedTypeIntervention}
-                setSelectedTypeIntervention={setSelectedTypeIntervention}
-              />
-            </Form.Item>
-          </Col>
-
-          <Col span={24}>
-            <label style={styles.formItem}>Technicien</label>
-            <div style={{ marginLeft: -5 }}>
-              <SelectTech
-                selectedTechUser={selectedTechUser}
-                setSelectedTechUser={setSelectedTechUser}
-              />
-            </div>
-          </Col>
-
-          <Col span={24}>
-            <Form.Item label="Prix total" style={styles.formItem}>
-              <Input value={`${price} €`} disabled />
-            </Form.Item>
-          </Col>
-
-          <Form.Item style={styles.formItem}>
-            <Button type="primary" htmlType="submit" style={styles.button} loading={loading}>
-              Mettre à jour l'intervention
-            </Button>
-          </Form.Item>
-        </Row>
-      </Form>
-    </Card>
+          </Row>
+        </Form>
+      </Card>
+    </>
   );
 }
 
@@ -162,12 +168,12 @@ const styles = {
   card: {
     maxWidth: 800,
     margin: '0 auto',
-    padding: '20px',
+    padding: '30px',
+    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
   },
-  formItem: {
-    marginBottom: 20,
-  },
-  button: {
-    width: '100%',
+  title: {
+    textAlign: 'center',
+    marginBottom: '30px',
+    color: '#000000ff',
   },
 };

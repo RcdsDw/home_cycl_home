@@ -1,5 +1,5 @@
 import React from 'react';
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined } from '@ant-design/icons';
 import { Input } from 'antd';
 import SelectTech from '../../utils/SelectTech';
 import { parseID } from '../../utils/ParseID';
@@ -9,7 +9,6 @@ export default function ZoneList({
     editingZone,
     newZoneName,
     newTechUser,
-    // onEdit,
     onDelete,
     onSave,
     onCancel,
@@ -31,10 +30,6 @@ export default function ZoneList({
                                     </small>
                                 </div>
                                 <div>
-                                    {/* <EditOutlined
-                                        style={styles.editIcon}
-                                        onClick={() => onEdit(zone)}
-                                    /> */}
                                     <DeleteOutlined
                                         style={styles.deleteIcon}
                                         onClick={() => onDelete(parseID(zone))}

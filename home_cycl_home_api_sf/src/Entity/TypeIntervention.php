@@ -5,6 +5,7 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use ApiPlatform\Metadata\Delete;
 use ApiPlatform\Metadata\GetCollection;
+use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Post;
 use ApiPlatform\Metadata\Put;
 use App\Repository\TypeInterventionRepository;
@@ -20,6 +21,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
     operations: [
         new Post(),
         new Put(),
+        new Get(),
         new GetCollection(),
         new Delete(),
     ],

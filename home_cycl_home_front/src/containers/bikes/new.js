@@ -7,6 +7,7 @@ import { createBike } from '../../actions/bikes';
 import { getUserById } from '../../actions/user';
 import SelectUser from '../../utils/SelectUser';
 import SelectBrandModel from '../../utils/SelectBrandModel';
+import { parseID } from '../../utils/ParseID';
 
 const { Option } = Select;
 
@@ -91,106 +92,105 @@ export default function NewBike() {
   };
 
   return (
-    <Card style={styles.card}>
-      <h2 style={styles.title}>Nouveau Vélo</h2>
+    <>
+      <Button type="primary" onClick={() => nav(`/users/show/${ownerId}`)}>
+        Retour
+      </Button>
+      <Card style={styles.card}>
+        <h2 style={styles.title}>Nouveau Vélo</h2>
 
-      <Form form={form} onFinish={onFinish} layout="vertical">
-        <Row gutter={16}>
-          <Col span={24}>
-            <Form.Item
-              label="Nom du vélo"
-              name="name"
-              style={styles.formItem}
-              rules={[
-                { required: true, message: 'Le nom du vélo est requis' },
-                { max: 120, message: 'Le nom ne peut pas dépasser 120 caractères' }
-              ]}
-            >
-              <Input
-                placeholder="Ex: Mon vélo de route"
-                maxLength={120}
-              />
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item
-              label="Type de vélo"
-              name="type"
-              style={styles.formItem}
-              rules={[
-                { required: true, message: 'Le type de vélo est requis' }
-              ]}
-            >
-              <Select placeholder="Sélectionner un type">
-                {bikeTypes.map(type => (
-                  <Option key={type} value={type}>{type}</Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-
-          <Col span={12}>
-            <Form.Item
-              label="Taille"
-              name="size"
-              style={styles.formItem}
-              rules={[
-                { required: true, message: 'La taille est requise' }
-              ]}
-            >
-              <Select placeholder="Sélectionner une taille">
-                {bikeSizes.map(size => (
-                  <Option key={size} value={size}>{size}</Option>
-                ))}
-              </Select>
-            </Form.Item>
-          </Col>
-
-          <Col span={24}>
-            <Form.Item
-              label="Propriétaire"
-              style={styles.formItem}
-              required
-            >
-              <SelectUser
-                onShowUser={true}
-                selectedUser={selectedOwner}
-                setSelectedUser={setSelectedOwner}
-              />
-            </Form.Item>
-          </Col>
-
-          <Col span={24}>
-            <Form.Item
-              label="Marque"
-              style={styles.formItem}
-              required
-            >
-              <SelectBrandModel
-                selectedBrand={selectedBrand}
-                setSelectedBrand={setSelectedBrand}
-                selectedModel={selectedModel}
-                setSelectedModel={setSelectedModel}
-              />
-            </Form.Item>
-          </Col>
-
-          <Col span={24}>
-            <Form.Item style={styles.submitContainer}>
-              <Button
-                type="primary"
-                htmlType="submit"
-                style={styles.button}
-                loading={loading}
+        <Form form={form} onFinish={onFinish} layout="vertical">
+          <Row gutter={16}>
+            <Col span={24}>
+              <Form.Item
+                label="Nom du vélo"
+                name="name"
+                rules={[
+                  { required: true, message: 'Le nom du vélo est requis' },
+                  { max: 120, message: 'Le nom ne peut pas dépasser 120 caractères' }
+                ]}
               >
-                Créer le vélo
-              </Button>
-            </Form.Item>
-          </Col>
-        </Row>
-      </Form>
-    </Card>
+                <Input
+                  placeholder="Ex: Mon vélo de route"
+                  maxLength={120}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                label="Type de vélo"
+                name="type"
+                rules={[
+                  { required: true, message: 'Le type de vélo est requis' }
+                ]}
+              >
+                <Select placeholder="Sélectionner un type">
+                  {bikeTypes.map(type => (
+                    <Option key={type} value={type}>{type}</Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+
+            <Col span={12}>
+              <Form.Item
+                label="Taille"
+                name="size"
+                rules={[
+                  { required: true, message: 'La taille est requise' }
+                ]}
+              >
+                <Select placeholder="Sélectionner une taille">
+                  {bikeSizes.map(size => (
+                    <Option key={size} value={size}>{size}</Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <Form.Item
+                label="Propriétaire"
+                required
+              >
+                <SelectUser
+                  onShowUser={true}
+                  selectedUser={selectedOwner}
+                  setSelectedUser={setSelectedOwner}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <Form.Item
+                label="Marque"
+                required
+              >
+                <SelectBrandModel
+                  selectedBrand={selectedBrand}
+                  setSelectedBrand={setSelectedBrand}
+                  selectedModel={selectedModel}
+                  setSelectedModel={setSelectedModel}
+                />
+              </Form.Item>
+            </Col>
+
+            <Col span={24}>
+              <Form.Item>
+                <Button
+                  type="primary"
+                  htmlType="submit"
+                  loading={loading}
+                >
+                  Créer le vélo
+                </Button>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Card>
+    </>
   );
 }
 
@@ -205,17 +205,5 @@ const styles = {
     textAlign: 'center',
     marginBottom: '30px',
     color: '#000000ff',
-  },
-  formItem: {
-    marginBottom: 20,
-  },
-  submitContainer: {
-    marginTop: 30,
-    textAlign: 'center',
-  },
-  button: {
-    width: '100%',
-    height: '45px',
-    fontSize: '16px',
   },
 };
