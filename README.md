@@ -22,6 +22,7 @@ Projet full stack orchestré avec Docker Compose :
 │   ├── nginx/
 │   │   └── Dockerfile              # Configuration Nginx
 │   └── Dockerfile                  # Configuration du conteneur backend
+├── home_cycl_home_front/           # Frontend de l'application
 ├── docker-compose.yml              # Configuration Docker Compose
 ├── Makefile                        # Commandes simplifiées
 └── README.md

@@ -16,11 +16,14 @@ jobs:
         with:
           node-version: 18
 
-      - name: Install dependencies
+      - name: Install Frontend Dependencies
+        working-directory: ./home_cycl_home_front
         run: npm install
 
       - name: Run lint (block on warnings)
+        working-directory: ./home_cycl_home_front
         run: npm run lint -- --max-warnings=0
 
       - name: Run prettier check
+        working-directory: ./home_cycl_home_front
         run: npm run prettier:check
