@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from 'react';
-import { message, Modal } from 'antd';
+import React, { useEffect, useState } from "react";
+import { message, Modal } from "antd";
 
-import Map from '../../components/dashboard/Map';
-import ZoneList from '../../components/dashboard/ZoneList';
-import AddZoneForm from '../../components/dashboard/AddZoneForm';
+import Map from "../../components/dashboard/Map";
+import ZoneList from "../../components/dashboard/ZoneList";
+import AddZoneForm from "../../components/dashboard/AddZoneForm";
 
-import { createZone, deleteZone, getZones, updateZone } from '../../actions/zones';
+import { createZone, deleteZone, getZones } from "../../actions/zones";
 
 export default function Dashboard() {
   const [zones, setZones] = useState([]);
-  const [zoneName, setZoneName] = useState('');
+  const [zoneName, setZoneName] = useState("");
   const [currentCoordinates, setCurrentCoordinates] = useState([]);
-  const [selectedTechUser, setSelectedTechUser] = useState('');
-  // const [editingZone, setEditingZone] = useState(null);
-  const [newZoneName, setNewZoneName] = useState('');
-  const [newTechUser, setNewTechUser] = useState('');
+  const [selectedTechUser, setSelectedTechUser] = useState("");
+  const [newZoneName, setNewZoneName] = useState("");
+  const [newTechUser, setNewTechUser] = useState("");
 
   useEffect(() => {
     fetchZones();
@@ -33,10 +32,12 @@ export default function Dashboard() {
     const { layer } = e;
     const { _latlngs } = layer;
 
-    setCurrentCoordinates(_latlngs[0].map(latlng => ({
-      lat: latlng.lat,
-      lng: latlng.lng,
-    })));
+    setCurrentCoordinates(
+      _latlngs[0].map((latlng) => ({
+        lat: latlng.lat,
+        lng: latlng.lng,
+      })),
+    );
   };
 
   const handleAddZone = async () => {
@@ -60,99 +61,56 @@ export default function Dashboard() {
       coords.push(first);
     }
 
-    const formattedCoords = coords.map(coord => ({
+    const formattedCoords = coords.map((coord) => ({
       lat: parseFloat(coord.lat),
-      lng: parseFloat(coord.lng)
+      lng: parseFloat(coord.lng),
     }));
 
     const zoneData = {
       name: zoneName,
       coordsArray: formattedCoords,
-      technician: selectedTechUser['@id'],
+      technician: selectedTechUser["@id"],
     };
 
     try {
       await createZone(zoneData);
       fetchZones();
-      setZoneName('');
-      setSelectedTechUser('');
+      setZoneName("");
+      setSelectedTechUser("");
       setCurrentCoordinates([]);
-      message.success('Zone ajoutée avec succès !');
+      message.success("Zone ajoutée avec succès !");
     } catch (error) {
       console.error("Erreur lors de la création de la zone", error);
       message.error("Impossible d'ajouter la zone.");
     }
   };
 
-  // const handleEditZone = (zone) => {
-  //   console.log("🚀 ~ handleEditZone ~ zone:", zone)
-  //   setEditingZone(zone.id);
-  //   setNewZoneName(zone.name);
-  //   setNewTechUser(zone.userId);
-  // };
-
-  // const handleCancelEdit = () => {
-  //   setEditingZone(null);
-  // };
-
-  // const handleSaveZone = async () => {
-  //   if (!newZoneName.trim()) {
-  //     return message.error("Veuillez saisir un nom pour la zone.");
-  //   }
-
-  //   if (!newTechUser) {
-  //     return message.error("Veuillez sélectionner un technicien.");
-  //   }
-
-  //   const updatedZone = {
-  //     name: newZoneName,
-  //     technician: newTechUser['@id'],
-  //   };
-
-  //   try {
-  //     await updateZone(editingZone, updatedZone);
-  //     fetchZones();
-  //     setEditingZone(null);
-  //     message.success('Zone modifiée avec succès !');
-  //   } catch (error) {
-  //     console.error("Erreur lors de la modification de la zone", error);
-  //     message.error("Impossible de modifier la zone.");
-  //   }
-  // };
-
   const handleDeleteZone = async (zoneId) => {
     Modal.confirm({
-      title: 'Êtes-vous sûr de vouloir supprimer cette zone ?',
+      title: "Êtes-vous sûr de vouloir supprimer cette zone ?",
       onOk: async () => {
         try {
           await deleteZone(zoneId);
           await fetchZones();
-          message.success('Zone supprimée avec succès !');
+          message.success("Zone supprimée avec succès !");
         } catch (error) {
           console.error("Erreur lors de la suppression de la zone", error);
           message.error("Impossible de supprimer la zone.");
         }
-      }
+      },
     });
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex' }}>
-        <Map
-          zones={zones}
-          onZoneCreated={handleZoneCreated}
-        />
+    <div style={{ display: "flex", flexDirection: "column" }}>
+      <div style={{ display: "flex" }}>
+        <Map zones={zones} onZoneCreated={handleZoneCreated} />
 
         <ZoneList
           zones={zones}
-          // editingZone={editingZone}
           newZoneName={newZoneName}
           newTechUser={newTechUser}
-          // onEdit={handleEditZone}
           onDelete={handleDeleteZone}
-          // onSave={handleSaveZone}
-          // onCancel={handleCancelEdit}
           setNewZoneName={setNewZoneName}
           setNewTechUser={setNewTechUser}
         />

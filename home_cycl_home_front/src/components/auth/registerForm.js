@@ -1,131 +1,162 @@
-import React from "react";
-import { Form, Input, Button, message } from "antd";
+import React, { useEffect, useState } from "react";
+import { Form, Input, Button, message, Card } from "antd";
 import { authRegister } from "../../actions/auth";
 import AddressSearch from "../../utils/AddressSearch";
 import { useNavigate } from "react-router-dom";
 
 export default function RegisterForm() {
-    const [form] = Form.useForm();
-    const nav = useNavigate();
+  const [disabled, setDisabled] = useState();
+  const [form] = Form.useForm();
+  const nav = useNavigate();
+  const savedAddress = localStorage.getItem("validatedAddress");
 
-    const refactoAddress = (address) => {
-        console.log("🚀 ~ refactoAddress ~ address:", address)
-        return {
-            street: address.data?.name,
-            city: address.data?.city,
-            code: address.data?.citycode,
-            coords: {
-                lat: address.geo?.coordinates[1],
-                lng: address.geo?.coordinates[0],
-            },
-        };
+  useEffect(() => {
+    if (!savedAddress) {
+      nav("/welcome");
+    } else {
+      setDisabled(true);
+      form.setFieldValue("address", JSON.parse(savedAddress));
+    }
+  }, []);
+
+  const refactoAddress = (address) => {
+    return {
+      street: address.data?.name,
+      city: address.data?.city,
+      code: address.data?.citycode,
+      coords: {
+        lat: address.geo?.coordinates[1],
+        lng: address.geo?.coordinates[0],
+      },
     };
+  };
 
-    const onFinish = (values) => {
-        console.log("🚀 ~ onFinish ~ values:", values)
-        if (values?.address) {
-            values.address = refactoAddress(values.address);
-        }
+  const onFinish = (values) => {
+    if (values?.address) {
+      values.address = refactoAddress(values.address);
+    }
+    authRegister(values)
+      .then(() => {
+        message.success(`Enregistré`);
+        nav("/auth/login");
+        localStorage.removeItem("validatedAddress");
+      })
+      .catch(() => {
+        message.error("Erreur lors de l'enregistrement");
+      });
+  };
 
-        // authRegister(values)
-        //     .then(() => {
-        //         message.success(`Enregistré`);
-        //         nav("/");
-        //     })
-        //     .catch(() => {
-        //         message.error("Erreur lors de l'enrefistrement");
-        //     });
-    };
-
-    return (
-        <Form
-            form={form}
-            name="register"
-            labelCol={{ span: 8 }}
-            wrapperCol={{ span: 16 }}
-            onFinish={onFinish}
-            onFinishFailed={() => message.error("Erreur lors de l'enregistrement")}
-            autoComplete="off"
+  return (
+    <Card style={styles.card}>
+      <h2 style={styles.title}>Inscription</h2>
+      <Form
+        form={form}
+        name="register"
+        labelCol={{ span: 8 }}
+        wrapperCol={{ span: 16 }}
+        onFinish={onFinish}
+        onFinishFailed={() => message.error("Erreur lors de l'enregistrement")}
+        autoComplete="off"
+      >
+        <Form.Item
+          label="Prénom"
+          name="firstname"
+          rules={[{ required: true, message: "Entrez votre prénom." }]}
         >
-            <Form.Item
-                label="Prénom"
-                name="firstname"
-                rules={[{ required: true, message: "Entrez votre prénom." }]}
-            >
-                <Input />
-            </Form.Item>
+          <Input />
+        </Form.Item>
 
-            <Form.Item
-                label="Nom"
-                name="lastname"
-                rules={[{ required: true, message: "Entrez votre nom." }]}
-            >
-                <Input />
-            </Form.Item>
+        <Form.Item
+          label="Nom"
+          name="lastname"
+          rules={[{ required: true, message: "Entrez votre nom." }]}
+        >
+          <Input />
+        </Form.Item>
 
-            <Form.Item
-                label="Numéro de téléphone"
-                name="number"
-                rules={[{ required: true, message: "Entrez votre numéro de téléphone." }]}
-            >
-                <Input type="tel" />
-            </Form.Item>
+        <Form.Item
+          label="Numéro de téléphone"
+          name="number"
+          rules={[
+            {
+              required: true,
+              min: 10,
+              max: 10,
+              message: "Entrez votre numéro de téléphone.",
+            },
+          ]}
+        >
+          <Input type="tel" />
+        </Form.Item>
 
-            <Form.Item
-                label="Adresse postale"
-                name="address"
-                rules={[{ required: true, message: "Entrez votre adresse postale." }]}
-            >
-                <AddressSearch
-                    onAddressSelect={(address) => {
-                        form.setFieldValue("address", address);
-                    }}
-                />
-            </Form.Item>
+        <Form.Item
+          label="Adresse postale"
+          name="address"
+          rules={[{ required: true, message: "Entrez votre adresse postale." }]}
+        >
+          <AddressSearch disabled={disabled} savedAddress={savedAddress} />
+        </Form.Item>
 
-            <Form.Item
-                label="Email"
-                name="email"
-                rules={[
-                    { required: true, message: "Entrez votre adresse email." },
-                    { type: "email", message: "Entrez une adresse email valide." },
-                ]}
-            >
-                <Input />
-            </Form.Item>
+        <Form.Item
+          label="Email"
+          name="email"
+          rules={[
+            { required: true, message: "Entrez votre adresse email." },
+            { type: "email", message: "Entrez une adresse email valide." },
+          ]}
+        >
+          <Input />
+        </Form.Item>
 
-            <Form.Item
-                label="Mot de passe"
-                name="password"
-                rules={[{ required: true, message: "Entrez votre mot de passe." }]}
-            >
-                <Input.Password />
-            </Form.Item>
+        <Form.Item
+          label="Mot de passe"
+          name="password"
+          rules={[{ required: true, message: "Entrez votre mot de passe." }]}
+        >
+          <Input.Password />
+        </Form.Item>
 
-            <Form.Item
-                label="Confirmer"
-                name="confirmPassword"
-                dependencies={["password"]}
-                rules={[
-                    { required: true, message: "Confirmez votre mot de passe." },
-                    ({ getFieldValue }) => ({
-                        validator(_, value) {
-                            if (!value || getFieldValue("password") === value) {
-                                return Promise.resolve();
-                            }
-                            return Promise.reject(new Error("Les mots de passe ne sont pas identiques."));
-                        },
-                    }),
-                ]}
-            >
-                <Input.Password />
-            </Form.Item>
+        <Form.Item
+          label="Confirmer"
+          name="confirmPassword"
+          dependencies={["password"]}
+          rules={[
+            { required: true, message: "Confirmez votre mot de passe." },
+            ({ getFieldValue }) => ({
+              validator(_, value) {
+                if (!value || getFieldValue("password") === value) {
+                  return Promise.resolve();
+                }
+                return Promise.reject(
+                  new Error("Les mots de passe ne sont pas identiques."),
+                );
+              },
+            }),
+          ]}
+        >
+          <Input.Password />
+        </Form.Item>
 
-            <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-                <Button type="primary" htmlType="submit">
-                    S'enregistrer
-                </Button>
-            </Form.Item>
-        </Form>
-    );
+        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+          <Button type="primary" htmlType="submit">
+            S'enregistrer
+          </Button>
+        </Form.Item>
+      </Form>
+    </Card>
+  );
 }
+
+const styles = {
+  card: {
+    maxWidth: 800,
+    margin: "0 auto",
+    padding: "30px",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+  },
+  title: {
+    textAlign: "center",
+    marginBottom: "30px",
+    color: "#000000ff",
+  },
+};

@@ -1,8 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 import { Button, Empty, message, Modal, Spin, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
-import { deleteIntervention, getInterventions } from "../../actions/interventions";
+import {
+  deleteIntervention,
+  getInterventions,
+} from "../../actions/interventions";
 import dayjs from "dayjs";
 import BikeCard from "../../utils/BikeCard";
 import UserCard from "../../utils/UserCard";
@@ -26,7 +29,10 @@ export default function TableInterventions() {
       const res = await getInterventions();
       setInterventions(res.member);
     } catch (error) {
-      console.error("Erreur lors de la récupération des interventions :", error);
+      console.error(
+        "Erreur lors de la récupération des interventions :",
+        error,
+      );
     } finally {
       setLoading(false);
     }
@@ -51,32 +57,34 @@ export default function TableInterventions() {
 
   const handleDelete = (id) => {
     deleteIntervention(id);
-    setInterventions((prevDatas) => prevDatas.filter((intervention) => parseID(intervention) !== id));
+    setInterventions((prevDatas) =>
+      prevDatas.filter((intervention) => parseID(intervention) !== id),
+    );
   };
 
   const columns = [
     {
-      title: 'Début',
-      dataIndex: 'start_date',
-      key: 'start_date',
+      title: "Début",
+      dataIndex: "start_date",
+      key: "start_date",
       render: (text) => <div>{dayjs(text).format("DD/MM/YYYY HH:mm")}</div>,
     },
     {
-      title: 'Fin',
-      dataIndex: 'end_date',
-      key: 'end_date',
+      title: "Fin",
+      dataIndex: "end_date",
+      key: "end_date",
       render: (text) => <div>{dayjs(text).format("DD/MM/YYYY HH:mm")}</div>,
     },
     {
-      title: 'Vélo',
-      dataIndex: 'clientBike',
-      key: 'clientBike',
+      title: "Vélo",
+      dataIndex: "clientBike",
+      key: "clientBike",
       render: (text) => <BikeCard bike={text} />,
     },
     {
-      title: 'Service',
-      dataIndex: 'typeIntervention',
-      key: 'service',
+      title: "Service",
+      dataIndex: "typeIntervention",
+      key: "service",
       render: (text) => (
         <Tag color={text?.name === "Réparation" ? "red" : "orange"} key={text}>
           {text?.name}
@@ -84,43 +92,52 @@ export default function TableInterventions() {
       ),
     },
     {
-      title: 'Durée',
-      dataIndex: 'typeIntervention',
-      key: 'duration',
+      title: "Durée",
+      dataIndex: "typeIntervention",
+      key: "duration",
       render: (text) => <DurationDisplay seconds={text.duration} />,
     },
     {
-      title: 'Prix',
-      dataIndex: 'typeIntervention',
-      key: 'price',
+      title: "Prix",
+      dataIndex: "typeIntervention",
+      key: "price",
       render: (text) => <div>{text?.price} €</div>,
     },
     {
-      title: 'Technicien',
-      dataIndex: 'technician',
-      key: 'technician',
+      title: "Technicien",
+      dataIndex: "technician",
+      key: "technician",
       render: (text) => <UserCard user={text} />,
     },
     {
-      title: 'Client',
-      dataIndex: 'clientBike',
-      key: 'owner',
+      title: "Client",
+      dataIndex: "clientBike",
+      key: "owner",
       render: (text) => <UserCard user={text.owner} />,
     },
     {
-      key: 'show',
-      dataIndex: 'show',
+      key: "show",
+      dataIndex: "show",
+      align: "right",
       render: (_, column) => (
-        <Button type="primary" onClick={() => nav(`/interventions/show/${parseID(column)}`)}>
+        <Button
+          type="primary"
+          onClick={() => nav(`/interventions/show/${parseID(column)}`)}
+        >
           <EyeOutlined />
         </Button>
       ),
     },
     {
-      key: 'delete',
-      dataIndex: 'delete',
+      key: "delete",
+      dataIndex: "delete",
+      align: "right",
       render: (_, column) => (
-        <Button type="primary" danger onClick={() => showModal(parseID(column))}>
+        <Button
+          type="primary"
+          danger
+          onClick={() => showModal(parseID(column))}
+        >
           <DeleteOutlined />
         </Button>
       ),
@@ -133,9 +150,13 @@ export default function TableInterventions() {
 
   return (
     <>
-      <Table columns={columns} dataSource={interventions} locale={{
-        emptyText: <Empty description="Aucune intervention trouvée" />,
-      }} />
+      <Table
+        columns={columns}
+        dataSource={interventions}
+        locale={{
+          emptyText: <Empty description="Aucune intervention trouvée" />,
+        }}
+      />
       <Modal
         okType="danger"
         okText="Valider"
@@ -151,8 +172,8 @@ export default function TableInterventions() {
 
 const styles = {
   spinner: {
-    display: 'block',
-    margin: '100px auto',
+    display: "block",
+    margin: "100px auto",
   },
   button: {
     marginBottom: 20,

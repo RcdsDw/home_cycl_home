@@ -1,7 +1,7 @@
 import { getReq, postReq } from "./api";
 
 export async function authRegister(values) {
-  return await postReq("/register", values, false)
+  return await postReq("/register", values, false);
 }
 
 export async function authLogin(values) {
@@ -9,7 +9,7 @@ export async function authLogin(values) {
   let currentUser;
 
   if (data) {
-    localStorage.setItem('token', data.token);
+    localStorage.setItem("token", data.token);
     currentUser = await getReq("/me");
     localStorage.setItem("user", JSON.stringify(currentUser));
   }
@@ -18,6 +18,6 @@ export async function authLogin(values) {
 }
 
 export async function authLogout() {
-  localStorage.removeItem('token');
-  localStorage.removeItem('user');
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
 }

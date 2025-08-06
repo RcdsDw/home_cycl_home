@@ -26,10 +26,25 @@
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "lint": "eslint src/**/*.{js,jsx,ts,tsx} --max-warnings=0",
+    "prettier": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,md}'",
+    "prettier:check": "prettier --check 'src/**/*.{js,jsx,ts,tsx,json,css,md}'",
+    "test": "npm run lint && npm run prettier:check",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
+    "rules": {
+      "react-hooks/exhaustive-deps": "off",
+      "no-console": [
+        "error",
+        {
+          "allow": [
+            "warn",
+            "error"
+          ]
+        }
+      ]
+    },
     "extends": [
       "react-app",
       "react-app/jest"
@@ -46,5 +61,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "prettier": "^3.6.2"
   }
 }

@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 
-import { DeleteOutlined, EyeOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EyeOutlined } from "@ant-design/icons";
 
 import { Button, Empty, message, Modal, Spin, Table } from "antd";
 import { useEffect, useState } from "react";
@@ -9,100 +9,108 @@ import TagRoles from "../../utils/TagRoles";
 import { parseID } from "../../utils/ParseID";
 
 export default function Users() {
-  const [loading, setLoading] = useState(true)
-  const [datas, setDatas] = useState([])
+  const [loading, setLoading] = useState(true);
+  const [datas, setDatas] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
 
-
-  const nav = useNavigate()
+  const nav = useNavigate();
 
   useEffect(() => {
-    fetchUsers()
-  }, [])
+    fetchUsers();
+  }, []);
 
   const fetchUsers = async () => {
     await getUsers().then((res) => {
-      setDatas(res.member)
-      setLoading(false)
+      setDatas(res.member);
+      setLoading(false);
     });
-  }
+  };
 
   const showModal = (id) => {
-    setCurrentId(id)
+    setCurrentId(id);
     setIsModalOpen(true);
   };
 
   const handleOk = () => {
-    handleDelete(currentId)
-    message.success("Utilisateur supprimé")
-    setCurrentId(null)
+    handleDelete(currentId);
+    message.success("Utilisateur supprimé");
+    setCurrentId(null);
     setIsModalOpen(false);
   };
 
   const handleCancel = () => {
-    setCurrentId(null)
+    setCurrentId(null);
     setIsModalOpen(false);
   };
 
   const handleDelete = (id) => {
-    deleteUser(id)
-    setDatas((prevDatas) => prevDatas.filter(user => parseID(user) !== id))
-  }
+    deleteUser(id);
+    setDatas((prevDatas) => prevDatas.filter((user) => parseID(user) !== id));
+  };
 
   const columns = [
     {
-      title: 'Prénom',
-      dataIndex: 'firstname',
-      key: 'firstname',
+      title: "Prénom",
+      dataIndex: "firstname",
+      key: "firstname",
       render: (text) => <div>{text}</div>,
     },
     {
-      title: 'Nom',
-      dataIndex: 'lastname',
-      key: 'lastname',
+      title: "Nom",
+      dataIndex: "lastname",
+      key: "lastname",
       render: (text) => <div>{text}</div>,
     },
     {
-      title: 'Numéro',
-      dataIndex: 'number',
-      key: 'number',
+      title: "Numéro",
+      dataIndex: "number",
+      key: "number",
       render: (text) => <div>{text}</div>,
     },
     {
-      title: 'Adresse',
-      dataIndex: 'address',
-      key: 'address',
-      render: (text) => <div>{text.street}, {text.code} {text.city}</div>,
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-      render: (text) => <div>{text}</div>,
-    },
-    {
-      title: 'Rôle',
-      key: 'roles',
-      dataIndex: 'roles',
-      render: (roles) => (
-        <TagRoles roles={roles} />
+      title: "Adresse",
+      dataIndex: "address",
+      key: "address",
+      render: (text) => (
+        <div>
+          {text.street}, {text.code} {text.city}
+        </div>
       ),
     },
     {
-      key: 'show',
-      dataIndex: 'show',
+      title: "Email",
+      dataIndex: "email",
+      key: "email",
+      render: (text) => <div>{text}</div>,
+    },
+    {
+      title: "Rôle",
+      key: "roles",
+      dataIndex: "roles",
+      render: (roles) => <TagRoles roles={roles} />,
+    },
+    {
+      key: "show",
+      dataIndex: "show",
+      align: "right",
       render: (_, column) => (
-        <Button type="primary" onClick={() => { nav(`/users/show/${parseID(column)}`) }}>
+        <Button
+          type="primary"
+          onClick={() => {
+            nav(`/users/show/${parseID(column)}`);
+          }}
+        >
           <EyeOutlined />
         </Button>
       ),
     },
     {
-      key: 'delete',
-      dataIndex: 'delete',
+      key: "delete",
+      dataIndex: "delete",
+      align: "right",
       render: (_, column) => (
-        <Button type="primary" danger onClick={() => showModal(column.id)} >
+        <Button type="primary" danger onClick={() => showModal(column.id)}>
           <DeleteOutlined />
         </Button>
       ),
@@ -115,10 +123,20 @@ export default function Users() {
 
   return (
     <>
-      <Button type="primary" style={styles.button} onClick={() => nav('/users/new')}>Ajouter un utilisateur</Button>
-      <Table columns={columns} dataSource={datas} locale={{
-        emptyText: <Empty description="Aucun utilisateur trouvé" />,
-      }} />
+      <Button
+        type="primary"
+        style={styles.button}
+        onClick={() => nav("/users/new")}
+      >
+        Ajouter un utilisateur
+      </Button>
+      <Table
+        columns={columns}
+        dataSource={datas}
+        locale={{
+          emptyText: <Empty description="Aucun utilisateur trouvé" />,
+        }}
+      />
       <Modal
         okType="danger"
         okText="Valider"
@@ -126,17 +144,18 @@ export default function Users() {
         title="Supprimer définitivement l'utilisateur ?"
         open={isModalOpen}
         onOk={handleOk}
-        onCancel={handleCancel} />
+        onCancel={handleCancel}
+      />
     </>
-  )
+  );
 }
 
 const styles = {
   spinner: {
-    display: 'block',
-    margin: '100px auto'
+    display: "block",
+    margin: "100px auto",
   },
   button: {
-    marginBottom: 20
-  }
-}
+    marginBottom: 20,
+  },
+};

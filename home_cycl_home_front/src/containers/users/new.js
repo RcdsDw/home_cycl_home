@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
 import { Button, Form, Input, Card, message, Select } from "antd";
 
@@ -6,7 +6,7 @@ import AddressSearch from "../../utils/AddressSearch";
 import { useState } from "react";
 
 export default function NewUser() {
-  const [loading, setLoading] = useState()
+  const [loading, setLoading] = useState();
   const nav = useNavigate();
   const [form] = Form.useForm();
 
@@ -23,7 +23,7 @@ export default function NewUser() {
   };
 
   const onFinishRegister = async (values) => {
-    setLoading(true)
+    setLoading(true);
 
     if (values?.address) {
       values.address = refactoAddress(values.address);
@@ -46,12 +46,16 @@ export default function NewUser() {
   };
 
   const onFinishFailed = (info) => {
-    message.error(`Erreur lors de ${info}`)
+    message.error(`Erreur lors de ${info}`);
   };
 
   return (
     <>
-      <Button type="primary" style={styles.button} onClick={() => nav("/users")}>
+      <Button
+        type="primary"
+        style={styles.button}
+        onClick={() => nav("/users")}
+      >
         Retour à la liste
       </Button>
       <Card style={styles.card}>
@@ -68,7 +72,7 @@ export default function NewUser() {
           <Form.Item
             label="Prénom"
             name="firstname"
-            rules={[{ required: true, message: 'Entrez le prénom.' }]}
+            rules={[{ required: true, message: "Entrez le prénom." }]}
           >
             <Input />
           </Form.Item>
@@ -76,7 +80,7 @@ export default function NewUser() {
           <Form.Item
             label="Nom"
             name="lastname"
-            rules={[{ required: true, message: 'Entrez le nom.' }]}
+            rules={[{ required: true, message: "Entrez le nom." }]}
           >
             <Input />
           </Form.Item>
@@ -84,21 +88,21 @@ export default function NewUser() {
           <Form.Item
             label="Rôle"
             name="roles"
-            rules={[{ required: true, message: 'Entrez le rôle.' }]}
+            rules={[{ required: true, message: "Entrez le rôle." }]}
           >
             <Select
               options={[
                 {
                   value: "ROLE_ADMIN",
-                  label: "Admin"
+                  label: "Admin",
                 },
                 {
                   value: "ROLE_TECH",
-                  label: "Technicien"
+                  label: "Technicien",
                 },
                 {
                   value: "ROLE_USER",
-                  label: "Utilisateur"
+                  label: "Utilisateur",
                 },
               ]}
             />
@@ -107,7 +111,14 @@ export default function NewUser() {
           <Form.Item
             label="Numéro de téléphone"
             name="number"
-            rules={[{ required: true, min: 10, max: 10, message: 'Entrez le numéro de téléphone.' }]}
+            rules={[
+              {
+                required: true,
+                min: 10,
+                max: 10,
+                message: "Entrez le numéro de téléphone.",
+              },
+            ]}
           >
             <Input type="tel" />
           </Form.Item>
@@ -115,7 +126,9 @@ export default function NewUser() {
           <Form.Item
             label="Adresse postale"
             name="address"
-            rules={[{ required: true, message: "Entrez l'adresse postale complète." }]}
+            rules={[
+              { required: true, message: "Entrez l'adresse postale complète." },
+            ]}
           >
             <AddressSearch
               onAddressSelect={(address) => {
@@ -128,8 +141,8 @@ export default function NewUser() {
             label="Email"
             name="email"
             rules={[
-              { required: true, message: 'Entrez le adresse email.' },
-              { type: "email", message: 'Entrez une adresse email valide.' },
+              { required: true, message: "Entrez le adresse email." },
+              { type: "email", message: "Entrez une adresse email valide." },
             ]}
           >
             <Input />
@@ -138,7 +151,7 @@ export default function NewUser() {
           <Form.Item
             label="Mot de passe"
             name="password"
-            rules={[{ required: true, message: 'Entrez le mot de passe.' }]}
+            rules={[{ required: true, message: "Entrez le mot de passe." }]}
           >
             <Input.Password />
           </Form.Item>
@@ -151,19 +164,19 @@ export default function NewUser() {
         </Form>
       </Card>
     </>
-  )
+  );
 }
 
 const styles = {
   card: {
     maxWidth: 800,
-    margin: '0 auto',
-    padding: '30px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    margin: "0 auto",
+    padding: "30px",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
   },
   title: {
-    textAlign: 'center',
-    marginBottom: '30px',
-    color: '#000000ff',
+    textAlign: "center",
+    marginBottom: "30px",
+    color: "#000000ff",
   },
 };

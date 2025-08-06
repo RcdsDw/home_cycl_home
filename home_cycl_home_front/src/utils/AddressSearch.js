@@ -1,9 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Select, Spin } from "antd";
 
-const AddressSearch = ({ onAddressSelect }) => {
-  const [options, setOptions] = useState([]);
+const AddressSearch = ({ onAddressSelect, disabled, savedAddress }) => {
   const [loading, setLoading] = useState(false);
+  const [options, setOptions] = useState([]);
+  const [selected, setSelected] = useState(null);
+
+  useEffect(() => {
+    if (savedAddress) {
+      const parsed =
+        typeof savedAddress === "string"
+          ? JSON.parse(savedAddress)
+          : savedAddress;
+
+      setSelected({
+        value: parsed.value,
+        label: parsed.value,
+      });
+    }
+  }, [savedAddress]);
 
   const refactoAddress = (address) => {
     onAddressSelect({
@@ -26,7 +41,7 @@ const AddressSearch = ({ onAddressSelect }) => {
     setLoading(true);
     try {
       const response = await fetch(
-        `https://api-adresse.data.gouv.fr/search/?q=${value}`
+        `https://api-adresse.data.gouv.fr/search/?q=${value}`,
       );
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
@@ -35,7 +50,7 @@ const AddressSearch = ({ onAddressSelect }) => {
       const addresses = json.features.map((feature) => ({
         value: feature.properties.label,
         data: feature.properties,
-        geo: feature.geometry
+        geo: feature.geometry,
       }));
       setOptions(addresses);
     } catch (error) {
@@ -50,7 +65,7 @@ const AddressSearch = ({ onAddressSelect }) => {
   };
 
   const handleSelect = (selected) => {
-    const selectedOption = options.find(opt => opt.value === selected.value);
+    const selectedOption = options.find((opt) => opt.value === selected.value);
     if (selectedOption) {
       refactoAddress(selectedOption);
     }
@@ -59,9 +74,11 @@ const AddressSearch = ({ onAddressSelect }) => {
   return (
     <Select
       showSearch
+      disabled={disabled}
       placeholder="Tapez une adresse complète"
       notFoundContent={loading ? <Spin size="small" /> : "Aucun résultat"}
       filterOption={false}
+      value={selected}
       onSearch={handleSearch}
       onSelect={handleSelect}
       options={options}

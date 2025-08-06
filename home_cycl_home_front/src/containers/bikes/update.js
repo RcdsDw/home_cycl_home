@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Form, Input, Button, Col, Row, message, Card, Select } from 'antd';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { Form, Input, Button, Col, Row, message, Card, Select } from "antd";
 
-import { getBikeById, updateBike } from '../../actions/bikes';
-import { getUserById } from '../../actions/user';
-import SelectUser from '../../utils/SelectUser';
-import SelectBrandModel from '../../utils/SelectBrandModel';
-import { parseID } from '../../utils/ParseID';
+import { getBikeById, updateBike } from "../../actions/bikes";
+import { getUserById } from "../../actions/user";
+import SelectUser from "../../utils/SelectUser";
+import SelectBrandModel from "../../utils/SelectBrandModel";
+import { parseID } from "../../utils/ParseID";
 
 const { Option } = Select;
 
@@ -20,8 +20,18 @@ export default function UpdateBike() {
   const nav = useNavigate();
   const { bikeId } = useParams();
 
-  const bikeTypes = ['VTT', 'Route', 'Urbain', 'Électrique', 'BMX', 'Gravel', 'Cyclocross', 'Fixie', 'Pliant'];
-  const bikeSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+  const bikeTypes = [
+    "VTT",
+    "Route",
+    "Urbain",
+    "Électrique",
+    "BMX",
+    "Gravel",
+    "Cyclocross",
+    "Fixie",
+    "Pliant",
+  ];
+  const bikeSizes = ["XS", "S", "M", "L", "XL", "XXL"];
 
   useEffect(() => {
     fetchBike();
@@ -33,7 +43,7 @@ export default function UpdateBike() {
       form.setFieldsValue({
         name: bike.name,
         type: bike.type,
-        size: bike.size
+        size: bike.size,
       });
 
       const user = await getUserById(parseID(bike.owner));
@@ -41,7 +51,7 @@ export default function UpdateBike() {
       setSelectedBrand(bike.brand);
       setSelectedModel(bike.model);
     } catch (err) {
-      console.error('Erreur lors du chargement du vélo :', err);
+      console.error("Erreur lors du chargement du vélo :", err);
       message.error("Impossible de charger les données du vélo");
     }
   };
@@ -53,16 +63,16 @@ export default function UpdateBike() {
         name: values.name,
         type: values.type,
         size: values.size,
-        owner: selectedOwner['@id'],
-        brand: selectedBrand['@id'],
-        model: selectedModel['@id'],
+        owner: selectedOwner["@id"],
+        brand: selectedBrand["@id"],
+        model: selectedModel["@id"],
       };
 
       await updateBike(bikeId, bikeData);
-      message.success('Vélo modifié avec succès !');
+      message.success("Vélo modifié avec succès !");
       nav(`/users/show/${parseID(selectedOwner)}`);
     } catch (err) {
-      console.error('Erreur lors de la modification :', err);
+      console.error("Erreur lors de la modification :", err);
       message.error("Erreur lors de la mise à jour du vélo");
     } finally {
       setLoading(false);
@@ -71,7 +81,10 @@ export default function UpdateBike() {
 
   return (
     <>
-      <Button type="primary" onClick={() => nav(`/users/show/${parseID(selectedOwner)}`)}>
+      <Button
+        type="primary"
+        onClick={() => nav(`/users/show/${parseID(selectedOwner)}`)}
+      >
         Retour
       </Button>
       <Card style={styles.card}>
@@ -79,32 +92,50 @@ export default function UpdateBike() {
         <Form form={form} onFinish={onFinish} layout="vertical">
           <Row gutter={16}>
             <Col span={24}>
-              <Form.Item label="Nom du vélo" name="name"
+              <Form.Item
+                label="Nom du vélo"
+                name="name"
                 rules={[
-                  { required: true, message: 'Le nom du vélo est requis' },
-                  { max: 120, message: 'Le nom ne peut pas dépasser 120 caractères' }
-                ]}>
+                  { required: true, message: "Le nom du vélo est requis" },
+                  {
+                    max: 120,
+                    message: "Le nom ne peut pas dépasser 120 caractères",
+                  },
+                ]}
+              >
                 <Input placeholder="Ex: Mon vélo de route" maxLength={120} />
               </Form.Item>
             </Col>
 
             <Col span={12}>
-              <Form.Item label="Type de vélo" name="type"
-                rules={[{ required: true, message: 'Le type de vélo est requis' }]}>
+              <Form.Item
+                label="Type de vélo"
+                name="type"
+                rules={[
+                  { required: true, message: "Le type de vélo est requis" },
+                ]}
+              >
                 <Select placeholder="Sélectionner un type">
-                  {bikeTypes.map(type => (
-                    <Option key={type} value={type}>{type}</Option>
+                  {bikeTypes.map((type) => (
+                    <Option key={type} value={type}>
+                      {type}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
             </Col>
 
             <Col span={12}>
-              <Form.Item label="Taille" name="size"
-                rules={[{ required: true, message: 'La taille est requise' }]}>
+              <Form.Item
+                label="Taille"
+                name="size"
+                rules={[{ required: true, message: "La taille est requise" }]}
+              >
                 <Select placeholder="Sélectionner une taille">
-                  {bikeSizes.map(size => (
-                    <Option key={size} value={size}>{size}</Option>
+                  {bikeSizes.map((size) => (
+                    <Option key={size} value={size}>
+                      {size}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -133,11 +164,7 @@ export default function UpdateBike() {
 
             <Col span={24}>
               <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={loading}
-                >
+                <Button type="primary" htmlType="submit" loading={loading}>
                   Mettre à jour le vélo
                 </Button>
               </Form.Item>
@@ -152,25 +179,25 @@ export default function UpdateBike() {
 const styles = {
   card: {
     maxWidth: 800,
-    margin: '0 auto',
-    padding: '30px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    margin: "0 auto",
+    padding: "30px",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
   },
   title: {
-    textAlign: 'center',
-    marginBottom: '30px',
-    color: '#000000ff',
+    textAlign: "center",
+    marginBottom: "30px",
+    color: "#000000ff",
   },
   formItem: {
     marginBottom: 20,
   },
   submitContainer: {
     marginTop: 30,
-    textAlign: 'center',
+    textAlign: "center",
   },
   button: {
-    width: '100%',
-    height: '45px',
-    fontSize: '16px',
+    width: "100%",
+    height: "45px",
+    fontSize: "16px",
   },
 };

@@ -9,11 +9,10 @@ export default function Login() {
   );
 }
 
-
 const styles = {
   card: {
     maxWidth: 600,
     margin: "auto",
-    marginTop: "200px"
-  }
-}
+    marginTop: "200px",
+  },
+};

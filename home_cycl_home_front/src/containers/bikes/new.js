@@ -1,13 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import React, { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 
-import { Form, Input, Button, Col, Row, message, Card, Select } from 'antd';
+import { Form, Input, Button, Col, Row, message, Card, Select } from "antd";
 
-import { createBike } from '../../actions/bikes';
-import { getUserById } from '../../actions/user';
-import SelectUser from '../../utils/SelectUser';
-import SelectBrandModel from '../../utils/SelectBrandModel';
-import { parseID } from '../../utils/ParseID';
+import { createBike } from "../../actions/bikes";
+import { getUserById } from "../../actions/user";
+import SelectUser from "../../utils/SelectUser";
+import SelectBrandModel from "../../utils/SelectBrandModel";
 
 const { Option } = Select;
 
@@ -33,30 +32,40 @@ export default function NewBike() {
       const user = await getUserById(id);
       setSelectedOwner(user);
     } catch (error) {
-      console.error('Erreur lors de la récupération de l\'utilisateur:', error);
+      console.error("Erreur lors de la récupération de l'utilisateur:", error);
     }
   };
 
-  const bikeTypes = ['VTT', 'Route', 'Urbain', 'Électrique', 'BMX', 'Gravel', 'Cyclocross', 'Fixie', 'Pliant'];
-  const bikeSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
+  const bikeTypes = [
+    "VTT",
+    "Route",
+    "Urbain",
+    "Électrique",
+    "BMX",
+    "Gravel",
+    "Cyclocross",
+    "Fixie",
+    "Pliant",
+  ];
+  const bikeSizes = ["XS", "S", "M", "L", "XL", "XXL"];
 
   const onFinish = async (values) => {
     setLoading(true);
 
     if (!selectedOwner) {
-      message.error('Veuillez sélectionner un propriétaire');
+      message.error("Veuillez sélectionner un propriétaire");
       setLoading(false);
       return;
     }
 
     if (!selectedBrand) {
-      message.error('Veuillez sélectionner une marque');
+      message.error("Veuillez sélectionner une marque");
       setLoading(false);
       return;
     }
 
     if (!selectedModel) {
-      message.error('Veuillez sélectionner un modèle');
+      message.error("Veuillez sélectionner un modèle");
       setLoading(false);
       return;
     }
@@ -65,9 +74,9 @@ export default function NewBike() {
       name: values.name,
       size: values.size,
       type: values.type,
-      owner: selectedOwner['@id'],
-      brand: selectedBrand['@id'],
-      model: selectedModel['@id'],
+      owner: selectedOwner["@id"],
+      brand: selectedBrand["@id"],
+      model: selectedModel["@id"],
     };
 
     try {
@@ -78,14 +87,15 @@ export default function NewBike() {
       setSelectedBrand(null);
       setSelectedModel(null);
 
-      message.success('Vélo créé avec succès !');
+      message.success("Vélo créé avec succès !");
       if (ownerId) {
         nav(`/users/show/${ownerId}`);
+      } else {
+        nav(`/users`);
       }
-      nav(`/users`);
     } catch (err) {
-      console.error('Erreur lors de la création du vélo:', err);
-      message.error('Erreur lors de la création du vélo.');
+      console.error("Erreur lors de la création du vélo:", err);
+      message.error("Erreur lors de la création du vélo.");
     } finally {
       setLoading(false);
     }
@@ -106,14 +116,14 @@ export default function NewBike() {
                 label="Nom du vélo"
                 name="name"
                 rules={[
-                  { required: true, message: 'Le nom du vélo est requis' },
-                  { max: 120, message: 'Le nom ne peut pas dépasser 120 caractères' }
+                  { required: true, message: "Le nom du vélo est requis" },
+                  {
+                    max: 120,
+                    message: "Le nom ne peut pas dépasser 120 caractères",
+                  },
                 ]}
               >
-                <Input
-                  placeholder="Ex: Mon vélo de route"
-                  maxLength={120}
-                />
+                <Input placeholder="Ex: Mon vélo de route" maxLength={120} />
               </Form.Item>
             </Col>
 
@@ -122,12 +132,14 @@ export default function NewBike() {
                 label="Type de vélo"
                 name="type"
                 rules={[
-                  { required: true, message: 'Le type de vélo est requis' }
+                  { required: true, message: "Le type de vélo est requis" },
                 ]}
               >
                 <Select placeholder="Sélectionner un type">
-                  {bikeTypes.map(type => (
-                    <Option key={type} value={type}>{type}</Option>
+                  {bikeTypes.map((type) => (
+                    <Option key={type} value={type}>
+                      {type}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -137,23 +149,20 @@ export default function NewBike() {
               <Form.Item
                 label="Taille"
                 name="size"
-                rules={[
-                  { required: true, message: 'La taille est requise' }
-                ]}
+                rules={[{ required: true, message: "La taille est requise" }]}
               >
                 <Select placeholder="Sélectionner une taille">
-                  {bikeSizes.map(size => (
-                    <Option key={size} value={size}>{size}</Option>
+                  {bikeSizes.map((size) => (
+                    <Option key={size} value={size}>
+                      {size}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
             </Col>
 
             <Col span={24}>
-              <Form.Item
-                label="Propriétaire"
-                required
-              >
+              <Form.Item label="Propriétaire" required>
                 <SelectUser
                   onShowUser={true}
                   selectedUser={selectedOwner}
@@ -163,10 +172,7 @@ export default function NewBike() {
             </Col>
 
             <Col span={24}>
-              <Form.Item
-                label="Marque"
-                required
-              >
+              <Form.Item label="Marque" required>
                 <SelectBrandModel
                   selectedBrand={selectedBrand}
                   setSelectedBrand={setSelectedBrand}
@@ -178,11 +184,7 @@ export default function NewBike() {
 
             <Col span={24}>
               <Form.Item>
-                <Button
-                  type="primary"
-                  htmlType="submit"
-                  loading={loading}
-                >
+                <Button type="primary" htmlType="submit" loading={loading}>
                   Créer le vélo
                 </Button>
               </Form.Item>
@@ -197,13 +199,13 @@ export default function NewBike() {
 const styles = {
   card: {
     maxWidth: 800,
-    margin: '0 auto',
-    padding: '30px',
-    boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+    margin: "0 auto",
+    padding: "30px",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
   },
   title: {
-    textAlign: 'center',
-    marginBottom: '30px',
-    color: '#000000ff',
+    textAlign: "center",
+    marginBottom: "30px",
+    color: "#000000ff",
   },
 };

@@ -1,8 +1,11 @@
 import { useNavigate } from "react-router-dom";
-import { DeleteOutlined, EditOutlined } from '@ant-design/icons';
+import { DeleteOutlined, EditOutlined } from "@ant-design/icons";
 import { Button, Empty, message, Modal, Spin, Table, Tag } from "antd";
 import { useEffect, useState } from "react";
-import { deleteTypeIntervention, getTypeInterventions } from "../../actions/typesIntervention";
+import {
+  deleteTypeIntervention,
+  getTypeInterventions,
+} from "../../actions/typesIntervention";
 import { DurationDisplay } from "../../utils/ParseDuration";
 import { parseID } from "../../utils/ParseID";
 
@@ -23,7 +26,10 @@ export default function TypeInterventions() {
       const res = await getTypeInterventions();
       setTypeInterventions(res.member);
     } catch (error) {
-      console.error("Erreur lors de la récupération des types d'interventions :", error);
+      console.error(
+        "Erreur lors de la récupération des types d'interventions :",
+        error,
+      );
     } finally {
       setLoading(false);
     }
@@ -48,20 +54,22 @@ export default function TypeInterventions() {
 
   const handleDelete = (id) => {
     deleteTypeIntervention(id);
-    setTypeInterventions((prevDatas) => prevDatas.filter((typeIntervention) => parseID(typeIntervention) !== id));
+    setTypeInterventions((prevDatas) =>
+      prevDatas.filter((typeIntervention) => parseID(typeIntervention) !== id),
+    );
   };
 
   const columns = [
     {
-      title: 'Nom',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Nom",
+      dataIndex: "name",
+      key: "name",
       render: (text) => <div>{text}</div>,
     },
     {
-      title: 'Prix',
-      dataIndex: 'price',
-      key: 'price',
+      title: "Prix",
+      dataIndex: "price",
+      key: "price",
       render: (text) => (
         <Tag color={"geekblue"} key={text}>
           {text} €
@@ -69,25 +77,34 @@ export default function TypeInterventions() {
       ),
     },
     {
-      title: 'Durée',
-      dataIndex: 'duration',
-      key: 'duration',
+      title: "Durée",
+      dataIndex: "duration",
+      key: "duration",
       render: (text) => <DurationDisplay seconds={text} />,
     },
     {
-      key: 'edit',
-      dataIndex: 'edit',
+      key: "edit",
+      dataIndex: "edit",
+      align: "right",
       render: (_, column) => (
-        <Button type="primary" onClick={() => nav(`/type_intervention/edit/${parseID(column)}`)}>
+        <Button
+          type="primary"
+          onClick={() => nav(`/type_intervention/edit/${parseID(column)}`)}
+        >
           <EditOutlined />
         </Button>
       ),
     },
     {
-      key: 'delete',
-      dataIndex: 'delete',
+      key: "delete",
+      dataIndex: "delete",
+      align: "right",
       render: (_, column) => (
-        <Button type="primary" danger onClick={() => showModal(parseID(column))}>
+        <Button
+          type="primary"
+          danger
+          onClick={() => showModal(parseID(column))}
+        >
           <DeleteOutlined />
         </Button>
       ),
@@ -100,12 +117,20 @@ export default function TypeInterventions() {
 
   return (
     <>
-      <Button type="primary" style={styles.button} onClick={() => nav('/type_intervention/new')}>
+      <Button
+        type="primary"
+        style={styles.button}
+        onClick={() => nav("/type_intervention/new")}
+      >
         Ajouter
       </Button>
-      <Table columns={columns} dataSource={typeInterventions} locale={{
-        emptyText: <Empty description="Aucun type d'intervention trouvé" />,
-      }} />
+      <Table
+        columns={columns}
+        dataSource={typeInterventions}
+        locale={{
+          emptyText: <Empty description="Aucun type d'intervention trouvé" />,
+        }}
+      />
       <Modal
         okType="danger"
         okText="Valider"
@@ -121,8 +146,8 @@ export default function TypeInterventions() {
 
 const styles = {
   spinner: {
-    display: 'block',
-    margin: '100px auto',
+    display: "block",
+    margin: "100px auto",
   },
   button: {
     marginBottom: 20,

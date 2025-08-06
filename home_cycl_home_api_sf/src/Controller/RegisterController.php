@@ -38,7 +38,7 @@ class RegisterController
         $user->setLastname($data['lastname']);
         $user->setNumber($data['number']);
         $user->setAddress($data['address']);
-        $user->setRoles($data['role'] ?? ['ROLE_USER']);
+        $user->setRoles($data['roles'] ?? 'ROLE_USER');
 
         $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
         $user->setPassword($hashedPassword);

@@ -1,43 +1,42 @@
 const API_URL = process.env.REACT_APP_API_URL;
 
-async function api(method, endpoint, payload = null, token = true) {
-    const headers = {
-        'Content-Type': 'application/ld+json',
-        ...(token && { 'Authorization': `Bearer ${localStorage.getItem('token')}` }),
-    };
+async function api(method, endpoint, payload, token) {
+  const headers = {
+    "Content-Type": "application/ld+json",
+    ...(token && { Authorization: `Bearer ${localStorage.getItem("token")}` }),
+  };
 
-    const options = {
-        method: method.toUpperCase(),
-        headers,
-    };
+  const options = {
+    method: method.toUpperCase(),
+    headers,
+  };
 
-    if (!['GET', 'DELETE'].includes(method.toUpperCase()) && payload !== null) {
-        options.body = JSON.stringify(payload);
+  if (!["GET", "DELETE"].includes(method.toUpperCase()) && payload !== null) {
+    options.body = JSON.stringify(payload);
+  }
+
+  try {
+    const response = await fetch(`${API_URL}${endpoint}`, options);
+    let data = null;
+    if (response.status !== 204) {
+      try {
+        data = await response.json();
+      } catch (parseError) {
+        data = null;
+      }
     }
 
-    try {
-        const response = await fetch(`${API_URL}${endpoint}`, options);
-        let data = null;
-        if (response.status !== 204) {
-            try {
-                data = await response.json();
-            } catch (parseError) {
-                data = null;
-            }
-        }
-
-        if (!response.ok) {
-            console.log("🚀 ~ api ~ data:", data)
-            const error = new Error(data?.message || 'Erreur serveur');
-            error.status = response.status;
-            error.details = data;
-            throw error;
-        }
-
-        return data;
-    } catch (err) {
-        throw err;
+    if (!response.ok) {
+      const error = new Error(data?.message || "Erreur serveur");
+      error.status = response.status;
+      error.details = data;
+      throw error;
     }
+
+    return data;
+  } catch (err) {
+    throw err;
+  }
 }
 
 /**
@@ -46,7 +45,7 @@ async function api(method, endpoint, payload = null, token = true) {
  * @param {boolean} token - default = true
  */
 export function getReq(endpoint, token = true) {
-    return api("GET", endpoint, null, token);
+  return api("GET", endpoint, null, token);
 }
 /**
  * @param {string} method - "POST"
@@ -55,7 +54,7 @@ export function getReq(endpoint, token = true) {
  * @param {boolean} token - default = true
  */
 export function postReq(endpoint, payload, token = true) {
-    return api("POST", endpoint, payload, token);
+  return api("POST", endpoint, payload, token);
 }
 /**
  * @param {string} method - "PATCH"
@@ -64,7 +63,7 @@ export function postReq(endpoint, payload, token = true) {
  * @param {boolean} token - default = true
  */
 export function patchReq(endpoint, payload, token = true) {
-    return api("PATCH", endpoint, payload, token);
+  return api("PATCH", endpoint, payload, token);
 }
 /**
  * @param {string} method - "PUT"
@@ -73,7 +72,7 @@ export function patchReq(endpoint, payload, token = true) {
  * @param {boolean} token - default = true
  */
 export function putReq(endpoint, payload, token = true) {
-    return api("PUT", endpoint, payload, token);
+  return api("PUT", endpoint, payload, token);
 }
 /**
  * @param {string} method - "DELETE"
@@ -81,5 +80,5 @@ export function putReq(endpoint, payload, token = true) {
  * @param {boolean} token - default = true
  */
 export function deleteReq(endpoint, token = true) {
-    return api("DELETE", endpoint, null, token);
+  return api("DELETE", endpoint, null, token);
 }
