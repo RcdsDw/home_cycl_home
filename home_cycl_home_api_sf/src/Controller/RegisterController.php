@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\User;
+use App\Entity\Zone;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -23,13 +24,18 @@ class RegisterController
     {
         $data = json_decode($request->getContent(), true);
 
-        if (!isset($data['email'], $data['password'], $data['firstname'], $data['lastname'], $data['number'], $data['address'])) {
+        if (!isset($data['email'], $data['password'], $data['firstname'], $data['lastname'], $data['number'], $data['address'], $data['zone_id'])) {
             return new JsonResponse(['error' => 'Missing parameters'], 400);
         }
 
         $existingUser = $this->em->getRepository(User::class)->findOneBy(['email' => $data['email']]);
         if ($existingUser) {
             return new JsonResponse(['error' => 'Email already used'], 400);
+        }
+
+        $zone = $this->em->getRepository(Zone::class)->find($data['zone_id']);
+        if (!$zone) {
+            return new JsonResponse(['error' => 'Zone not found'], 404);
         }
 
         $user = new User();
@@ -39,6 +45,7 @@ class RegisterController
         $user->setNumber($data['number']);
         $user->setAddress($data['address']);
         $user->setRoles($data['roles'] ?? 'ROLE_USER');
+        $user->setClientZone($zone);
 
         $hashedPassword = $this->passwordHasher->hashPassword($user, $data['password']);
         $user->setPassword($hashedPassword);

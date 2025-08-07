@@ -1,12 +1,12 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useNavigate, useParams } from "react-router-dom";
-import { Button, Card, Form, Input, Select, message } from "antd";
-import { getUserById, updateUser } from "../../actions/user";
 import { useEffect, useState } from "react";
-import AddressSearch from "../../utils/AddressSearch";
+import { useNavigate, useParams } from "react-router-dom";
+
+import { Button, Card, Form, Input, Select, message } from "antd";
+
+import { getUserById, updateUser } from "../../actions/user";
 
 export default function EditUser() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const { id } = useParams();
   const nav = useNavigate();
@@ -16,9 +16,10 @@ export default function EditUser() {
   }, []);
 
   const fetchUser = async () => {
+    setLoading(true);
     try {
       const res = await getUserById(id);
-      form.setFieldsValue(res.data);
+      form.setFieldsValue(res);
     } catch (error) {
       message.error(
         "Impossible de récupérer les informations de l'utilisateur",
@@ -29,17 +30,17 @@ export default function EditUser() {
   };
 
   const handleUpdate = async (values) => {
+    setLoading(true);
+    values.roles = values.roles[0];
     try {
-      await updateUser(id, values);
+      await updateUser(values, id);
       message.success("Utilisateur mis à jour avec succès !");
-      nav(`/user/show/${id}`);
+      nav(`/users/show/${id}`);
     } catch (error) {
       message.error("Erreur lors de la mise à jour de l'utilisateur");
+    } finally {
+      setLoading(false);
     }
-  };
-
-  const handleAddressSelect = (option) => {
-    form.setFieldsValue({ address: option });
   };
 
   return (
@@ -76,24 +77,42 @@ export default function EditUser() {
 
           <Form.Item
             label="Rôle"
-            name="role"
+            name="roles"
             rules={[
               { required: true, message: "Veuillez sélectionner un rôle" },
             ]}
           >
-            <Select>
-              <Select.Option value="admin">Admin</Select.Option>
-              <Select.Option value="tech">Tech</Select.Option>
-              <Select.Option value="user">Utilisateur</Select.Option>
-            </Select>
+            <Select
+              options={[
+                {
+                  value: "ROLE_ADMIN",
+                  label: "Admin",
+                },
+                {
+                  value: "ROLE_TECH",
+                  label: "Technicien",
+                },
+                {
+                  value: "ROLE_USER",
+                  label: "Utilisateur",
+                },
+              ]}
+            />
           </Form.Item>
 
           <Form.Item
-            label="Adresse"
-            name="address"
-            rules={[{ required: true, message: "Veuillez entrer l'adresse" }]}
+            label="Numéro de téléphone"
+            name="number"
+            rules={[
+              {
+                required: true,
+                min: 10,
+                max: 10,
+                message: "Entrez le numéro de téléphone.",
+              },
+            ]}
           >
-            <AddressSearch onAddressSelect={handleAddressSelect} />
+            <Input type="tel" />
           </Form.Item>
 
           <Form.Item>

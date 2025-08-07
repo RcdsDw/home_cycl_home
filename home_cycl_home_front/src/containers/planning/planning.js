@@ -11,7 +11,7 @@ import { getCurrentUser } from "../../utils/GetCurrentInfo";
 import { parseID } from "../../utils/ParseID";
 
 export default function Planning() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [selectedTechUser, setSelectedTechUser] = useState();
   const [events, setEvents] = useState([]);
 
@@ -20,6 +20,7 @@ export default function Planning() {
   }, [selectedTechUser]);
 
   const fetchData = async () => {
+    setLoading(true);
     try {
       setLoading(true);
 

@@ -10,7 +10,7 @@ import { DurationDisplay } from "../../utils/ParseDuration";
 import { parseID } from "../../utils/ParseID";
 
 export default function TypeInterventions() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [typeInterventions, setTypeInterventions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
@@ -19,9 +19,10 @@ export default function TypeInterventions() {
 
   useEffect(() => {
     fetchTypeInterventions();
-  }, [typeInterventions]);
+  }, []);
 
   const fetchTypeInterventions = async () => {
+    setLoading(true);
     try {
       const res = await getTypeInterventions();
       setTypeInterventions(res.member);

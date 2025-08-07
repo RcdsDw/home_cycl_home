@@ -9,7 +9,7 @@ import TagRoles from "../../utils/TagRoles";
 import { parseID } from "../../utils/ParseID";
 
 export default function Users() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [datas, setDatas] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
@@ -21,10 +21,17 @@ export default function Users() {
   }, []);
 
   const fetchUsers = async () => {
-    await getUsers().then((res) => {
-      setDatas(res.member);
+    setLoading(true);
+    try {
+      await getUsers().then((res) => {
+        setDatas(res.member);
+        setLoading(false);
+      });
+    } catch (err) {
+      console.error(err);
+    } finally {
       setLoading(false);
-    });
+    }
   };
 
   const showModal = (id) => {

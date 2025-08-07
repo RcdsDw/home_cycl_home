@@ -5,10 +5,12 @@ import AddressSearch from "../../utils/AddressSearch";
 import { useNavigate } from "react-router-dom";
 
 export default function RegisterForm() {
+  const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState();
   const [form] = Form.useForm();
   const nav = useNavigate();
   const savedAddress = localStorage.getItem("validatedAddress");
+  const zoneId = localStorage.getItem("zoneId");
 
   useEffect(() => {
     if (!savedAddress) {
@@ -16,6 +18,7 @@ export default function RegisterForm() {
     } else {
       setDisabled(true);
       form.setFieldValue("address", JSON.parse(savedAddress));
+      form.setFieldValue("zone_id", zoneId);
     }
   }, []);
 
@@ -31,19 +34,26 @@ export default function RegisterForm() {
     };
   };
 
-  const onFinish = (values) => {
+  const onFinish = async (values) => {
+    setLoading(true);
+
     if (values?.address) {
       values.address = refactoAddress(values.address);
     }
-    authRegister(values)
-      .then(() => {
+
+    try {
+      await authRegister(values).then(() => {
         message.success(`Enregistré`);
         nav("/auth/login");
         localStorage.removeItem("validatedAddress");
-      })
-      .catch(() => {
-        message.error("Erreur lors de l'enregistrement");
+        localStorage.removeItem("zoneId");
       });
+    } catch (err) {
+      console.error(err);
+      message.error("Erreur lors de l'enregistrement");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -97,6 +107,10 @@ export default function RegisterForm() {
           <AddressSearch disabled={disabled} savedAddress={savedAddress} />
         </Form.Item>
 
+        <Form.Item label="Zone ID" name="zone_id" hidden>
+          <Input />
+        </Form.Item>
+
         <Form.Item
           label="Email"
           name="email"
@@ -138,7 +152,7 @@ export default function RegisterForm() {
         </Form.Item>
 
         <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
-          <Button type="primary" htmlType="submit">
+          <Button type="primary" htmlType="submit" loading={loading}>
             S'enregistrer
           </Button>
         </Form.Item>

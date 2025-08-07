@@ -13,6 +13,7 @@ use ApiPlatform\Metadata\GetCollection;
 use ApiPlatform\Metadata\Get;
 use ApiPlatform\Metadata\Put;
 use ApiPlatform\Metadata\Delete;
+use ApiPlatform\Metadata\Patch;
 use ApiPlatform\OpenApi\Model\Operation;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -46,6 +47,7 @@ use Symfony\Component\Serializer\Attribute\Groups;
             openapi: new Operation(summary: 'Get a user with their bikes by user ID'),
         ),
         new Put(),
+        new Patch(),
         new Delete(),
     ],
     normalizationContext: ['groups' => ['user:read']],

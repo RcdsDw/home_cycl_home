@@ -13,7 +13,7 @@ import { parseID } from "../../utils/ParseID";
 import { DurationDisplay } from "../../utils/ParseDuration";
 
 export default function TableInterventions() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [interventions, setInterventions] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
@@ -25,6 +25,7 @@ export default function TableInterventions() {
   }, []);
 
   const fetchInterventions = async () => {
+    setLoading(true);
     try {
       const res = await getInterventions();
       setInterventions(res.member);

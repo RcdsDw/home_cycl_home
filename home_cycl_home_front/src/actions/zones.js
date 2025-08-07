@@ -5,7 +5,8 @@ export async function createZone(values) {
 }
 
 export async function testAddress(values) {
-  return await postReq("/zones/check", values, false);
+  const res = await postReq("/zones/check", values, false);
+  return res;
 }
 
 export async function updateZone(values, id) {

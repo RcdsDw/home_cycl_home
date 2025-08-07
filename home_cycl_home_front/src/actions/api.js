@@ -1,8 +1,14 @@
 const API_URL = process.env.REACT_APP_API_URL;
 
 async function api(method, endpoint, payload, token) {
+  let contentType = "application/ld+json";
+
+  if (method.toUpperCase() === "PATCH") {
+    contentType = "application/merge-patch+json";
+  }
+
   const headers = {
-    "Content-Type": "application/ld+json",
+    "Content-Type": contentType,
     ...(token && { Authorization: `Bearer ${localStorage.getItem("token")}` }),
   };
 

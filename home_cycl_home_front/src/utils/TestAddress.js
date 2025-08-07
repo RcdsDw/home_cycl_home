@@ -32,6 +32,7 @@ const TestAddress = () => {
                 `);
 
         localStorage.setItem("validatedAddress", JSON.stringify(address));
+        localStorage.setItem("zoneId", res.insideZones[0].id);
         nav("/auth/register");
       } else {
         message.error("Zone non couverte actuellement");
@@ -49,7 +50,6 @@ const TestAddress = () => {
       return;
     }
 
-    setLoading(true);
     try {
       const response = await fetch(
         `https://api-adresse.data.gouv.fr/search/?q=${value}`,
@@ -66,8 +66,6 @@ const TestAddress = () => {
       setOptions(addresses);
     } catch (error) {
       console.error("Erreur lors de la récupération des adresses :", error);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -83,19 +81,29 @@ const TestAddress = () => {
   };
 
   return (
-    <Select
-      showSearch
-      placeholder="Tapez une adresse complète"
-      notFoundContent={loading ? <Spin size="small" /> : "Aucun résultat"}
-      loading={loading}
-      filterOption={false}
-      onSearch={handleSearch}
-      onSelect={handleSelect}
-      options={options}
-      style={{ width: "100%" }}
-      labelInValue
-    />
+    <div style={styles.container}>
+      <Select
+        showSearch
+        placeholder="Tapez une adresse complète"
+        notFoundContent={loading ? <Spin size="small" /> : "Aucun résultat"}
+        filterOption={false}
+        onSearch={handleSearch}
+        onSelect={handleSelect}
+        options={options}
+        style={{ width: "100%" }}
+        labelInValue
+      />
+      {loading && <Spin size="small" />}
+    </div>
   );
+};
+
+const styles = {
+  container: {
+    display: "flex",
+    flexDirection: "column",
+    justifyContent: "center",
+  },
 };
 
 export default TestAddress;

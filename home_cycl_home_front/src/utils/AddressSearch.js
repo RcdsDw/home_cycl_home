@@ -68,6 +68,7 @@ const AddressSearch = ({ onAddressSelect, disabled, savedAddress }) => {
     const selectedOption = options.find((opt) => opt.value === selected.value);
     if (selectedOption) {
       refactoAddress(selectedOption);
+      setSelected(selectedOption);
     }
   };
 

@@ -22,7 +22,7 @@ import TableBikes from "../../components/bikes/table";
 import { parseID } from "../../utils/ParseID";
 
 export default function ShowUser() {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const { id } = useParams();
   const nav = useNavigate();
@@ -32,6 +32,7 @@ export default function ShowUser() {
   }, []);
 
   const fetchUser = async () => {
+    setLoading(true);
     try {
       const res = await getUserById(id);
       setUser(res);

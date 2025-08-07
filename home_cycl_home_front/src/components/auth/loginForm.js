@@ -4,7 +4,7 @@ import { authLogin } from "../../actions/auth";
 import { useNavigate } from "react-router-dom";
 
 export default function LoginForm() {
-  const [loading, setLoading] = useState();
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
   const nav = useNavigate();
 

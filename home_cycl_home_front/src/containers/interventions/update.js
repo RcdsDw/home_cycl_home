@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
-import { Form, Input, Button, Col, Row, message, Card } from "antd";
+import { Form, Input, Button, message, Card } from "antd";
 import { parseID } from "../../utils/ParseID";
 
 import {
@@ -103,73 +103,63 @@ export default function EditIntervention() {
   return (
     <>
       <Button type="primary" onClick={() => nav(`/interventions/show/${id}`)}>
-        Retour à la liste
+        Retour
       </Button>
       <Card style={styles.card}>
-        <h2 style={styles.title}>Nouvelle intervention</h2>
+        <h2 style={styles.title}>Modifier l'intervention</h2>
         <Form form={form} onFinish={onFinish} layout="vertical">
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item
-                label="Type de vélo"
-                name="bike"
-                rules={[
-                  {
-                    required: true,
-                    message: "Veuillez choisir un type de vélo",
-                  },
-                ]}
-              >
-                <SelectBikes
-                  selectedBike={selectedBike}
-                  setSelectedBike={setSelectedBike}
-                  clientId={
-                    intervention && parseID(intervention?.clientBike?.owner)
-                  }
-                />
-              </Form.Item>
-            </Col>
+          <Form.Item
+            label="Type de vélo"
+            name="bike"
+            rules={[
+              {
+                required: true,
+                message: "Veuillez choisir un type de vélo",
+              },
+            ]}
+          >
+            <SelectBikes
+              selectedBike={selectedBike}
+              setSelectedBike={setSelectedBike}
+              clientId={
+                intervention && parseID(intervention?.clientBike?.owner)
+              }
+            />
+          </Form.Item>
 
-            <Col span={24}>
-              <Form.Item
-                label="Service"
-                name="service"
-                rules={[
-                  {
-                    required: true,
-                    message: "Veuillez choisir un type de service",
-                  },
-                ]}
-              >
-                <SelectTypeIntervention
-                  selectedTypeIntervention={selectedTypeIntervention}
-                  setSelectedTypeIntervention={setSelectedTypeIntervention}
-                />
-              </Form.Item>
-            </Col>
+          <Form.Item
+            label="Service"
+            name="service"
+            rules={[
+              {
+                required: true,
+                message: "Veuillez choisir un type de service",
+              },
+            ]}
+          >
+            <SelectTypeIntervention
+              selectedTypeIntervention={selectedTypeIntervention}
+              setSelectedTypeIntervention={setSelectedTypeIntervention}
+            />
+          </Form.Item>
 
-            <Col span={24}>
-              <label>Technicien</label>
-              <div style={{ marginLeft: -5 }}>
-                <SelectTech
-                  selectedTechUser={selectedTechUser}
-                  setSelectedTechUser={setSelectedTechUser}
-                />
-              </div>
-            </Col>
+          <Form.Item label="Technicien" name="technician" required>
+            <SelectTech
+              isDisabled={true}
+              selectedTechUser={selectedTechUser}
+              setSelectedTechUser={setSelectedTechUser}
+            />
+          </Form.Item>
 
-            <Col span={24}>
-              <Form.Item label="Prix total">
-                <Input value={`${price} €`} disabled />
-              </Form.Item>
-            </Col>
+          <Form.Item label="Prix total">
+            <Input value={`${price} €`} disabled />
+          </Form.Item>
 
-            <Form.Item>
-              <Button type="primary" htmlType="submit" loading={loading}>
-                Valider
-              </Button>
-            </Form.Item>
-          </Row>
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              Valider
+            </Button>
+          </Form.Item>
         </Form>
       </Card>
     </>

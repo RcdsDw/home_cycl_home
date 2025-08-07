@@ -10,20 +10,22 @@ export default function SelectBikes({
   setSelectedBike,
   clientId,
 }) {
-  const [bikes, setBikes] = useState([]);
+  const [loading, setLoading] = useState([]);
+  const [bikes, setBikes] = useState(false);
 
   useEffect(() => {
-    if (clientId) {
-      fetchBikes();
-    }
+    fetchBikes();
   }, []);
 
   const fetchBikes = async () => {
+    setLoading(true);
     try {
       const res = await getUsersBikes(clientId);
       setBikes(res.bikes);
     } catch (error) {
       console.error("Erreur lors de la récupération des techniciens", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -39,11 +41,8 @@ export default function SelectBikes({
       allowClear
       style={{ width: "100%", margin: "5px" }}
       placeholder="Sélectionnez un de vos vélos"
+      loading={loading}
     >
-      <Option disabled value={null}>
-        Sélectionnez un de vos vélos
-      </Option>
-
       {bikes &&
         bikes.map((bike) => (
           <Option key={parseID(bike)} value={parseID(bike)}>

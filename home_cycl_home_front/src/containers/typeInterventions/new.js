@@ -7,9 +7,7 @@ import { createTypeIntervention } from "../../actions/typesIntervention";
 
 export default function NewTypeInterventions() {
   const [loading, setLoading] = useState(false);
-
   const [form] = Form.useForm();
-
   const nav = useNavigate();
 
   const onFinish = async (values) => {

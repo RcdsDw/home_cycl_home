@@ -4,49 +4,33 @@ import { Button, Form, Input, Card, message, Select } from "antd";
 
 import AddressSearch from "../../utils/AddressSearch";
 import { useState } from "react";
+import { createUser } from "../../actions/user";
+import { parseID } from "../../utils/ParseID";
 
 export default function NewUser() {
-  const [loading, setLoading] = useState();
-  const nav = useNavigate();
+  const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
-
-  const refactoAddress = (address) => {
-    return {
-      street: address.data?.name,
-      city: address.data?.city,
-      code: address.data?.citycode,
-      coords: {
-        lat: address.geo?.coordinates[1],
-        lng: address.geo?.coordinates[0],
-      },
-    };
-  };
+  const nav = useNavigate();
 
   const onFinishRegister = async (values) => {
     setLoading(true);
 
-    if (values?.address) {
-      values.address = refactoAddress(values.address);
+    values.address = form.getFieldValue("address");
+
+    try {
+      await createUser(values).then((res) => {
+        message.success(`Nouvel utilisateur créé`);
+        nav(`/users/show/${parseID(res)}`);
+      });
+    } catch (err) {
+      if (err.status === 409) {
+        message.error("Cette adresse email est déjà utilisée.");
+      } else {
+        message.error("Erreur lors de la création.");
+      }
+    } finally {
+      setLoading(false);
     }
-
-    // try {
-    //   await createUser(values).then((res) => {
-    //     message.success(`Nouvel utilisateur créé`);
-    //     nav(`/users/show/${parseID(res)}`);
-    //   })
-    // } catch (err) {
-    //   if (err.status === 409) {
-    //     message.error("Cette adresse email est déjà utilisée.");
-    //   } else {
-    //     message.error("Erreur lors de la création.");
-    //   }
-    // } finally {
-    //   setLoading(false)
-    // }
-  };
-
-  const onFinishFailed = (info) => {
-    message.error(`Erreur lors de ${info}`);
   };
 
   return (
@@ -60,15 +44,7 @@ export default function NewUser() {
       </Button>
       <Card style={styles.card}>
         <h2 style={styles.title}>Nouvel utilisateur</h2>
-        <Form
-          form={form}
-          name="newUser"
-          labelCol={{ span: 8 }}
-          wrapperCol={{ span: 16 }}
-          onFinish={onFinishRegister}
-          onFinishFailed={() => onFinishFailed("la création")}
-          autoComplete="off"
-        >
+        <Form form={form} onFinish={onFinishRegister} layout="vertical">
           <Form.Item
             label="Prénom"
             name="firstname"

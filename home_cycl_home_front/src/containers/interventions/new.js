@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
 
-import { Form, Input, Button, Col, Row, message, Card } from "antd";
+import { Form, Input, Button, message, Card } from "antd";
 import { parseID } from "../../utils/ParseID";
 
 import { getCurrentUser } from "../../utils/GetCurrentInfo";
@@ -39,12 +39,8 @@ export default function NewIntervention() {
   }, []);
 
   useEffect(() => {
-    calculateTotalPrice();
-  }, [selectedTypeIntervention]);
-
-  const calculateTotalPrice = () => {
     setPrice(selectedTypeIntervention?.price);
-  };
+  }, [selectedTypeIntervention]);
 
   const onFinish = async (values) => {
     setLoading(true);
@@ -71,7 +67,7 @@ export default function NewIntervention() {
     const interventionData = {
       start_date: values.start_date || dayjs(),
       end_date: values.end_date || dayjs(),
-      comment: values.comment || "",
+      comment: values.comment,
       clientBike: selectedBike["@id"],
       technician: selectedTechUser["@id"],
       typeIntervention: selectedTypeIntervention["@id"],
@@ -134,79 +130,62 @@ export default function NewIntervention() {
         Retour à la liste
       </Button>
       <Card style={styles.card}>
-        <h2 style={styles.title}>Nouvel utilisateur</h2>
+        <h2 style={styles.title}>Nouvelle intervention</h2>
         <Form form={form} onFinish={onFinish} layout="vertical">
-          <Row gutter={16}>
-            {selectedClient && (
-              <Col span={24}>
-                <Form.Item label="Vélo" name="bike" required>
-                  <SelectBikes
-                    selectedBike={selectedBike}
-                    setSelectedBike={setSelectedBike}
-                    clientId={selectedClient.id}
-                  />
-                </Form.Item>
-              </Col>
-            )}
-
-            <Col span={24}>
-              <Form.Item label="Service" name="service" required>
-                <SelectTypeIntervention
-                  selectedTypeIntervention={selectedTypeIntervention}
-                  setSelectedTypeIntervention={setSelectedTypeIntervention}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col span={24}>
-              <Form.Item label="Créneau disponible" name="creneau" required>
-                <SelectDate
-                  form={form}
-                  selectedTypeIntervention={selectedTypeIntervention}
-                />
-              </Form.Item>
-
-              <Form.Item name="start_date" hidden>
-                <Input />
-              </Form.Item>
-
-              <Form.Item name="end_date" hidden>
-                <Input />
-              </Form.Item>
-            </Col>
-
-            <Col span={24}>
-              <Form.Item label="Technicien" name="technician" required>
-                <SelectTech
-                  isDisabled={isDisabled}
-                  selectedTechUser={selectedTechUser}
-                  required
-                  setSelectedTechUser={setSelectedTechUser}
-                />
-              </Form.Item>
-            </Col>
-
-            <Col span={24}>
-              <Form.Item label="Commentaires" name="comments">
-                <Input type="text" />
-              </Form.Item>
-            </Col>
-
-            <Col span={24}>
-              <Form.Item label="Prix total">
-                <Input
-                  value={price ? `${price} €` : "Non disponible"}
-                  disabled
-                />
-              </Form.Item>
-            </Col>
-
-            <Form.Item>
-              <Button type="primary" htmlType="submit" loading={loading}>
-                Valider
-              </Button>
+          {selectedClient && (
+            <Form.Item label="Vélo" name="bike" required>
+              <SelectBikes
+                selectedBike={selectedBike}
+                setSelectedBike={setSelectedBike}
+                clientId={selectedClient.id}
+              />
             </Form.Item>
-          </Row>
+          )}
+
+          <Form.Item label="Service" name="service" required>
+            <SelectTypeIntervention
+              selectedTypeIntervention={selectedTypeIntervention}
+              setSelectedTypeIntervention={setSelectedTypeIntervention}
+            />
+          </Form.Item>
+
+          <Form.Item label="Créneau disponible" name="creneau" required>
+            <SelectDate
+              form={form}
+              selectedTypeIntervention={selectedTypeIntervention}
+            />
+          </Form.Item>
+
+          <Form.Item name="start_date" hidden>
+            <Input />
+          </Form.Item>
+
+          <Form.Item name="end_date" hidden>
+            <Input />
+          </Form.Item>
+
+          <Form.Item label="Technicien" name="technician" required>
+            <SelectTech
+              isDisabled={isDisabled}
+              selectedTechUser={selectedTechUser}
+              required
+              setSelectedTechUser={setSelectedTechUser}
+            />
+          </Form.Item>
+
+          <Form.Item label="Commentaires" name="comments">
+            <Input type="text" />
+          </Form.Item>
+
+          <Form.Item label="Prix total">
+            <Input value={price ? `${price} €` : "Non disponible"} disabled />
+          </Form.Item>
+
+          <Form.Item>
+            <Button type="primary" htmlType="submit" loading={loading}>
+              Valider
+            </Button>
+          </Form.Item>
         </Form>
       </Card>
     </>

@@ -9,7 +9,7 @@ import { deleteBike, getBikes } from "../../actions/bikes";
 import { parseID } from "../../utils/ParseID";
 
 export default function TableBikes({ id }) {
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [bikes, setBikes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentId, setCurrentId] = useState(null);
@@ -21,6 +21,7 @@ export default function TableBikes({ id }) {
   }, []);
 
   const fetchBikes = async () => {
+    setLoading(true);
     try {
       const res = await getBikes();
       const filtered = res.member.filter((bike) => parseID(bike.owner) === id);
