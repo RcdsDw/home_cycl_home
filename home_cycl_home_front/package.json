@@ -8,9 +8,6 @@
     "@fullcalendar/interaction": "^6.1.15",
     "@fullcalendar/react": "^6.1.15",
     "@fullcalendar/timegrid": "^6.1.15",
-    "@testing-library/jest-dom": "^5.17.0",
-    "@testing-library/react": "^13.4.0",
-    "@testing-library/user-event": "^13.5.0",
     "antd": "^5.21.6",
     "dayjs": "^1.11.13",
     "leaflet": "^1.9.4",
@@ -29,7 +26,9 @@
     "lint": "eslint src/**/*.{js,jsx,ts,tsx} --max-warnings=0",
     "prettier": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,md}'",
     "prettier:check": "prettier --check 'src/**/*.{js,jsx,ts,tsx,json,css,md}'",
-    "test": "npm run lint && npm run prettier:check",
+    "check": "npm run lint && npm run prettier:check",
+    "test": "react-scripts test --watchAll=false",
+    "test:ci": "react-scripts test --watchAll=false --passWithNoTests",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
@@ -63,6 +62,11 @@
     ]
   },
   "devDependencies": {
+    "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
+    "@testing-library/jest-dom": "^6.6.4",
+    "@testing-library/react": "^16.3.0",
+    "@testing-library/user-event": "^14.6.1",
+    "jest": "^27.5.1",
     "prettier": "^3.6.2"
   }
 }
