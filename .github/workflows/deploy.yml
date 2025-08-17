@@ -23,91 +23,60 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Create project directory and sync files
+      - name: Update project via Git
         run: |
-          # Créer le dossier de destination s'il n'existe pas
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "mkdir -p /home/${{ secrets.VPS_USER }}/home_cycl_home"
-          
-          # Synchroniser seulement dans le dossier du projet
-          rsync -avz --delete \
-            --exclude='.git/' \
-            --exclude='node_modules/' \
-            --exclude='*.log' \
-            --exclude='.env' \
-            --exclude='.env.local' \
-            ./ ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/home/${{ secrets.VPS_USER }}/home_cycl_home/
-
-      - name: Deploy to VPS
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
-            set -e  # Arrêter le script si une commande échoue
-            
-            mkdir -p "/home/${{ secrets.VPS_USER }}/backups"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << EOF
+            echo "Mise à jour du code..."
             cd /home/${{ secrets.VPS_USER }}/home_cycl_home
-            
-            echo "🔄 Début du déploiement..."
-            
-            # Backup de l'ancienne version
-            BACKUP_NAME="backup_$(date +%Y%m%d_%H%M%S)"
-            if [ -d "../backups/$BACKUP_NAME" ]; then
-              rm -rf "../backups/$BACKUP_NAME"
-            fi
-            cp -r . "../backups/$BACKUP_NAME" || echo "⚠️  Backup échoué, mais on continue"
-            
-            # Arrêt des services existants
-            echo "🛑 Arrêt des containers Docker..."
-            docker compose down || echo "Aucun container à arrêter"
-            
-            # Libération du port si occupé
-            sudo fuser -k 82/tcp || true
-            
-            # Build avec timeout pour éviter les blocages comme précédemment
-            echo "🐳 Construction des containers..."
-            if ! timeout 600 docker compose build --parallel; then
-              echo "⚠️ Build timeout après 10min - tentative avec cache"
-              docker compose up -d --remove-orphans || {
-                echo "❌ Échec total - restauration du backup si possible"
-                exit 1
-              }
-            else
-              echo "✅ Build réussi - démarrage des containers"
-              docker compose up -d --remove-orphans
-            fi
-            
-            # Attendre que les containers soient prêts
-            sleep 10
-            
-             # Installation des dépendances PHP (sécurité)
-            echo "📦 Vérification des dépendances PHP..."
-            docker compose exec -T backend composer install --no-interaction --optimize-autoloader
+            git pull origin main
+          EOF
 
-            # Lancer les migrations Doctrine
-            echo "📦 Lancement des migrations Doctrine..."
-            docker compose exec -T backend php bin/console doctrine:migrations:migrate --no-interaction
-            
-            if [ -d "home_cycl_home_front" ]; then
-              echo "🎨 Déploiement du front..."
-              cd home_cycl_home_front
-              
-              # Installation des dépendances si package.json a changé
-              if [ package.json -nt node_modules/.package-lock.json ] || [ ! -d node_modules ]; then
-                echo "📦 Installation des dépendances..."
-                timeout 300 npm install --omit=dev || {
-                  echo "❌ Installation des dépendances échouée"
-                }
-              else
-                echo "📦 Dépendances déjà à jour"
-              fi
-              
-              # Restart avec PM2
-              if pm2 describe front > /dev/null 2>&1; then
-                pm2 restart front
-              else
-                pm2 start npm --name front -- start
-              fi
-              
-              cd ..
+      - name: Deploy backend to VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << EOF
+            cd /home/${{ secrets.VPS_USER }}/home_cycl_home
+
+            mkdir -p "../backups"
+            BACKUP_NAME="backup_$(date +%Y%m%d_%H%M%S)"
+            cp -r . "../backups/$BACKUP_NAME"
+
+            echo "Arrêt des conteneurs existants..."
+            docker compose down
+
+            echo "Vérification de l'utilisation du port 82..."
+            sudo fuser -k 82/tcp
+
+            echo "Build et up des conteneurs..."
+            docker compose up --build -d --remove-orphans
+
+            echo "Attente de 10 secondes..."
+            sleep 10
+
+            echo "Lancement des migrations..."
+            docker compose exec backend php bin/console doctrine:migrations:migrate --no-interaction
+          EOF
+
+      - name: Deploy frontend to VPS
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << EOF
+            cd /home/${{ secrets.VPS_USER }}/home_cycl_home/home_cycl_home_front
+
+            echo "Installation des dépendances front..."
+            npm install --omit=dev --verbose
+
+            echo "Build du front React..."
+            npm run build --verbose
+
+            echo "Lancement avec PM2..."
+            if ! command -v serve &> /dev/null; then
+              npm install -g serve
             fi
-            
-            echo "✅ Déploiement terminé avec succès !"
+
+            if pm2 describe front > /dev/null 2>&1; then
+              pm2 restart front
+            else
+              pm2 start "sh -c 'npx serve -s build -l 4000'" --name front
+            fi
+
+            echo "✅ Front déployé avec succès !"
           EOF
