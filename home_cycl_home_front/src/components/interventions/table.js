@@ -44,11 +44,16 @@ export default function TableInterventions() {
     setIsModalOpen(true);
   };
 
-  const handleOk = () => {
-    handleDelete(currentId);
-    message.success("Intervention supprimée");
-    setCurrentId(null);
-    setIsModalOpen(false);
+  const handleOk = async () => {
+    try {
+      await handleDelete(currentId);
+      message.success("Intervention supprimée");
+    } catch (error) {
+      message.error("Erreur lors de la suppression");
+    } finally {
+      setCurrentId(null);
+      setIsModalOpen(false);
+    }
   };
 
   const handleCancel = () => {
@@ -56,8 +61,8 @@ export default function TableInterventions() {
     setIsModalOpen(false);
   };
 
-  const handleDelete = (id) => {
-    deleteIntervention(id);
+  const handleDelete = async (id) => {
+    await deleteIntervention(id);
     setInterventions((prevDatas) =>
       prevDatas.filter((intervention) => parseID(intervention) !== id),
     );
@@ -137,6 +142,7 @@ export default function TableInterventions() {
         <Button
           type="primary"
           danger
+          aria-label="supprimer intervention"
           onClick={() => showModal(parseID(column))}
         >
           <DeleteOutlined />
@@ -154,6 +160,7 @@ export default function TableInterventions() {
       <Table
         columns={columns}
         dataSource={interventions}
+        rowKey={(record) => record["@id"]}
         locale={{
           emptyText: <Empty description="Aucune intervention trouvée" />,
         }}
@@ -166,6 +173,7 @@ export default function TableInterventions() {
         open={isModalOpen}
         onOk={handleOk}
         onCancel={handleCancel}
+        okButtonProps={{ "data-testid": "confirm-delete" }}
       />
     </>
   );

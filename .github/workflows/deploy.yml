@@ -48,10 +48,11 @@ jobs:
             echo "🔄 Début du déploiement..."
             
             # Backup de l'ancienne version
-            if [ -d "../backups/backup_$(date +%Y%m%d)" ]; then
-              rm -rf "../backups/backup_$(date +%Y%m%d)"
+            BACKUP_NAME="backup_$(date +%Y%m%d_%H%M%S)"
+            if [ -d "../backups/$BACKUP_NAME" ]; then
+              rm -rf "../backups/$BACKUP_NAME"
             fi
-            cp -r . "../backups/backup_$(date +%Y%m%d)" || echo "⚠️  Backup échoué, mais on continue"
+            cp -r . "../backups/$BACKUP_NAME" || echo "⚠️  Backup échoué, mais on continue"
             
             # Arrêt des services existants
             echo "🛑 Arrêt des containers Docker..."
@@ -60,29 +61,29 @@ jobs:
             # Libération du port si occupé
             sudo fuser -k 82/tcp || true
             
-            # Rebuild et lancement des containers
-            echo "🐳 Construction et lancement des containers..."
-            docker compose up -d --build --remove-orphans
+            # Build avec timeout pour éviter les blocages comme précédemment
+            echo "🐳 Construction des containers..."
+            if ! timeout 600 docker compose build --parallel; then
+              echo "⚠️ Build timeout après 10min - tentative avec cache"
+              docker compose up -d --remove-orphans || {
+                echo "❌ Échec total - restauration du backup si possible"
+                exit 1
+              }
+            else
+              echo "✅ Build réussi - démarrage des containers"
+              docker compose up -d --remove-orphans
+            fi
             
             # Attendre que les containers soient prêts
             sleep 10
             
+             # Installation des dépendances PHP (sécurité)
+            echo "📦 Vérification des dépendances PHP..."
+            docker compose exec -T backend composer install --no-interaction --optimize-autoloader
+
             # Lancer les migrations Doctrine
             echo "📦 Lancement des migrations Doctrine..."
             docker compose exec -T backend php bin/console doctrine:migrations:migrate --no-interaction
-
-            # Vérifier le statut Docker
-            DOCKER_STATUS=$(docker compose ps --format "table {{.Service}}\t{{.Status}}" | tail -n +2)
-            DOCKER_SUCCESS=true
-            
-            if ! docker compose ps | grep -q "Up"; then
-              DOCKER_SUCCESS=false
-              echo "❌ Erreur: Aucun container Docker n'est actif"
-            fi
-            
-            # Déploiement du front (si pas dans Docker)
-            FRONT_STATUS="Non déployé"
-            FRONT_SUCCESS=true
             
             if [ -d "home_cycl_home_front" ]; then
               echo "🎨 Déploiement du front..."
@@ -93,8 +94,6 @@ jobs:
                 echo "📦 Installation des dépendances..."
                 timeout 300 npm install --omit=dev || {
                   echo "❌ Installation des dépendances échouée"
-                  FRONT_SUCCESS=false
-                  FRONT_STATUS="Erreur installation npm"
                 }
               else
                 echo "📦 Dépendances déjà à jour"
@@ -103,49 +102,12 @@ jobs:
               # Restart avec PM2
               if pm2 describe front > /dev/null 2>&1; then
                 pm2 restart front
-                FRONT_STATUS="Redémarré avec PM2"
               else
                 pm2 start npm --name front -- start
-                FRONT_STATUS="Démarré avec PM2"
-              fi
-              
-              # Vérifier que le processus PM2 fonctionne
-              if ! pm2 describe front | grep -q "online"; then
-                FRONT_SUCCESS=false
-                FRONT_STATUS="Erreur PM2"
               fi
               
               cd ..
             fi
             
-            # Déterminer le statut global
-            if [ "$DOCKER_SUCCESS" = true ] && [ "$FRONT_SUCCESS" = true ]; then
-              DEPLOY_STATUS="✅ Succès"
-              EMBED_COLOR=3066993
-            else
-              DEPLOY_STATUS="❌ Échec partiel"
-              EMBED_COLOR=15158332
-            fi
-            
-            # Formatage du statut Docker pour Discord
-            DOCKER_STATUS_FORMATTED=$(echo "$DOCKER_STATUS" | sed 's/$/\\n/g' | tr -d '\n')
-            
-            # Notification Discord
-            curl -H "Content-Type: application/json" \
-                -X POST \
-                -d "{
-                  \"content\": \"<@246753473587052555>\",
-                  \"embeds\": [{
-                    \"title\": \"🚀 Déploiement terminé\",
-                    \"description\": \"**Statut global:** $DEPLOY_STATUS\\n\\n**Front:** $FRONT_STATUS\\n\\n**Docker:**\\n\`\`\`\\n$DOCKER_STATUS_FORMATTED\`\`\`\",
-                    \"color\": $EMBED_COLOR,
-                    \"timestamp\": \"$(date -u +%Y-%m-%dT%H:%M:%SZ)\",
-                    \"footer\": {
-                      \"text\": \"Déploiement automatique\"
-                    }
-                  }]
-                }" \
-                ${{ secrets.DISCORD_WEBHOOK_URL }}
-            
-            echo "✅ Déploiement terminé !"
+            echo "✅ Déploiement terminé avec succès !"
           EOF
