@@ -70,7 +70,7 @@ jobs:
             cd /home/${{ secrets.VPS_USER }}/home_cycl_home/home_cycl_home_front
 
             echo "Installation des dépendances front..."
-            npm install --omit=dev --verbose
+            npm install --omit=dev
 
             echo "Build du front React..."
             npm run build --verbose
