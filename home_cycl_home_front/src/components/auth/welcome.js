@@ -23,7 +23,7 @@ const styles = {
   container: {
     width: "100vw",
     height: "100vh",
-    backgroundImage: 'url("/assets/bg.jpg")',
+    backgroundImage: 'url("/assets/background.webp")',
     backgroundSize: "cover",
     backgroundPosition: "center",
     backgroundRepeat: "no-repeat",
