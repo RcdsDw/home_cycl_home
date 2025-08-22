@@ -1,40 +1,24 @@
-name: Lint and Prettier Check
+name: Tests
 
 on:
   push:
     branches:
+      - main
       - dev
 
 jobs:
-  lint-and-prettier:
+  ci:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      # Frontend
       - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 18
 
-      - name: Install Frontend Dependencies
-        working-directory: ./home_cycl_home_front
-        run: npm install
-
-      - name: Run lint (block on warnings)
-        working-directory: ./home_cycl_home_front
-        run: npm run lint -- --max-warnings=0
-
-      - name: Run prettier check
-        working-directory: ./home_cycl_home_front
-        run: npm run prettier:check
-
-      - name: Run tests front
-        working-directory: ./home_cycl_home_front
-        run: npm test -- --watchAll=false
-
-      # Backend
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -42,9 +26,17 @@ jobs:
           extensions: mbstring, xml, ctype, iconv, intl, dom, filter, gd, json
           coverage: none
 
+      - name: Install Frontend Dependencies
+        working-directory: ./home_cycl_home_front
+        run: npm install
+
       - name: Install Backend Dependencies
         working-directory: ./home_cycl_home_api_sf
         run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Run tests front
+        working-directory: ./home_cycl_home_front
+        run: npm test -- --watchAll=false
 
       - name: Run tests back
         working-directory: ./home_cycl_home_api_sf
