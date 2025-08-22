@@ -19,6 +19,10 @@ COPY . .
 # Change ownership so the symfony user can write in /app
 RUN chown -R symfony:symfony /app
 
+# 👉 Définir une fausse DB pour le build
+ARG FAKE_DATABASE_URL=sqlite:///:memory:
+ENV DATABASE_URL=${FAKE_DATABASE_URL}
+
 # Switch to symfony user for composer install
 USER symfony
 

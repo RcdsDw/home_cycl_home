@@ -2,9 +2,6 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches:
-      - main
-      - dev
 
 env:
   NODE_VERSION: 18
@@ -77,12 +74,9 @@ jobs:
     if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
 
     env:
-      BACK_PROD_ENV: ${{ vars.BACK_PROD_ENV }}
-      FRONT_PROD_ENV: ${{ vars.FRONT_PROD_ENV }}
-      DB_PROD_ENV: ${{ vars.DB_PROD_ENV }}
-      BACK_DEV_ENV: ${{ vars.BACK_DEV_ENV }}
-      FRONT_DEV_ENV: ${{ vars.FRONT_DEV_ENV }}
-      DB_DEV_ENV: ${{ vars.DB_DEV_ENV }}
+      DB_ENV: ${{ github.ref == 'refs/heads/main' && vars.DB_PROD_ENV || vars.DB_DEV_ENV }}
+      BACK_ENV: ${{ github.ref == 'refs/heads/main' && vars.BACK_PROD_ENV || vars.BACK_DEV_ENV }}
+      FRONT_ENV: ${{ github.ref == 'refs/heads/main' && vars.FRONT_PROD_ENV || vars.FRONT_DEV_ENV }}
 
     steps:
       - name: Checkout code
@@ -106,34 +100,25 @@ jobs:
               git clone git@github.com:${{ github.repository }} /home/${{ secrets.VPS_USER }}/home_cycl_home
             else
               cd /home/${{ secrets.VPS_USER }}/home_cycl_home
-              git pull origin main --no-rebase
+              git fetch origin main
+              git reset --hard origin/main
             fi
           EOF
 
       - name: Deploy backend to VPS
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << EOF
-            if github.ref == 'refs/heads/main'; then
-              echo "DB_PROD_ENV=${DB_PROD_ENV}" > .env
-            ti
-
-            if github.ref == 'refs/heads/dev'; then
-              echo "DB_DEV_ENV=${DB_DEV_ENV}" > .env
-            ti
-
             cd /home/${{ secrets.VPS_USER }}/home_cycl_home
 
-            if github.ref == 'refs/heads/main'; then
-              echo "BACK_PROD_ENV=${BACK_PROD_ENV}" > .env.local
-            ti
+            echo "DB_ENV=$DB_ENV" > .env
 
-            if github.ref == 'refs/heads/dev'; then
-              echo "BACK_DEV_ENV=${BACK_DEV_ENV}" > .env.local
-            ti
+            cd /home/${{ secrets.VPS_USER }}/home_cycl_home/home_cycl_home_api_sf
+
+            echo "BACK_ENV=$BACK_ENV" > .env
 
             mkdir -p "../backups"
             BACKUP_NAME="backup_$(date +%Y%m%d_%H%M%S)"
-            cp -r . "../backups/$BACKUP_NAME"
+            rsync -a --exclude='.git' ./ "../backups/$BACKUP_NAME"
 
             docker compose down
             sudo fuser -k 82/tcp
@@ -149,13 +134,7 @@ jobs:
 
             cd /home/${{ secrets.VPS_USER }}/home_cycl_home/home_cycl_home_front
 
-            if github.ref == 'refs/heads/main'; then
-              echo "FRONT_PROD_ENV=${FRONT_PROD_ENV}" > .env
-            ti
-
-            if github.ref == 'refs/heads/dev'; then
-              echo "FRONT_DEV_ENV=${FRONT_DEV_ENV}" > .env
-            ti
+            echo "FRONT_ENV=$FRONT_ENV" > .env
             
             npm install --omit=dev
             npm run build --verbose

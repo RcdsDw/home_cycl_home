@@ -83,6 +83,7 @@ const TestAddress = () => {
   return (
     <div style={styles.container}>
       <Select
+        aria-label="Test d'adresse postale"
         showSearch
         placeholder="Tapez une adresse complète"
         notFoundContent={loading ? <Spin size="small" /> : "Aucun résultat"}
