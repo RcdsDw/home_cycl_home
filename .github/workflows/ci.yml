@@ -58,7 +58,7 @@ jobs:
 
       - name: Install Backend Dependencies
         working-directory: ./home_cycl_home_api_sf
-        run: composer install --prefer-dist --no-progress --no-interaction
+        run: composer install --prefer-dist --no-progress --no-interaction --no-scripts
 
       - name: Run frontend tests
         working-directory: ./home_cycl_home_front
@@ -92,27 +92,40 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
+      - name: Set deployment directory
+        run: |
+          if [ "${GITHUB_REF}" == "refs/heads/main" ]; then
+            echo "DEPLOY_DIR=/home/${{ secrets.VPS_USER }}/home_cycl_home_main" >> $GITHUB_ENV
+          else
+            echo "DEPLOY_DIR=/home/${{ secrets.VPS_USER }}/home_cycl_home_dev" >> $GITHUB_ENV
+          fi
+          echo "Deployment directory is $DEPLOY_DIR"
+
       - name: Update project via Git
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << EOF
-            if [ ! -d "/home/${{ secrets.VPS_USER }}/home_cycl_home/.git" ]; then
-              rm -rf /home/${{ secrets.VPS_USER }}/home_cycl_home
-              git clone git@github.com:${{ github.repository }} /home/${{ secrets.VPS_USER }}/home_cycl_home
+            if [ ! -d "$DEPLOY_DIR/.git" ]; then
+              rm -rf "$DEPLOY_DIR"
+              git clone git@github.com:${{ github.repository }} "$DEPLOY_DIR"
             else
-              cd /home/${{ secrets.VPS_USER }}/home_cycl_home
-              git fetch origin main
-              git reset --hard origin/main
+              cd "$DEPLOY_DIR"
+              git fetch origin
+              git reset --hard origin/${GITHUB_REF##*/}
             fi
           EOF
 
       - name: Deploy backend to VPS
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << EOF
-            cd /home/${{ secrets.VPS_USER }}/home_cycl_home
+            echo "Using deployment directory: $DEPLOY_DIR"
+            echo "DB_ENV=$DB_ENV"
+            echo "BACK_ENV=$BACK_ENV"
+
+            cd "$DEPLOY_DIR"
 
             echo "DB_ENV=$DB_ENV" > .env
 
-            cd /home/${{ secrets.VPS_USER }}/home_cycl_home/home_cycl_home_api_sf
+            cd "$DEPLOY_DIR/home_cycl_home_api_sf"
 
             echo "BACK_ENV=$BACK_ENV" > .env
 
@@ -132,7 +145,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << EOF
 
-            cd /home/${{ secrets.VPS_USER }}/home_cycl_home/home_cycl_home_front
+            cd "$DEPLOY_DIR/home_cycl_home_front"
 
             echo "FRONT_ENV=$FRONT_ENV" > .env
             
