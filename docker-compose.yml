@@ -19,7 +19,7 @@ services:
     depends_on:
       - backend
     ports:
-      - "82:80"
+      - ${NGINX_PORT}
     networks:
       - app-network
 
