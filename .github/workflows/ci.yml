@@ -71,14 +71,20 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: test
-    if: ${{ github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' }}
-
-    env:
-      DB_ENV: ${{ github.ref == 'refs/heads/main' && vars.DB_PROD_ENV || vars.DB_DEV_ENV }}
-      BACK_ENV: ${{ github.ref == 'refs/heads/main' && vars.BACK_PROD_ENV || vars.BACK_DEV_ENV }}
-      FRONT_ENV: ${{ github.ref == 'refs/heads/main' && vars.FRONT_PROD_ENV || vars.FRONT_DEV_ENV }}
-
+    
     steps:
+      - name: Set environment variables
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            echo "DB_ENV=${{ vars.DB_PROD_ENV }}" >> $GITHUB_ENV
+            echo "BACK_ENV=${{ vars.BACK_PROD_ENV }}" >> $GITHUB_ENV
+            echo "FRONT_ENV=${{ vars.FRONT_PROD_ENV }}" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == "refs/heads/dev" ]]; then
+            echo "DB_ENV=${{ vars.DB_DEV_ENV }}" >> $GITHUB_ENV
+            echo "BACK_ENV=${{ vars.BACK_DEV_ENV }}" >> $GITHUB_ENV
+            echo "FRONT_ENV=${{ vars.FRONT_DEV_ENV }}" >> $GITHUB_ENV
+          fi
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -99,7 +105,6 @@ jobs:
           else
             echo "DEPLOY_DIR=/home/${{ secrets.VPS_USER }}/home_cycl_home_dev" >> $GITHUB_ENV
           fi
-          echo "Deployment directory is $DEPLOY_DIR"
 
       - name: Update project via Git
         run: |
@@ -114,20 +119,28 @@ jobs:
             fi
           EOF
 
+      - name: Deploy db .env
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "cat > $DEPLOY_DIR/.env" << 'EOF'
+          ${DB_ENV}
+          EOF
+
+      - name: Deploy backend .env
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "cat > $DEPLOY_DIR/home_cycl_home_api_sf/.env" << 'EOF'
+          ${BACK_ENV}
+          EOF
+
+      - name: Deploy frontend .env
+        run: |
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "cat > $DEPLOY_DIR/home_cycl_home_front/.env" << 'EOF'
+          ${FRONT_ENV}
+          EOF
+
       - name: Deploy backend to VPS
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << EOF
-            echo "Using deployment directory: $DEPLOY_DIR"
-            echo "DB_ENV=$DB_ENV"
-            echo "BACK_ENV=$BACK_ENV"
-
-            cd "$DEPLOY_DIR"
-
-            echo "DB_ENV=$DB_ENV" > .env
-
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << EOF          
             cd "$DEPLOY_DIR/home_cycl_home_api_sf"
-
-            echo "BACK_ENV=$BACK_ENV" > .env
 
             mkdir -p "../backups"
             BACKUP_NAME="backup_$(date +%Y%m%d_%H%M%S)"
@@ -143,11 +156,8 @@ jobs:
 
       - name: Deploy frontend to VPS
         run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << EOF
-
+          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} << 'EOF'
             cd "$DEPLOY_DIR/home_cycl_home_front"
-
-            echo "FRONT_ENV=$FRONT_ENV" > .env
             
             npm install --omit=dev
             npm run build --verbose
