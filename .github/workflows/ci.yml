@@ -73,18 +73,6 @@ jobs:
     needs: test
     
     steps:
-      - name: Set environment variables
-        run: |
-          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
-            echo "DB_ENV=${{ vars.DB_PROD_ENV }}" >> $GITHUB_ENV
-            echo "BACK_ENV=${{ vars.BACK_PROD_ENV }}" >> $GITHUB_ENV
-            echo "FRONT_ENV=${{ vars.FRONT_PROD_ENV }}" >> $GITHUB_ENV
-          elif [[ "${GITHUB_REF}" == "refs/heads/dev" ]]; then
-            echo "DB_ENV=${{ vars.DB_DEV_ENV }}" >> $GITHUB_ENV
-            echo "BACK_ENV=${{ vars.BACK_DEV_ENV }}" >> $GITHUB_ENV
-            echo "FRONT_ENV=${{ vars.FRONT_DEV_ENV }}" >> $GITHUB_ENV
-          fi
-
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -117,24 +105,6 @@ jobs:
               git fetch origin
               git reset --hard origin/${GITHUB_REF##*/}
             fi
-          EOF
-
-      - name: Deploy db .env
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "cat > $DEPLOY_DIR/.env" << 'EOF'
-          ${DB_ENV}
-          EOF
-
-      - name: Deploy backend .env
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "cat > $DEPLOY_DIR/home_cycl_home_api_sf/.env" << 'EOF'
-          ${BACK_ENV}
-          EOF
-
-      - name: Deploy frontend .env
-        run: |
-          ssh -o StrictHostKeyChecking=no ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }} "cat > $DEPLOY_DIR/home_cycl_home_front/.env" << 'EOF'
-          ${FRONT_ENV}
           EOF
 
       - name: Deploy backend to VPS
