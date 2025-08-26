@@ -8,13 +8,46 @@ export default function LoginForm() {
   const [form] = Form.useForm();
   const nav = useNavigate();
 
+  const handleLoginSuccess = (user) => {
+    const primaryRole = user.roles?.[0];
+
+    switch (primaryRole) {
+      case "ROLE_ADMIN":
+        nav("/dashboard");
+        break;
+      case "ROLE_TECH":
+        nav("/planning");
+        break;
+      case "ROLE_USER":
+        nav("/dashboard");
+        break;
+      default:
+        message.warning("Rôle utilisateur non défini");
+        nav("/dashboard");
+        break;
+    }
+  };
+
   const onFinish = async (values) => {
     setLoading(true);
     try {
-      await authLogin(values).then(() => {
-        message.success(`Connecté`);
+      const response = await authLogin(values);
+
+      let user;
+      if (response && response.user) {
+        user = response.user;
+      } else {
+        user = JSON.parse(localStorage.getItem("user"));
+      }
+
+      if (user) {
+        const roleLabel = user.roles?.[0] || "ROLE_USER";
+        message.success(`Connecté en tant que ${roleLabel}`);
+        handleLoginSuccess(user);
+      } else {
+        message.error("Erreur lors de la récupération des données utilisateur");
         nav("/dashboard");
-      });
+      }
     } catch (err) {
       message.error("Identifiants invalides");
       console.error(err);

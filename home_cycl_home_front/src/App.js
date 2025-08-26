@@ -1,10 +1,9 @@
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
-
 import Login from "./containers/auth/login.js";
 import Register from "./containers/auth/register.js";
 import Dashboard from "./containers/dashboard/dashboard.js";
 import Users from "./containers/users/list.js";
-import MainLayout from "./MainLayout";
+import MainLayout from "./MainLayout"; // Remplace MainLayout
 import NewUser from "./containers/users/new.js";
 import ShowUser from "./containers/users/show.js";
 import Planning from "./containers/planning/planning.js";
@@ -31,6 +30,7 @@ export default function App() {
         <Route path="/auth/login" element={<Login />} />
         <Route path="/auth/register" element={<Register />} />
 
+        {/* Toutes les routes existantes utilisent maintenant le MainLayout */}
         <Route
           element={
             <PrivateRoute>
@@ -67,6 +67,7 @@ export default function App() {
           <Route path="/bikes/edit/:bikeId" element={<UpdateBike />} />
           <Route path="/brands" element={<BrandsModels />} />
         </Route>
+
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
