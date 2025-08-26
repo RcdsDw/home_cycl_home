@@ -125,8 +125,10 @@ jobs:
         run: |
           if [ "${GITHUB_REF}" == "refs/heads/main" ]; then
             echo "DEPLOY_DIR=/home/${{ secrets.VPS_USER }}/home_cycl_home_main" >> $GITHUB_ENV
+            echo "FRONT_NAME=front_main" >> $GITHUB_ENV
           elif [ "${GITHUB_REF}" == "refs/heads/dev" ]; then
             echo "DEPLOY_DIR=/home/${{ secrets.VPS_USER }}/home_cycl_home_dev" >> $GITHUB_ENV
+            echo "FRONT_NAME=front_dev" >> $GITHUB_ENV
           fi
 
       - name: Update project via Git
@@ -185,9 +187,9 @@ jobs:
               npm install -g serve
             fi
 
-            if pm2 describe front > /dev/null 2>&1; then
-              pm2 restart front
+            if pm2 describe ${FRONT_NAME} > /dev/null 2>&1; then
+              pm2 restart $FRONT_NAME
             else
-              pm2 start "sh -c 'npx serve -s build -l 4000'" --name front
+              pm2 start "sh -c 'npx serve -s build -l 4000'" --name $FRONT_NAME
             fi
           EOF
