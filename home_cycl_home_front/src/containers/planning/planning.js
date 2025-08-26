@@ -107,13 +107,13 @@ export default function Planning() {
         eventClick={(info) => {
           const props = info.event.extendedProps;
           const messageContent = `
-                        👤 Client : ${props.clientName}
-                        🔧 Technicien : ${props.techName}
-                        🚲 Vélo : ${props.bike}
-                        🛠️ Intervention : ${props.type}
-                        💰 Prix : ${props.price}
-                        🕒 De ${info.event.start.toLocaleTimeString()} à ${info.event.end.toLocaleTimeString()}
-                            `;
+            👤 Client : ${props.clientName}
+            🔧 Technicien : ${props.techName}
+            🚲 Vélo : ${props.bike}
+            🛠️ Intervention : ${props.type}
+            💰 Prix : ${props.price}
+            🕒 De ${info.event.start.toLocaleTimeString()} à ${info.event.end.toLocaleTimeString()}
+                `;
           message.info({
             content: <pre>{messageContent}</pre>,
             duration: 3,
