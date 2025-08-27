@@ -9,7 +9,7 @@ export default function Interventions() {
 
   return (
     <>
-      {!currentUser.roles?.includes("ROLE_TECH") ? (
+      {currentUser.roles?.includes("ROLE_ADMIN") ? (
         <Button
           type="primary"
           onClick={() => nav("/interventions/new")}

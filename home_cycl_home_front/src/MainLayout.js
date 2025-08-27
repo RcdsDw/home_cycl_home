@@ -11,7 +11,6 @@ import {
   TagOutlined,
   SettingOutlined,
   ToolOutlined,
-  HomeOutlined,
 } from "@ant-design/icons";
 import { authLogout } from "./actions/auth";
 
@@ -41,7 +40,6 @@ export default function DynamicLayout() {
 
     setCurrentUser(user);
 
-    // ⚡️ si l'interface est déjà choisie (localStorage), on la reprend
     const savedInterface = localStorage.getItem("currentInterface");
     if (savedInterface) {
       setCurrentInterface(savedInterface);
@@ -70,7 +68,8 @@ export default function DynamicLayout() {
     ]
 
     const userMenu = [
-      { label: "Accueil", key: "map", icon: <HomeOutlined /> },
+      { label: "Mon profil", key: "me", icon: <UserOutlined /> },
+      { label: "Commander", key: "newInter", icon: <QqOutlined /> },
       { label: "Mes Interventions", key: "inters", icon: <FormOutlined /> },
     ]
 
@@ -124,6 +123,9 @@ export default function DynamicLayout() {
         break;
       case "brands":
         nav("/brands");
+        break;
+      case "me":
+        nav(`/users/show/${currentUser.id}`);
         break;
       default:
         break;

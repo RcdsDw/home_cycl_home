@@ -13,6 +13,7 @@ import UserCard from "../../utils/UserCard";
 import { parseID } from "../../utils/ParseID";
 import { DurationDisplay } from "../../utils/ParseDuration";
 import { getCurrentUser } from "../../utils/GetCurrentInfo";
+import { getUsersInterventions } from "../../actions/user";
 
 export default function TableInterventions() {
   const [loading, setLoading] = useState(false);
@@ -35,6 +36,9 @@ export default function TableInterventions() {
       if (currentUser.roles?.includes("ROLE_TECH")) {
         const queryParams = `?technician.id=${currentUser.id}`;
         res = await getInterventionsWithParams(queryParams);
+        // } else if (currentUser.roles?.includes("ROLE_USER")) {
+        //   res = await getUsersInterventions(currentUser.id)
+        //   console.log("🚀 ~ fetchInterventions ~ res:", res)
       } else {
         res = await getInterventions();
       }

@@ -28,8 +28,3 @@ export async function getUsersBikes(id) {
   const res = await getReq(`/users/${id}/bikes`);
   return res;
 }
-
-export async function getUsersInterventions(id) {
-  const res = await getReq(`/users/${id}/interventions`);
-  return res;
-}

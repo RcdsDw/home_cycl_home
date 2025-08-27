@@ -20,12 +20,15 @@ import { getUserById } from "../../actions/user";
 import TagRoles from "../../utils/TagRoles";
 import TableBikes from "../../components/bikes/table";
 import { parseID } from "../../utils/ParseID";
+import { getCurrentUser } from "../../utils/GetCurrentInfo";
 
 export default function ShowUser() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
   const { id } = useParams();
   const nav = useNavigate();
+
+  const currentUser = getCurrentUser();
 
   useEffect(() => {
     fetchUser();
@@ -65,13 +68,15 @@ export default function ShowUser() {
 
   return (
     <>
-      <Button
-        type="primary"
-        style={styles.button}
-        onClick={() => nav("/users")}
-      >
-        Retour à la liste
-      </Button>
+      {!currentUser.roles?.includes("ROLE_USER") && (
+        <Button
+          type="primary"
+          style={styles.button}
+          onClick={() => nav("/users")}
+        >
+          Retour à la liste
+        </Button>
+      )}
       <Button
         type="primary"
         color="danger"
