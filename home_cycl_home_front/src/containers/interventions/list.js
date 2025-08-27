@@ -21,7 +21,7 @@ export default function Interventions() {
         <h1>Mes interventions</h1>
       )
       }
-      <TableInterventions />
+      <TableInterventions currentUser={currentUser} />
     </>
   );
 }

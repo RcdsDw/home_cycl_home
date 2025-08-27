@@ -5,12 +5,14 @@ import { useEffect, useState } from "react";
 import {
   deleteIntervention,
   getInterventions,
+  getInterventionsWithParams,
 } from "../../actions/interventions";
 import dayjs from "dayjs";
 import BikeCard from "../../utils/BikeCard";
 import UserCard from "../../utils/UserCard";
 import { parseID } from "../../utils/ParseID";
 import { DurationDisplay } from "../../utils/ParseDuration";
+import { getCurrentUser } from "../../utils/GetCurrentInfo";
 
 export default function TableInterventions() {
   const [loading, setLoading] = useState(false);
@@ -19,6 +21,7 @@ export default function TableInterventions() {
   const [currentId, setCurrentId] = useState(null);
 
   const nav = useNavigate();
+  const currentUser = getCurrentUser();
 
   useEffect(() => {
     fetchInterventions();
@@ -26,8 +29,15 @@ export default function TableInterventions() {
 
   const fetchInterventions = async () => {
     setLoading(true);
+    let res
+
     try {
-      const res = await getInterventions();
+      if (currentUser.roles?.includes("ROLE_TECH")) {
+        const queryParams = `?technician.id=${currentUser.id}`;
+        res = await getInterventionsWithParams(queryParams);
+      } else {
+        res = await getInterventions();
+      }
       setInterventions(res.member);
     } catch (error) {
       console.error(

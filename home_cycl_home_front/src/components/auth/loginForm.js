@@ -41,8 +41,7 @@ export default function LoginForm() {
       }
 
       if (user) {
-        const roleLabel = user.roles?.[0] || "ROLE_USER";
-        message.success(`Connecté en tant que ${roleLabel}`);
+        message.success(`Connecté`);
         handleLoginSuccess(user);
       } else {
         message.error("Erreur lors de la récupération des données utilisateur");
