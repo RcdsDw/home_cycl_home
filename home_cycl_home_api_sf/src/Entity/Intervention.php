@@ -42,7 +42,8 @@ use Symfony\Component\Serializer\Attribute\Groups;
     denormalizationContext: ['groups' => ['intervention:write']]
 )]
 #[ApiFilter(SearchFilter::class, properties: [
-    'technician.id' => 'exact'
+    'technician.id' => 'exact',
+    'clientBike' => 'exact'
 ])]
 #[ORM\Entity(repositoryClass: InterventionRepository::class)]
 #[ORM\Table(name: "interventions")]

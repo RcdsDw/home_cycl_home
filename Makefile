@@ -50,6 +50,10 @@ migrate:
 fixtures:
 	${COMPOSE} exec backend php bin/console doctrine:fixtures:load
 
-# Connect to db
-db: 
-	$(COMPOSE) exec db psql -U postgres -d home_cycl_home
+# Connect to db dev
+dbdev: 
+	$(COMPOSE) exec db psql -U postgres -d home_cycl_home_dev
+
+# Connect to db main
+dbmain: 
+	$(COMPOSE) exec db psql -U postgres -d home_cycl_home_main

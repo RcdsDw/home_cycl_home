@@ -181,6 +181,24 @@ class Fixtures extends Fixture
             $bike->setModel($model);
             $manager->persist($bike);
             $bikes[] = $bike;
+
+            // --- Ici on crée le deuxième vélo si c’est user1 ---
+            if ($i === 1) {
+                $secondBike = new Bikes();
+                $secondBike->setName("Vélo Secondaire");
+                $secondBike->setSize('M');
+                $secondBike->setType('VTC');
+                $secondBike->setOwner($user);
+
+                $brand = $brands[array_rand($brands)];
+                $model = $models[$brand->getName()][array_rand($models[$brand->getName()])];
+
+                $secondBike->setBrand($brand);
+                $secondBike->setModel($model);
+                $manager->persist($secondBike);
+                $bikes[] = $secondBike;
+            }
+
             $manager->persist($user);
             $clients[] = $user;
         }
@@ -285,21 +303,35 @@ class Fixtures extends Fixture
 
         // --- Création de 40 interventions sans chevauchement par technicien ---
         echo "📅 Création des interventions...\n";
-        $created = 0;
+        // Récupération du technicien de Laloubère
+        $techLaloubere = null;
+        foreach ($technicians as $t) {
+            if ($t->getTechnicianZone() && $t->getTechnicianZone()->getName() === 'Laloubère') {
+                $techLaloubere = $t;
+                break;
+            }
+        }
 
+        $created = 0;
         $interventionsPerTech = []; // stocke les créneaux déjà utilisés par tech
 
         for ($i = 1; $i <= 40; $i++) {
             $intervention = new Intervention();
-
             $type = $typeInterventions[array_rand($typeInterventions)];
             $duration = $type->getDuration(); // en secondes
 
-            $tech = $technicians[array_rand($technicians)];
+            // Choix d'un bike aléatoire
+            $bike = $bikes[array_rand($bikes)];
+
+            // Technicien selon le propriétaire du bike
+            if ($bike->getOwner()->getEmail() === 'user1@example.com') {
+                $tech = $techLaloubere;
+            } else {
+                $tech = $technicians[array_rand($technicians)];
+            }
 
             // Initialise la liste des créneaux si pas encore fait
             $techId = (string) $tech->getId();
-
             if (!isset($interventionsPerTech[$techId])) {
                 $interventionsPerTech[$techId] = [];
             }
@@ -310,14 +342,11 @@ class Fixtures extends Fixture
 
             do {
                 $tries++;
-
-                // Génère une date de début aléatoire (entre aujourd'hui et +10j)
                 $start = (new \DateTime())->modify("+" . rand(0, 10) . " days")
-                    ->setTime(rand(8, 16), 0); // entre 8h et 16h
-
+                    ->setTime(rand(8, 16), 0);
                 $end = (clone $start)->modify("+{$duration} seconds");
 
-                // Vérifie s'il y a un chevauchement
+                // Vérifie chevauchement
                 $overlaps = false;
                 foreach ($interventionsPerTech[$techId] as [$existingStart, $existingEnd]) {
                     if ($start < $existingEnd && $end > $existingStart) {
@@ -325,21 +354,19 @@ class Fixtures extends Fixture
                         break;
                     }
                 }
-            } while ($overlaps && $tries < 100); // pour éviter boucle infinie
+            } while ($overlaps && $tries < 100);
 
             if ($tries >= 100) {
                 echo "💥 Impossible de planifier l'intervention #$i pour le tech {$tech->getEmail()} après 100 essais.\n";
-                continue; // skip si on n’a pas trouvé de créneau dispo
+                continue;
             }
 
-            // Enregistre le créneau
             $interventionsPerTech[$techId][] = [$start, $end];
 
             $intervention->setStartDate($start);
             $intervention->setEndDate($end);
             $intervention->setComment("Intervention #$i description");
-
-            $intervention->setClientBike($bikes[array_rand($bikes)]);
+            $intervention->setClientBike($bike);
             $intervention->setTechnician($tech);
             $intervention->setTypeIntervention($type);
             $now = new \DateTime();
@@ -361,9 +388,11 @@ class Fixtures extends Fixture
 
                 $manager->persist($interventionProduct);
             }
+
             echo "✅ Intervention #$i planifiée pour {$tech->getEmail()} de {$start->format('Y-m-d H:i')} à {$end->format('H:i')}\n";
             $created++;
         }
+
         $manager->flush();
 
         echo "\n🎉 Fixtures terminées :\n";
@@ -384,13 +413,21 @@ class Fixtures extends Fixture
         $user->setFirstname($firstname);
         $user->setLastname($lastname);
         $user->setNumber($number);
-        $user->setAddress([
-            'street' => '123 rue Exemple',
-            'city' => 'Paris',
-            'code' => '75000',
-            'coords' => ['lat' => 43.2566, 'lng' => 4.5922]
-        ]);
-
+        if ($email === 'user1@example.com') {
+            $user->setAddress([
+                'street' => '4 rue Blanche',
+                'city' => 'Odin, Laloubère',
+                'code' => '65200',
+                'coords' => ['lat' => 43.20886952609264, 'lng' => 0.06730780949462074]
+            ]);
+        } else {
+            $user->setAddress([
+                'street' => '123 rue Exemple',
+                'city' => 'Paris',
+                'code' => '75000',
+                'coords' => ['lat' => 43.2566, 'lng' => 4.5922]
+            ]);
+        }
         return $user;
     }
 }
