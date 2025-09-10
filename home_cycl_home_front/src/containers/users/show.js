@@ -25,10 +25,11 @@ import { getCurrentUser } from "../../utils/GetCurrentInfo";
 export default function ShowUser() {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState(null);
-  const { id } = useParams();
+  const { id: paramId } = useParams();
   const nav = useNavigate();
 
   const currentUser = getCurrentUser();
+  const id = currentUser.roles.includes("ROLE_USER") ? currentUser.id : paramId;
 
   useEffect(() => {
     fetchUser();

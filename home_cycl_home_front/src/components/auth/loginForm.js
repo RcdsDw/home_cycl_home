@@ -19,7 +19,7 @@ export default function LoginForm() {
         nav("/planning");
         break;
       case "ROLE_USER":
-        nav("/dashboard");
+        nav(`/users/show/${user.id}`);
         break;
       default:
         message.warning("Rôle utilisateur non défini");

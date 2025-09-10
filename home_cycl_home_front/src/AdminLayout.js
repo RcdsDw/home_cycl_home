@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import Logo from "./assets/logo.png";
-import { Layout, Menu, message, Button, Space } from "antd";
+import { Layout, Menu, message, Button } from "antd";
 import {
   BarChartOutlined,
   FundOutlined,
@@ -26,7 +26,7 @@ export default function DynamicLayout() {
   const [collapsed, setCollapsed] = useState(false);
   const [menuItems, setMenuItems] = useState([]);
   const [currentUser, setCurrentUser] = useState({});
-  const [currentInterface, setCurrentInterface] = useState("admin");
+  const [currentInterface, setCurrentInterface] = useState("user");
 
   const nav = useNavigate();
   const location = useLocation();
@@ -40,16 +40,9 @@ export default function DynamicLayout() {
 
     setCurrentUser(user);
 
-    const savedInterface = localStorage.getItem("currentInterface");
-    if (savedInterface) {
-      setCurrentInterface(savedInterface);
-      loadMenuItems(savedInterface);
-    } else {
-      const role = roleMap[user.roles?.[0]] || "user";
-      setCurrentInterface(role);
-      loadMenuItems(role);
-      localStorage.setItem("currentInterface", role);
-    }
+    const role = roleMap[user.roles?.[0]] || "user";
+    setCurrentInterface(role);
+    loadMenuItems(role);
 
     document.body.style.overflow = "hidden";
     return () => {
@@ -61,17 +54,17 @@ export default function DynamicLayout() {
     loadMenuItems(currentInterface);
   }, [currentInterface]);
 
-  const loadMenuItems = (roles) => {
+  const loadMenuItems = (role) => {
     const techMenu = [
       { label: "Mes Interventions", key: "inters", icon: <ToolOutlined /> },
       { label: "Planning", key: "plan", icon: <BarChartOutlined /> },
-    ]
+    ];
 
     const userMenu = [
       { label: "Mon profil", key: "me", icon: <UserOutlined /> },
       { label: "Commander", key: "newInter", icon: <QqOutlined /> },
       { label: "Mes Interventions", key: "inters", icon: <FormOutlined /> },
-    ]
+    ];
 
     const adminMenu = [
       { label: "Carte", key: "map", icon: <FundOutlined /> },
@@ -83,9 +76,9 @@ export default function DynamicLayout() {
       { label: "Marques et Modèles", key: "brands", icon: <SettingOutlined /> },
     ];
 
-    if (roles === "admin") {
+    if (role === "admin") {
       setMenuItems(adminMenu);
-    } else if (roles === "tech") {
+    } else if (role === "tech") {
       setMenuItems(techMenu);
     } else {
       setMenuItems(userMenu);
@@ -132,26 +125,6 @@ export default function DynamicLayout() {
     }
   };
 
-  const handleInterfaceChange = (interfaceType) => {
-    setCurrentInterface(interfaceType);
-    localStorage.setItem("currentInterface", interfaceType);
-
-    switch (interfaceType) {
-      case "admin":
-        nav("/dashboard");
-        break;
-      case "tech":
-        nav("/planning");
-        break;
-      case "user":
-        nav("/interventions");
-        break;
-      default:
-        nav("/dashboard");
-        break;
-    }
-  };
-
   const getInterfaceTitle = () =>
     ({
       admin: "Admin",
@@ -166,32 +139,6 @@ export default function DynamicLayout() {
       user: "#2d2d2dff",
     })[currentInterface] || "#001529";
 
-  const renderInterfaceSwitcher = () => {
-    const userRole = currentUser.roles?.[0];
-    if (userRole !== "ROLE_ADMIN") return null;
-
-    return (
-      <Space size="small">
-        {["admin", "tech", "user"].map((role) => (
-          <Button
-            key={role}
-            size="small"
-            type={currentInterface === role ? "primary" : "default"}
-            onClick={() => handleInterfaceChange(role)}
-            style={{
-              backgroundColor:
-                currentInterface === role ? getInterfaceColor() : undefined,
-              borderColor:
-                currentInterface === role ? getInterfaceColor() : undefined,
-            }}
-          >
-            {role === "admin" ? "Admin" : role === "tech" ? "Tech" : "Client"}
-          </Button>
-        ))}
-      </Space>
-    );
-  };
-
   return (
     <Layout style={styles.layout}>
       <Header
@@ -201,8 +148,6 @@ export default function DynamicLayout() {
           <img width={50} height={50} src={Logo} alt="logo" />
           <span style={styles.interfaceTitle}>{getInterfaceTitle()}</span>
         </div>
-
-        <div>{renderInterfaceSwitcher()}</div>
 
         <div style={styles.headerRight}>
           <div style={styles.userName}>
@@ -263,7 +208,9 @@ const styles = {
   },
 
   headerLeft: {
-    display: "flex", alignItems: "center", gap: 12
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
   },
 
   interfaceTitle: {
@@ -275,33 +222,37 @@ const styles = {
   },
 
   headerRight: {
-    display: "flex", alignItems: "center", gap: 16
+    display: "flex",
+    alignItems: "center",
+    gap: 16,
   },
 
   userName: {
-    color: "white", textAlign: "right"
+    color: "white",
+    textAlign: "right",
   },
 
   sider: {
-    transition: "all 0.2s"
+    transition: "all 0.2s",
   },
 
   menu: {
     backgroundColor: "transparent",
-    borderRight: "none", // sinon ligne moche
+    borderRight: "none",
   },
 
   contentLayout: {
-    height: "calc(100vh - 64px)", overflow: "auto"
+    height: "calc(100vh - 64px)",
+    overflow: "auto",
   },
 
   content: {
-    padding: 24, margin: 0, overflow: "auto"
+    padding: 24,
+    margin: 0,
+    overflow: "auto",
   },
 
   footer: {
-    textAlign: "center"
-
+    textAlign: "center",
   },
 };
-
