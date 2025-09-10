@@ -2,8 +2,10 @@ import { render, screen, fireEvent, waitFor } from "@testing-library/react";
 import TableInterventions from "./table";
 import * as interventionsAPI from "../../actions/interventions";
 import { MemoryRouter } from "react-router-dom";
+import { getCurrentUser } from "../../utils/GetCurrentInfo";
 
 jest.mock("../../actions/interventions");
+jest.mock("../../utils/GetCurrentInfo");
 
 const fakeInterventions = [
   {
@@ -22,6 +24,12 @@ const fakeInterventions = [
 describe("TableInterventions", () => {
   beforeEach(() => {
     jest.clearAllMocks();
+
+    getCurrentUser.mockReturnValue({
+      id: 1,
+      roles: ["ROLE_ADMIN"],
+      bikes: [],
+    });
 
     interventionsAPI.getInterventions.mockResolvedValue({
       member: fakeInterventions,

@@ -21,6 +21,7 @@ import BikeCard from "../../utils/BikeCard";
 import ProductCard from "../../utils/ProductCard";
 import ModalProducts from "../../components/interventions/modalProducts";
 import { DurationDisplay } from "../../utils/ParseDuration";
+import { getCurrentUser } from "../../utils/GetCurrentInfo";
 
 export default function ShowIntervention() {
   const [loading, setLoading] = useState(true);
@@ -31,6 +32,7 @@ export default function ShowIntervention() {
 
   const { id } = useParams();
   const nav = useNavigate();
+  const currentUser = getCurrentUser();
 
   useEffect(() => {
     fetchIntervention();
@@ -99,20 +101,24 @@ export default function ShowIntervention() {
 
   return (
     <>
-      <Button
-        type="primary"
-        style={styles.button}
-        onClick={() => nav("/interventions")}
-      >
-        Retour à la liste
-      </Button>
-      <Button
-        type="primary"
-        style={styles.button}
-        onClick={() => nav(`/interventions/edit/${id}`)}
-      >
-        Modifier
-      </Button>
+      {currentUser.roles?.includes("ROLE_ADMIN") && (
+        <Button
+          type="primary"
+          style={styles.button}
+          onClick={() => nav("/interventions")}
+        >
+          Retour à la liste
+        </Button>
+      )}
+      {!currentUser.roles?.includes("ROLE_TECH") && (
+        <Button
+          type="primary"
+          style={styles.button}
+          onClick={() => nav(`/interventions/edit/${id}`)}
+        >
+          Modifier
+        </Button>
+      )}
       <Row gutter={32} style={styles.row}>
         <Col span={12}>
           <Card
@@ -170,9 +176,11 @@ export default function ShowIntervention() {
                 }}
               >
                 <span>Produits Commandés</span>
-                <Button type="primary" onClick={showModal}>
-                  Modifier les produits associés
-                </Button>
+                {!currentUser.roles?.includes("ROLE_TECH") && (
+                  <Button type="primary" onClick={showModal}>
+                    Modifier les produits associés
+                  </Button>
+                )}
               </div>
             }
             style={{ ...styles.card, marginTop: 20 }}

@@ -30,6 +30,7 @@ export default function NewIntervention() {
 
   const [form] = Form.useForm();
   const nav = useNavigate();
+  const currentUser = getCurrentUser();
 
   useEffect(() => {
     if (hasInitialized.current) return;
@@ -126,9 +127,11 @@ export default function NewIntervention() {
 
   return (
     <>
-      <Button type="primary" onClick={() => nav("/users")}>
-        Retour à la liste
-      </Button>
+      {currentUser.roles?.includes("ROLE_ADMIN") && (
+        <Button type="primary" onClick={() => nav("/users")}>
+          Retour à la liste
+        </Button>
+      )}
       <Card style={styles.card}>
         <h2 style={styles.title}>Nouvelle intervention</h2>
         <Form form={form} onFinish={onFinish} layout="vertical">

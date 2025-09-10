@@ -15,6 +15,8 @@ export default function Planning() {
   const [selectedTechUser, setSelectedTechUser] = useState();
   const [events, setEvents] = useState([]);
 
+  const currentUser = getCurrentUser();
+
   useEffect(() => {
     fetchData();
   }, [selectedTechUser]);
@@ -24,7 +26,6 @@ export default function Planning() {
     try {
       setLoading(true);
 
-      const currentUser = getCurrentUser();
       const queryParams = `?technician.id=${selectedTechUser ? parseID(selectedTechUser) : currentUser.id}`;
       const res = await getInterventionsWithParams(queryParams);
 
@@ -88,10 +89,14 @@ export default function Planning() {
 
   return (
     <>
-      <SelectTech
-        selectedTechUser={selectedTechUser}
-        setSelectedTechUser={setSelectedTechUser}
-      />
+      {!currentUser.roles?.includes("ROLE_TECH") ? (
+        <SelectTech
+          selectedTechUser={selectedTechUser}
+          setSelectedTechUser={setSelectedTechUser}
+        />
+      ) : (
+        <h1>Mon Planning</h1>
+      )}
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
         initialView="timeGridWeek"
@@ -101,13 +106,13 @@ export default function Planning() {
         eventClick={(info) => {
           const props = info.event.extendedProps;
           const messageContent = `
-                        👤 Client : ${props.clientName}
-                        🔧 Technicien : ${props.techName}
-                        🚲 Vélo : ${props.bike}
-                        🛠️ Intervention : ${props.type}
-                        💰 Prix : ${props.price}
-                        🕒 De ${info.event.start.toLocaleTimeString()} à ${info.event.end.toLocaleTimeString()}
-                            `;
+            👤 Client : ${props.clientName}
+            🔧 Technicien : ${props.techName}
+            🚲 Vélo : ${props.bike}
+            🛠️ Intervention : ${props.type}
+            💰 Prix : ${props.price}
+            🕒 De ${info.event.start.toLocaleTimeString()} à ${info.event.end.toLocaleTimeString()}
+                `;
           message.info({
             content: <pre>{messageContent}</pre>,
             duration: 3,

@@ -20,4 +20,5 @@ export async function authLogin(values) {
 export async function authLogout() {
   localStorage.removeItem("token");
   localStorage.removeItem("user");
+  localStorage.removeItem("currentInterface");
 }
