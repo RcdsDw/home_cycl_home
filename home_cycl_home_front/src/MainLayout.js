@@ -6,7 +6,6 @@ import {
   BarChartOutlined,
   FundOutlined,
   UserDeleteOutlined,
-  UnorderedListOutlined,
   QqOutlined,
   UserOutlined,
   FormOutlined,
@@ -96,24 +95,17 @@ export default function Dashboard() {
       { label: "Carte", key: "map", icon: <FundOutlined /> },
       { label: "Planning", key: "plan", icon: <BarChartOutlined /> },
       { label: "Commander", key: "newInter", icon: <QqOutlined /> },
+      { label: "Utilisateurs", key: "users", icon: <UserOutlined /> },
+      { label: "Interventions", key: "inters", icon: <FormOutlined /> },
       {
-        label: "Listes",
-        key: "lists",
-        icon: <UnorderedListOutlined />,
-        children: [
-          { label: "Utilisateurs", key: "users", icon: <UserOutlined /> },
-          { label: "Interventions", key: "inters", icon: <FormOutlined /> },
-          {
-            label: "Types d'intervention",
-            key: "typesInter",
-            icon: <TagOutlined />,
-          },
-          {
-            label: "Marques et Modèles",
-            key: "brands",
-            icon: <SettingOutlined />,
-          },
-        ],
+        label: "Types d'intervention",
+        key: "typesInter",
+        icon: <TagOutlined />,
+      },
+      {
+        label: "Marques et Modèles",
+        key: "brands",
+        icon: <SettingOutlined />,
       },
     ];
   };
