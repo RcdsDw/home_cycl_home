@@ -28,7 +28,7 @@ describe("TableInterventions", () => {
     getCurrentUser.mockReturnValue({
       id: 1,
       roles: ["ROLE_ADMIN"],
-      bikes: []
+      bikes: [],
     });
 
     interventionsAPI.getInterventions.mockResolvedValue({
@@ -102,7 +102,7 @@ describe("TableInterventions", () => {
 
     const consoleSpy = jest
       .spyOn(console, "error")
-      .mockImplementation(() => { });
+      .mockImplementation(() => {});
 
     render(
       <MemoryRouter>
