@@ -72,7 +72,11 @@ export default function DynamicLayout() {
       { label: "Commander", key: "newInter", icon: <QqOutlined /> },
       { label: "Utilisateurs", key: "users", icon: <UserOutlined /> },
       { label: "Interventions", key: "inters", icon: <FormOutlined /> },
-      { label: "Types d'intervention", key: "typesInter", icon: <TagOutlined /> },
+      {
+        label: "Types d'intervention",
+        key: "typesInter",
+        icon: <TagOutlined />,
+      },
       { label: "Marques et Modèles", key: "brands", icon: <SettingOutlined /> },
     ];
 

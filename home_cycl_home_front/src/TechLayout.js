@@ -14,7 +14,11 @@ export default function TechLayout() {
   const user = JSON.parse(localStorage.getItem("user"));
 
   const menuItems = [
-    { label: "Mes Interventions", key: "interventions", icon: <ToolOutlined /> },
+    {
+      label: "Mes Interventions",
+      key: "interventions",
+      icon: <ToolOutlined />,
+    },
     { label: "Planning", key: "planning", icon: <BarChartOutlined /> },
   ];
 
@@ -42,8 +46,14 @@ export default function TechLayout() {
           <span style={styles.title}>Technicien</span>
         </div>
         <div style={styles.headerRight}>
-          <span style={styles.userName}>{user?.firstname} {user?.lastname}</span>
-          <Button type="primary" danger onClick={() => authLogout().then(() => nav("/auth/login"))}>
+          <span style={styles.userName}>
+            {user?.firstname} {user?.lastname}
+          </span>
+          <Button
+            type="primary"
+            danger
+            onClick={() => authLogout().then(() => nav("/auth/login"))}
+          >
             Déconnexion
           </Button>
         </div>
@@ -75,7 +85,9 @@ export default function TechLayout() {
         </Layout>
       </Layout>
 
-      <Footer style={styles.footer}>Home Cycl'Home - Technicien ©2024-{new Date().getFullYear()}</Footer>
+      <Footer style={styles.footer}>
+        Home Cycl'Home - Technicien ©2024-{new Date().getFullYear()}
+      </Footer>
     </Layout>
   );
 }

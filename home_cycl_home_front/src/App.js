@@ -55,8 +55,14 @@ export default function App() {
           <Route path="/users" element={<Users />} />
           <Route path="/users/new" element={<NewUser />} />
           <Route path="/type_intervention" element={<TypeInterventions />} />
-          <Route path="/type_intervention/new" element={<NewTypeInterventions />} />
-          <Route path="/type_intervention/edit/:id" element={<EditTypeInterventions />} />
+          <Route
+            path="/type_intervention/new"
+            element={<NewTypeInterventions />}
+          />
+          <Route
+            path="/type_intervention/edit/:id"
+            element={<EditTypeInterventions />}
+          />
           <Route path="/brands" element={<BrandsModels />} />
         </Route>
 
@@ -90,17 +96,25 @@ export default function App() {
         <Route
           element={
             <RolesRoute allowedRoles={["ROLE_ADMIN", "ROLE_TECH", "ROLE_USER"]}>
-              {userRole === "ROLE_ADMIN"
-                ? <AdminLayout />
-                : userRole === "ROLE_TECH"
-                  ? <TechLayout />
-                  : <UserLayout />}
+              {userRole === "ROLE_ADMIN" ? (
+                <AdminLayout />
+              ) : userRole === "ROLE_TECH" ? (
+                <TechLayout />
+              ) : (
+                <UserLayout />
+              )}
             </RolesRoute>
           }
         >
           <Route path="/interventions" element={<Interventions />} />
-          <Route path="/interventions/show/:id" element={<ShowIntervention />} />
-          <Route path="/interventions/edit/:id" element={<EditIntervention />} />
+          <Route
+            path="/interventions/show/:id"
+            element={<ShowIntervention />}
+          />
+          <Route
+            path="/interventions/edit/:id"
+            element={<EditIntervention />}
+          />
         </Route>
 
         {/* Catch all */}

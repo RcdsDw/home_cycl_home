@@ -96,8 +96,7 @@ export default function Planning() {
         />
       ) : (
         <h1>Mon Planning</h1>
-      )
-      }
+      )}
       <FullCalendar
         plugins={[dayGridPlugin, interactionPlugin, timeGridPlugin]}
         initialView="timeGridWeek"

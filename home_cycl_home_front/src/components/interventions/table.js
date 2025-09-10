@@ -29,17 +29,20 @@ export default function TableInterventions() {
 
   const fetchInterventions = async () => {
     setLoading(true);
-    let res
+    let res;
 
     try {
       if (currentUser.roles?.includes("ROLE_TECH")) {
         const queryParams = `?technician.id=${currentUser.id}`;
         res = await getInterventionsWithParams(queryParams);
       } else if (currentUser.roles?.includes("ROLE_USER")) {
-        const userBikeIds = currentUser.bikes?.map(bike => parseID(bike)) || [];
+        const userBikeIds =
+          currentUser.bikes?.map((bike) => parseID(bike)) || [];
 
         if (userBikeIds.length > 0) {
-          const bikeParams = userBikeIds.map(id => `clientBike[]=${encodeURIComponent(id)}`).join('&');
+          const bikeParams = userBikeIds
+            .map((id) => `clientBike[]=${encodeURIComponent(id)}`)
+            .join("&");
           res = await getInterventionsWithParams(`?${bikeParams}`);
         } else {
           res = { member: [] };

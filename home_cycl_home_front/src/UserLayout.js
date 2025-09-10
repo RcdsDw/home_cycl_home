@@ -46,8 +46,14 @@ export default function UserLayout() {
           <span style={styles.title}>Client</span>
         </div>
         <div style={styles.headerRight}>
-          <span style={styles.userName}>{user?.firstname} {user?.lastname}</span>
-          <Button type="primary" danger onClick={() => authLogout().then(() => nav("/auth/login"))}>
+          <span style={styles.userName}>
+            {user?.firstname} {user?.lastname}
+          </span>
+          <Button
+            type="primary"
+            danger
+            onClick={() => authLogout().then(() => nav("/auth/login"))}
+          >
             Déconnexion
           </Button>
         </div>
@@ -120,4 +126,3 @@ const styles = {
     textAlign: "center",
   },
 };
-
